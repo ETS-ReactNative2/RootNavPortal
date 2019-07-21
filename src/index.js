@@ -1,3 +1,7 @@
+var appRoot = path.join(__dirname, '..');
+
+require('electron-compile').init(appRoot, require.resolve('./main'));
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';

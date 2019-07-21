@@ -11,7 +11,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "deploy": "electron-packager ./src --all --out=releases --overwrite --no-prune",
+    "deploy": "electron-packager ./src --all --out=releases --overwrite ",
     "eject": "react-scripts eject"
   },
   "author": "Andrew Reynolds, Daniel Cordell",
@@ -36,7 +36,6 @@
   },
   "devDependencies": {
     "electron": "^5.0.7",
-    "electron-packager": "^14.0.2",
-    "electron-prebuilt-compile": "^4.0.0"
+    "electron-packager": "^14.0.2"
   }
 }
