@@ -1,38 +1,122 @@
-## RootNav3
+# RootNav3
 
-## Available Scripts
+```bash
+$ cd RootNav3
+$ yarn
+```
 
-In the project directory, you can run:
+## Run
 
-### `npm start`
+Start the app in the `dev` environment. This starts the renderer process in [**hot-module-replacement**](https://webpack.js.org/guides/hmr-react/) mode and starts a webpack dev server that sends hot updates to the renderer process:
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```bash
+$ yarn dev
+```
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+If you don't need autofocus when your files was changed, then run `dev` with env `START_MINIMIZED=true`:
 
-### `npm test`
+```bash
+$ START_MINIMIZED=true yarn dev
+```
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Packaging
 
-### `npm run build`
+To package apps for the local platform:
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+$ yarn package
+```
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+To package apps for all platforms:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+First, refer to the [Multi Platform Build docs](https://www.electron.build/multi-platform-build) for dependencies.
 
-### `npm run eject`
+Then,
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+```bash
+$ yarn package-all
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+To package apps with options:
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```bash
+$ yarn package --[option]
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+To run End-to-End Test
+
+```bash
+$ yarn build-e2e
+$ yarn test-e2e
+
+# Running e2e tests in a minimized window
+$ START_MINIMIZED=true yarn build-e2e
+$ yarn test-e2e
+```
+
+:bulb: You can debug your production build with devtools by simply setting the `DEBUG_PROD` env variable:
+
+```bash
+DEBUG_PROD=true yarn package
+```
+
+## CSS Modules
+
+This boilerplate is configured to use [css-modules](https://github.com/css-modules/css-modules) out of the box.
+
+All `.css` file extensions will use css-modules unless it has `.global.css`.
+
+If you need global styles, stylesheets with `.global.css` will not go through the
+css-modules loader. e.g. `app.global.css`
+
+If you want to import global css libraries (like `bootstrap`), you can just write the following code in `.global.css`:
+
+```css
+@import '~bootstrap/dist/css/bootstrap.css';
+```
+
+## SASS support
+
+If you want to use Sass in your app, you only need to import `.sass` files instead of `.css` once:
+
+```js
+import './app.global.scss';
+```
+
+## Static Type Checking
+
+This project comes with Flow support out of the box! You can annotate your code with types, [get Flow errors as ESLint errors](https://github.com/amilajack/eslint-plugin-flowtype-errors), and get [type errors during runtime](https://github.com/codemix/flow-runtime) during development. Types are completely optional.
+
+## Dispatching redux actions from main process
+
+See [#118](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/118) and [#108](https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues/108)
+
+## How to keep your project updated with the boilerplate
+
+If your application is a fork from this repo, you can add this repo to another git remote:
+
+```sh
+git remote add upstream https://github.com/electron-react-boilerplate/electron-react-boilerplate.git
+```
+
+Then, use git to merge some latest commits:
+
+```sh
+git pull upstream master
+```
+
+## License
+
+MIT © [Electron React Boilerplate](https://github.com/electron-react-boilerplate)
+
+[npm-image]: https://img.shields.io/npm/v/electron-react-boilerplate.svg?style=flat-square
+[github-tag-image]: https://img.shields.io/github/tag/electron-react-boilerplate/electron-react-boilerplate.svg
+[github-tag-url]: https://github.com/electron-react-boilerplate/electron-react-boilerplate/releases/latest
+[travis-image]: https://travis-ci.com/electron-react-boilerplate/electron-react-boilerplate.svg?branch=master
+[travis-url]: https://travis-ci.com/electron-react-boilerplate/electron-react-boilerplate
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/github/electron-react-boilerplate/electron-react-boilerplate?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/electron-react-boilerplate/electron-react-boilerplate/branch/master
+[david_img]: https://img.shields.io/david/electron-react-boilerplate/electron-react-boilerplate.svg
+[david_site]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate
+[david_img_dev]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate/dev-status.svg
+[david_site_dev]: https://david-dm.org/electron-react-boilerplate/electron-react-boilerplate?type=dev
