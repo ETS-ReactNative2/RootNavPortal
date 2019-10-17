@@ -5,6 +5,7 @@ import Root from './containers/Root';
 import { configureStore, history } from './store/configureStore';
 import './bootstrap.global.css';
 import './app.global.css';
+import './fontawesome.global.css';
 
 const store = configureStore();
 

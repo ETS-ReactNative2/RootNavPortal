@@ -9,12 +9,14 @@ type Props = {};
 
 export default class Home extends Component<Props> {
   props: Props;
-
+  
   render() {
     return (
       <div className={styles.container} data-tid="container">
         <h2>Home</h2>
         <Link to={routes.COUNTER}>to Counter</Link>
+        <br />
+        <Link to={routes.GALLERY}>to Gallery</Link>
         <br />
         <ButtonToolbar>
           <Button variant="success">Hi I'm button</Button>
