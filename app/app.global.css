@@ -3,6 +3,7 @@
  *        See https://github.com/webpack-contrib/sass-loader#imports
  */
 @import "~@fortawesome/fontawesome-free/css/all.css";
+@import "~react-day-picker/lib/style.css";
 
 body {
   position: relative;
