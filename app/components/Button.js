@@ -6,12 +6,13 @@ import './common.css';
 
 //Circular styling - fixed size is bad, we change later
 const StyledButton = styled(Button)` && {
-    width: 30px;
-    height: 30px;
+    width: 2.5em;
+    height: 2.5em;
     padding: 6px 0px;
     text-align: center;
-    font-size: 12px;
-    border-radius: 15px;
+    font-size: 20px;
+    border-radius: 30px;
+    margin: 0px 10px;
 }`
 
 //Takes a 'variant' see react-bootstrap docs, and an fa-`icon` suffix

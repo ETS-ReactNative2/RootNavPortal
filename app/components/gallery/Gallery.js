@@ -10,7 +10,7 @@ export default class Gallery extends Component<Props> {
 
   render() {
     return (
-      <div className={styles.container} data-tid="container">
+      <div data-tid="container">
           <TopBar />
       </div>
     );
