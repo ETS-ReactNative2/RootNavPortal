@@ -9,7 +9,7 @@ export default class FilterBar extends Component<Props> {
 
   render() {
     return (
-      <span style={{'width': '50%'}}>
+      <span style={{'width': '50%', 'margin': 'auto 0 auto 1em'}}>
         <div className="input-group">
           <input type="text" className="form-control"/>
           <div className="input-group-append input-group-text">

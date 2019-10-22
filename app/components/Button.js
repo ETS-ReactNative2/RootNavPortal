@@ -8,6 +8,10 @@ import './common.css';
 const StyledButton = styled(Button)` && {
     width: 2.5em;
     height: 2.5em;
+    max-width: 2.5em;
+    min-width: 2.5em;
+    max-height: 2.5em;
+    min-height: 2.5em;
     padding: 6px 0px;
     text-align: center;
     font-size: 20px;

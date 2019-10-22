@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import './DateRange.scss'; //This doesn't work because css is fucked
+import styles from './DateRange.scss'; //This doesn't work because css is fucked
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { formatDate, parseDate } from 'react-day-picker/moment';
 import styled from 'styled-components';
@@ -40,7 +40,7 @@ export default class DateRange extends React.Component {
     const modifiers = { start: from, end: to };
 
     return (
-      <span id='test' className="InputFromTo" style={{'display':'inline-flex', 'marginLeft': '50px'}}>
+      <span className={`${styles.DatePickerForm} InputFromTo`} style={{'display':'inline-flex', 'margin': 'auto 0.5em auto 2em'}}>
         <DayPickerInput
           value={from}
           placeholder="From"
@@ -56,9 +56,8 @@ export default class DateRange extends React.Component {
             onDayClick: () => this.to.getInput().focus(),
           }}
           onDayChange={this.handleFromChange}
-        />{' '}
-        —{' '}
-        <span className="InputFromTo-to" id='test'>
+        /><div style={{'padding':'0 5px', 'textAlign':'center', 'margin': 'auto 0px'}}>—</div>
+        <span className={`${styles.DatePickerForm} InputFromTo-to`}>
           <DayPickerInput
             ref={el => (this.to = el)}
             value={to}
