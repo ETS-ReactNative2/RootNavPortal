@@ -2,7 +2,9 @@
 import React, { Component } from 'react';
 import styles from './TopBar.css';
 import { ButtonToolbar } from 'react-bootstrap';
-import Button from '../Button';
+import AddButton from '../containers/AddButtonContainer';
+import RefreshButton from '../buttons/RefreshButton';
+import ClearButton from '../buttons/ClearButton';
 import FilterBar from './FilterBar'
 import DateRange from './DateRange';
 import styled from 'styled-components';
@@ -28,11 +30,11 @@ export default class TopBar extends Component<Props> {
     return (
       <div>
         <StyledDiv className="d-inline-flex" data-tid="container">
-          <Button variant="success" icon="plus"/>
-          <Button variant="primary" icon="sync"/>
+          <AddButton />
+          <RefreshButton />
           <FilterBar/>
           <DateRange />
-          <Button variant="danger" icon="times" />
+          <ClearButton />
         </StyledDiv>
         <StyledHR/>
       </div>

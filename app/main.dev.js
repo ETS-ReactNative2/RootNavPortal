@@ -10,7 +10,7 @@
  *
  * @flow
  */
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
@@ -22,7 +22,7 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-
+ 
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
@@ -74,6 +74,10 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html`);
+  
+  ipcMain.on('openFolder', (event, path) => {
+    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] }, paths => event.sender.send('folderData', paths));
+  });
 
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
