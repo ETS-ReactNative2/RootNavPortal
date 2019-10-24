@@ -29,6 +29,7 @@ class AddButton extends Component {
         }
     
         ipcRenderer.on('folderData', (event, data) => {
+            if (!data) return;
             console.log(data);
             this.props.add(data);
         });

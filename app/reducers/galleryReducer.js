@@ -1,5 +1,4 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR} from '../actions/galleryActions';
-import type { Action } from './types';
 
 export default (state = {folders: []}, action) => {
     switch (action.type)
