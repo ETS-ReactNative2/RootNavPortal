@@ -4,6 +4,7 @@ import { add, refresh } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
+        folders: state.gallery.folders,
         variant: ownProps.variant,
         icon: ownProps.icon 
     }
