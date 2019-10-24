@@ -5,8 +5,10 @@ export default (state = {folders: []}, action) => {
     switch (action.type)
     {
         case OPEN_DIR: {
-            let newState = Object.assign({}, state);
-            newState.folders.push(action.path)
+            return {
+                ...state,
+                folders: state.folders.concat(action.paths)
+            };
         }     
         case REFRESH_DIRS: return state;
         case REMOVE_DIR:   return state;

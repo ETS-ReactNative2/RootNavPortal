@@ -76,7 +76,7 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`);
   
   ipcMain.on('openFolder', (event, path) => {
-    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory'] }, paths => event.sender.send('folderData', paths));
+    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }, paths => event.sender.send('folderData', paths));
   });
 
   // @TODO: Use 'ready-to-show' event
