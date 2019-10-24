@@ -19,7 +19,7 @@ export default class FileView extends Component<Props> {
         {
           //This doesn't work. It fires with index 0 on an empty array, it also doesn't update with state
           //Kind of assumed it would. I'm probably wrong.
-            Array.apply(null, Array(Object.keys(folders)).map((item, i) => {
+            Array.apply(null, folders.map((item, i) => {
                 console.log(i);
                 if (folders.length > 0)
                   return <FolderView key={i} folder={folders[i]}/>
