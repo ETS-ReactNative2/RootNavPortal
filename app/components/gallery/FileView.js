@@ -18,7 +18,6 @@ export default class FileView extends Component<Props> {
         </div>
         {
           folders.map((item, i) => {
-            console.log(i);
             if (folders.length > 0)
               return <FolderView key={i} folder={folders[i]}/>;
           })
