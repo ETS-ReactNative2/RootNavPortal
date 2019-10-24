@@ -30,8 +30,8 @@ class AddButton extends Component {
     
         ipcRenderer.on('folderData', (event, data) => {
             if (!data) return;
-            console.log(data);
-            this.props.add(data);
+            // If props already contains a folder that we're supposed to add, filter it out.
+            this.props.add(data.filter(word => !this.props.folders.includes(word)));
         });
     
         return (

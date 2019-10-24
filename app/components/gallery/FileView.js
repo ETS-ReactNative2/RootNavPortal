@@ -22,7 +22,7 @@ export default class FileView extends Component<Props> {
             if (folders.length > 0)
               return <FolderView key={i} folder={folders[i]}/>;
           })
-        };
+        }
       </div>
     );
   }
