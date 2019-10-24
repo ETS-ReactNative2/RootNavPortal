@@ -1,14 +1,22 @@
 import { connect } from 'react-redux';
 import Button from '../buttons/AddButton'
-import { add, refresh } from '../../actions/galleryActions';
+import { add, refresh, showModal, closeModal, updateModal } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
-    { folders: state.gallery.folders }
+    { 
+        folders: state.gallery.folders,
+        modal: state.gallery.modal
+    }
 );
 
 const mapDispatchToProps = dispatch => (
-    { refresh: () => dispatch(refresh()),
-      add: (path) => dispatch(add(path)) }
+    { 
+        refresh: () => dispatch(refresh()),
+        add: path   => dispatch(add(path)),
+        closeModal: () => dispatch(closeModal()),
+        showModal:  () => dispatch(showModal()),
+        updateModalBody: tree => dispatch(updateModal(tree))
+    }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Button)

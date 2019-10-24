@@ -2,44 +2,47 @@
 import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import styled from 'styled-components';
-import '../common.css';
 import { ipcRenderer } from 'electron';
-import dirTree from 'directory-tree';
+const dree = require('dree')
+import '../common.css';
+import TreeChecklist from '../containers/TreeChecklistContainer';
 
 class AddButton extends Component {
 
     render() {
-        let showModal = false;
-        const StyledButton = styled(Button)` && {
-            width: 2.5em;
-            height: 2.5em;
-            max-width: 2.5em;
-            min-width: 2.5em;
-            max-height: 2.5em;
-            min-height: 2.5em;
-            padding: 6px 0px;
-            text-align: center;
-            font-size: 20px;
-            border-radius: 30px;
-            margin: 0px 10px;
-        }`
-        
-        const handleClose = () => showModal = false;
-        const handleShow  = () => { console.log("toggling"); showModal = true };
+    const StyledModal = styled(Modal)` && {
+        color: black;
+        white-space: pre-wrap;
+    }`     
 
+    const StyledButton = styled(Button)` && {
+        width: 2.5em;
+        height: 2.5em;
+        max-width: 2.5em;
+        min-width: 2.5em;
+        max-height: 2.5em;
+        min-height: 2.5em;
+        padding: 6px 0px;
+        text-align: center;
+        font-size: 20px;
+        border-radius: 30px;
+        margin: 0px 10px;
+    }`
+        
         const openFileDialog = () => {
             ipcRenderer.send('openFolder', () => {
                 console.log("Sent open folder");
             })
         }
-    
+
+        let tree;
         ipcRenderer.on('folderData', (event, data) => {
             if (!data) return;
-            const tree = data.map((item, i) => dirTree(item, { exclude: [/\*local\*/] }));
-            console.log(tree);
-            handleShow();
+            tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } ));
+            this.props.updateModalBody(tree);
             // If props already contains a folder that we're supposed to add, filter it out.
             this.props.add(data.filter(word => !this.props.folders.includes(word)));
+            this.props.showModal();
         });
 
         return (
@@ -49,20 +52,22 @@ class AddButton extends Component {
                     onClick={openFileDialog} 
                     className={`btn btn-default fas fa-plus button`} 
                 />
-                <Modal show={showModal} onHide={handleClose}>
+                <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
-                    <Modal.Title>Modal heading</Modal.Title>
+                    <Modal.Title>Select Subfolders</Modal.Title>
                     </Modal.Header>
-                    <Modal.Body>Woohoo, you're reading this text in a modal!</Modal.Body>
+                    <Modal.Body>
+                        <TreeChecklist/>
+                    </Modal.Body>
                     <Modal.Footer>
-                    <Button variant="secondary" onClick={handleClose}>
-                        Close
+                    <Button variant="danger" onClick={this.props.closeModal}>
+                        Cancel
                     </Button>
-                    <Button variant="primary" onClick={handleClose}>
-                        Save Changes
+                    <Button variant="primary" onClick={this.props.closeModal}>
+                        Import
                     </Button>
                     </Modal.Footer>
-                </Modal> 
+                </StyledModal> 
             </>
         )
     }

@@ -16,7 +16,6 @@ const configureStore = (initialState?: counterStateType) => {
   // Redux Configuration
   const middleware = [];
   const enhancers = [];
-
   // Thunk Middleware
   middleware.push(thunk);
 

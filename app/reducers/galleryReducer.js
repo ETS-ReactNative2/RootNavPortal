@@ -1,8 +1,11 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR} from '../actions/galleryActions';
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL } from '../actions/galleryActions';
 
-export default (state = {folders: []}, action) => {
+let initialState = {folders: [], modal: false, modalBody: []};
+
+export default (state = initialState, action) => {
     switch (action.type)
     {
+        //Directory reducer actions
         case OPEN_DIR: return {
             ...state,
             folders: state.folders.concat(action.paths)
@@ -12,6 +15,23 @@ export default (state = {folders: []}, action) => {
             ...state,
             folders: state.folders.filter(path => path != action.path)
         };
+
+        //Modal reducer actions
+        case SHOW_MODAL:
+            return {
+                ...state,
+                modal: true
+            };
+        case CLOSE_MODAL:
+            return {
+                ...state,
+                modal: false
+            };
+        case UPDATE_MODAL:
+            return {
+                ...state,
+                modalBody: action.tree
+            }
         default: return state;
     }
 }
