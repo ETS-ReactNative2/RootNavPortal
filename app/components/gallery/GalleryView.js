@@ -1,11 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './FileView.scss';
+import styles from './GalleryView.scss';
 import FolderView from './FolderView';
 
 type Props = {};
 
-export default class FileView extends Component<Props> {
+export default class GalleryView extends Component<Props> {
   props: Props;
 
   render() {

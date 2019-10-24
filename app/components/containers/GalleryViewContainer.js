@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import FileView from '../gallery/FileView';
+import GalleryView from '../gallery/GalleryView';
 import { remove } from '../../actions/galleryActions';
 
 const mapStateToProps = state => (
@@ -10,4 +10,4 @@ const mapDispatchToProps = dispatch => (
     { remove: () => dispatch(remove()) }
 );
 
-export default connect(mapStateToProps, mapDispatchToProps)(FileView)
+export default connect(mapStateToProps, mapDispatchToProps)(GalleryView)
