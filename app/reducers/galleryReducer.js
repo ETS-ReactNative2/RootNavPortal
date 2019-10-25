@@ -1,4 +1,4 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, READ_CONFIG } from '../actions/galleryActions';
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, IMPORT_CONFIG } from '../actions/galleryActions';
 
 const initialState = {folders: [], modal: false, modalBody: [], hasReadConfig: false};
 
@@ -32,7 +32,7 @@ export default (state = initialState, action) => {
                 ...state,
                 modalBody: action.tree
             };
-        case READ_CONFIG:
+        case IMPORT_CONFIG:
             return {
                 ...state,
                 hasReadConfig: true,
