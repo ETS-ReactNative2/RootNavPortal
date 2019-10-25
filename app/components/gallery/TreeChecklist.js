@@ -13,49 +13,58 @@ export default class TreeChecklist extends Component<Props> {
   state = {
         checked: [],
         expanded: [],
+        rendered: false,
+        nodes: []
     };
 
-  render() {
-    const { tree } = this.props;
-    console.log(this.props);
-
-    const getNodes = nodes => 
+    render() 
     {
-        if (!nodes) return [];
-        return nodes.map((item, i) =>
+        const getNodes = nodes => 
         {
-            return { 
-                value: item.path, 
-                label: item.name,
-                children: getNodes(item.children)
-            };
-        });
-    }
+            if (!nodes) return [];
+            return nodes.map((item, i) =>
+            {
+                return { 
+                    value: item.path, 
+                    label: item.name,
+                    children: getNodes(item.children)
+                };
+            });
+        }
 
-    let nodes = getNodes(tree);
+        if (!this.state.rendered) 
+        {
+            this.state.rendered = true;
+            this.state.nodes = getNodes(this.props.tree);
+        } 
 
-    return (
-      <div>
+        return (
+        <div>
           <CheckboxTree
-            nodes={nodes}
+            nodes={this.state.nodes}
             checked={this.state.checked}
             expanded={this.state.expanded}
-            onCheck={checked => this.setState({ checked })}
+            noCascade={true}
+            onCheck={checked => {
+            this.setState({ checked });
+            this.props.updateChecked(checked);
+            }}
+            checkModel={'all'}
             onExpand={expanded => this.setState({ expanded })}
             icons={{
-              check: <i class="far fa-check-square"/>,
-              uncheck: <i class="far fa-square"/>,
-              halfCheck: <i class="far fa-minus-square"/>,
-              expandClose: <i class="fas fa-chevron-right"/>,
-              expandOpen: <i class="fas fa-chevron-down"/>,
-              expandAll: <i class="fas fa-plus-square"/>,
-              collapseAll: <i class="fas fa-minus-square"/>,
-              parentClose: <i class="far fa-folder"/>,
-              parentOpen: <i class="far fa-folder-open"/>,
-              leaf: <i class="far fa-folder"/>,
+            check: <i class="far fa-check-square"/>,
+            uncheck: <i className="far fa-square"/>,
+            halfCheck: <i className="far fa-minus-square"/>,
+            expandClose: <i className="fas fa-chevron-right"/>,
+            expandOpen: <i className="fas fa-chevron-down"/>,
+            expandAll: <i className="fas fa-plus-square"/>,
+            collapseAll: <i className="fas fa-minus-square"/>,
+            parentClose: <i className="far fa-folder"/>,
+            parentOpen: <i className="far fa-folder-open"/>,
+            leaf: <i className="far fa-folder"/>,
             }}
-        />
-      </div>
+          />
+        </div>
     );
   }
 }

@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import { Button } from 'react-bootstrap';
 import styled from 'styled-components';
 import '../common.css';
-
+import { APPHOME, CONFIG } from '../../constants/globals';
+import { existsSync, writeFile } from 'fs';
 class RemoveButton extends Component {
 
     render() {
@@ -24,6 +25,13 @@ class RemoveButton extends Component {
         const deleteFolder = () => {
             console.log(this.props);
             if (!this.props.path) return;
+
+            const filteredPaths = this.props.path.filter(path => path != action.path);
+            if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
+                writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
+                    if (err) console.log(err); //idk do some handling here
+                });
+
             this.props.remove(this.props.path);
         }
     

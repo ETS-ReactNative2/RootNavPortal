@@ -269,7 +269,7 @@
     "react": "^16.10.2",
     "react-addons-shallow-compare": "^15.6.2",
     "react-bootstrap": "^1.0.0-beta.14",
-    "react-checkbox-tree": "^1.5.1",
+    "react-checkbox-tree": "^1.6.0-alpha.2",
     "react-day-picker": "^7.3.2",
     "react-dom": "^16.10.2",
     "react-hot-loader": "^4.3.12",

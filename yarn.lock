@@ -9588,10 +9588,10 @@ react-bootstrap@^1.0.0-beta.14:
     uncontrollable "^7.0.0"
     warning "^4.0.3"
 
-react-checkbox-tree@^1.5.1:
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/react-checkbox-tree/-/react-checkbox-tree-1.5.1.tgz#8f08ee97a41dae208f48e36408eec4dec024e2c2"
-  integrity sha512-fBLMVpd7/YXavzIBz+3OMS5eo2oZLW9PlTY4M1zrJ3TdZRzgILicSzRj6V5VKKm80y8uQXn60skn98pwn3i3Ig==
+react-checkbox-tree@^1.6.0-alpha.2:
+  version "1.6.0-alpha.2"
+  resolved "https://registry.yarnpkg.com/react-checkbox-tree/-/react-checkbox-tree-1.6.0-alpha.2.tgz#7b4df73817851eb04fb1a16c16ec08c333c34183"
+  integrity sha512-ScwaFedinzJVyeth/87aombYASSUgnuTcnp8Lcjb4eo6HFiuoYpsaT+fRdbplwyxwSqCrdL+i+Yu0uNqfak+SQ==
   dependencies:
     classnames "^2.2.5"
     lodash "^4.17.10"

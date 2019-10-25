@@ -12,19 +12,16 @@ export default class Gallery extends Component<Props> {
   props: Props;
 
   render() {
+
     if (!this.props.hasReadConfig) 
     {
       console.log(APPHOME + CONFIG)
-      if (existsSync(APPHOME + CONFIG)) {
-        readFile(APPHOME + CONFIG, "utf8", (err, data) => {
-          if (err) {
-            console.log("Error reading file");
-            console.log(err); 
-          }
-          else {
-            console.log(JSON.parse(data));
-            this.props.importConfig(JSON.parse(data))
-          }
+      if (existsSync(APPHOME + CONFIG)) 
+      {
+        readFile(APPHOME + CONFIG, "utf8", (err, data) => 
+        {
+          if (err) console.log(err); 
+          else this.props.importConfig(JSON.parse(data))
         }); 
       }
       else console.log("doesn't exist: " + APPHOME+CONFIG);     

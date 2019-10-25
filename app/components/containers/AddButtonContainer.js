@@ -5,7 +5,8 @@ import { add, refresh, showModal, closeModal, updateModal } from '../../actions/
 const mapStateToProps = (state, ownProps) => (
     { 
         folders: state.gallery.folders,
-        modal: state.gallery.modal
+        modal: state.gallery.modal,
+        imports: state.gallery.checked
     }
 );
 

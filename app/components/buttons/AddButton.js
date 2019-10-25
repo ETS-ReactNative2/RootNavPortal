@@ -11,16 +11,18 @@ const dree = require('dree');
 
 
 class AddButton extends Component {
-    state = {
-        data: []
-    };
+
+    shouldComponentUpdate(nextProps, nextState)
+    {   //Stops this component re-rendering (thus re-rendering the checklist) whenever state changes (by the checklist)
+        if (nextProps.modal != this.props.modal) return true //Only re-render when modal state changes. 
+        else return false; //Other state is for data passing and internals
+    }
 
     render() {
     const StyledModal = styled(Modal)` && {
         color: black;
         white-space: pre-wrap;
     }`     
-
     const StyledButton = styled(Button)` && {
         width: 2.5em;
         height: 2.5em;
@@ -41,18 +43,15 @@ class AddButton extends Component {
             })
         }
 
-        let tree;
         ipcRenderer.on('folderData', (event, data) => {
             if (!data) return;
-            tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } ));
+            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //Filter out files, with a depth of 5. Make an exclude regex of standard big paths, like OS folders, node_modules, other big dependency thinhs
             this.props.updateModalBody(tree);
-            this.state.data = data;
-            // If props already contains a folder that we're supposed to add, filter it out.
             this.props.showModal();
         });
 
         const importFolders = () => {
-            this.props.add(this.state.data.filter(path => !this.props.folders.includes(path)));
+            this.props.add(this.props.imports.filter(path => !this.props.folders.includes(path)));
             this.props.closeModal();
 
             if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
@@ -60,7 +59,7 @@ class AddButton extends Component {
                      if (err) console.log(err) 
                 });
 
-            writeFile(APPHOME + CONFIG , JSON.stringify(this.state.data, null, 4), err => {
+            writeFile(APPHOME + CONFIG , JSON.stringify(this.props.imports, null, 4), err => {
                 if (err) console.log(err); //idk do some handling here
             });
         }
@@ -77,7 +76,7 @@ class AddButton extends Component {
                     <Modal.Title>Select Subfolders</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <TreeChecklist/>
+                        <TreeChecklist />
                     </Modal.Body>
                     <Modal.Footer>
                     <Button variant="danger" onClick={this.props.closeModal}>

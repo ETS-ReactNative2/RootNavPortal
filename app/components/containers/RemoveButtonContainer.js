@@ -4,7 +4,8 @@ import { remove } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
-        path: ownProps.path
+        path: ownProps.path,
+        folders: state.gallery.folders
     }
 );
 

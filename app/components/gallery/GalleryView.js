@@ -9,7 +9,7 @@ export default class GalleryView extends Component<Props> {
 
   render() {
     const { folders } = this.props;
-    console.log(folders);
+
     return (
       <div className={styles.container} data-tid="container">
         <div className={styles.title}>
