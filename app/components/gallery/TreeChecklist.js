@@ -19,15 +19,17 @@ export default class TreeChecklist extends Component<Props> {
     const { tree } = this.props;
     console.log(this.props);
 
-    const getNodes = (nodes) => {
+    const getNodes = nodes => 
+    {
         if (!nodes) return [];
-        return nodes.map((item, i) => {
+        return nodes.map((item, i) =>
+        {
             return { 
-                value: item.name, 
+                value: item.path, 
                 label: item.name,
                 children: getNodes(item.children)
-            }
-        })
+            };
+        });
     }
 
     let nodes = getNodes(tree);

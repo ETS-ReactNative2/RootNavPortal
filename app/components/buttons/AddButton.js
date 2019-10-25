@@ -3,11 +3,17 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
-const dree = require('dree')
 import '../common.css';
 import TreeChecklist from '../containers/TreeChecklistContainer';
+import { existsSync, writeFile, mkdirSync } from 'fs';
+import { APPHOME, CONFIG } from '../../constants/globals';
+const dree = require('dree');
+
 
 class AddButton extends Component {
+    state = {
+        data: []
+    };
 
     render() {
     const StyledModal = styled(Modal)` && {
@@ -40,10 +46,24 @@ class AddButton extends Component {
             if (!data) return;
             tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } ));
             this.props.updateModalBody(tree);
+            this.state.data = data;
             // If props already contains a folder that we're supposed to add, filter it out.
-            this.props.add(data.filter(word => !this.props.folders.includes(word)));
             this.props.showModal();
         });
+
+        const importFolders = () => {
+            this.props.add(this.state.data.filter(path => !this.props.folders.includes(path)));
+            this.props.closeModal();
+
+            if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
+                mkdirSync(APPHOME, '0777', true, err => {
+                     if (err) console.log(err) 
+                });
+
+            writeFile(APPHOME + CONFIG , JSON.stringify(this.state.data, null, 4), err => {
+                if (err) console.log(err); //idk do some handling here
+            });
+        }
 
         return (
             <>
@@ -63,7 +83,7 @@ class AddButton extends Component {
                     <Button variant="danger" onClick={this.props.closeModal}>
                         Cancel
                     </Button>
-                    <Button variant="primary" onClick={this.props.closeModal}>
+                    <Button variant="primary" onClick={importFolders}>
                         Import
                     </Button>
                     </Modal.Footer>

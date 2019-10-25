@@ -1,6 +1,6 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL } from '../actions/galleryActions';
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, READ_CONFIG } from '../actions/galleryActions';
 
-let initialState = {folders: [], modal: false, modalBody: []};
+const initialState = {folders: [], modal: false, modalBody: [], hasReadConfig: false};
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -31,7 +31,13 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 modalBody: action.tree
-            }
+            };
+        case READ_CONFIG:
+            return {
+                ...state,
+                hasReadConfig: true,
+                folders: action.data
+            };
         default: return state;
     }
 }
