@@ -21,8 +21,10 @@ export default class FilterBar extends Component<Props> {
           <input type="text" className="form-control"/>
           <div className="input-group-append">
             <div className="input-group-text">
-              <input style={{'margin':'0 5px 0px 0'}} type="checkbox" />
-              Analysed
+              <div className="custom-control custom-checkbox">
+                <input type="checkbox" className="custom-control-input" id="customCheck"/>
+                <label className="custom-control-label" for="customCheck">Analysed</label>
+              </div>
             </div>
           </div>
         </div>

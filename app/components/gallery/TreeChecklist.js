@@ -36,12 +36,6 @@ export default class TreeChecklist extends Component<Props> {
 
     return (
       <div>
-        {
-            //This is a nice styled bootstrap checkbox that should go over the anaylsed one but it doesn't work there for some reason
-            /* <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="customCheck1" />
-            </div> */
-        }
           <CheckboxTree
             nodes={nodes}
             checked={this.state.checked}
