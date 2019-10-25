@@ -74,18 +74,18 @@ class AddButton extends Component {
                 />
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
-                    <Modal.Title>Select Subfolders</Modal.Title>
+                        <Modal.Title>Select Subfolders</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <TreeChecklist/>
                     </Modal.Body>
                     <Modal.Footer>
-                    <Button variant="danger" onClick={this.props.closeModal}>
-                        Cancel
-                    </Button>
-                    <Button variant="primary" onClick={importFolders}>
-                        Import
-                    </Button>
+                        <Button variant="danger" onClick={this.props.closeModal}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" onClick={importFolders}>
+                            Import
+                        </Button>
                     </Modal.Footer>
                 </StyledModal> 
             </>

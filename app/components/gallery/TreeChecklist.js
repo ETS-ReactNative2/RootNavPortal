@@ -54,6 +54,7 @@ export default class TreeChecklist extends Component<Props> {
               parentOpen: <i class="far fa-folder-open"/>,
               leaf: <i class="far fa-folder"/>,
             }}
+            showExpandAll={true}
         />
       </div>
     );
