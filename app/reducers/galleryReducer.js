@@ -1,6 +1,6 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, IMPORT_CONFIG, UPDATE_CHECKED } from '../actions/galleryActions';
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES } from '../actions/galleryActions';
 
-const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [] };
+const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {} };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -42,6 +42,14 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 checked: action.paths
+            }
+        case ADD_FILES:
+            return {
+                ...state,
+                files: {
+                    ...state.files,
+                    [action.folder]: action.files
+                }
             }
         default: return state;
     }

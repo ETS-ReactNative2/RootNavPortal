@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import styles from './GalleryView.scss';
-import FolderView from './FolderView';
+import FolderView from '../containers/FolderViewContainer';
 import { Accordion } from 'react-bootstrap';
 import styled from 'styled-components';
 

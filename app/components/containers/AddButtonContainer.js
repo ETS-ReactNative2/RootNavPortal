@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Button from '../buttons/AddButton'
-import { add, refresh, showModal, closeModal, updateModal } from '../../actions/galleryActions';
+import { addFolders, refresh, showModal, closeModal, updateModal } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
@@ -12,10 +12,10 @@ const mapStateToProps = (state, ownProps) => (
 
 const mapDispatchToProps = dispatch => (
     { 
-        refresh: () => dispatch(refresh()),
-        add: path   => dispatch(add(path)),
+        refresh:    () => dispatch(refresh()),
         closeModal: () => dispatch(closeModal()),
         showModal:  () => dispatch(showModal()),
+        addFolders: path => dispatch(addFolders(path)),
         updateModalBody: tree => dispatch(updateModal(tree))
     }
 );

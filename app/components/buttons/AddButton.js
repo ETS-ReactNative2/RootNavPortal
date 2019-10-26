@@ -14,8 +14,8 @@ class AddButton extends Component {
 
     shouldComponentUpdate(nextProps, nextState)
     {   //Stops this component re-rendering (thus re-rendering the checklist) whenever state changes (by the checklist)
-        if (nextProps.modal != this.props.modal) return true //Only re-render when modal state changes. 
-        else return false; //Other state is for data passing and internals
+        return nextProps.modal != this.props.modal //Only re-render when modal state changes. 
+        //Other state is for data passing and internals
     }
 
     render() {
@@ -51,7 +51,7 @@ class AddButton extends Component {
         });
 
         const importFolders = () => {
-            this.props.add(this.props.imports.filter(path => !this.props.folders.includes(path)));
+            this.props.addFolders(this.props.imports.filter(path => !this.props.folders.includes(path)));
             this.props.closeModal();
 
             if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.

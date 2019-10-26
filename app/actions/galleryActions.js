@@ -6,8 +6,9 @@ export const CLOSE_MODAL    = 'CLOSE_MODAL';
 export const UPDATE_MODAL   = 'UPDATE_MODAL';
 export const IMPORT_CONFIG  = 'IMPORT_CONFIG';
 export const UPDATE_CHECKED = 'UPDATE_CHECKED';
+export const ADD_FILES      = 'ADD_FILES';
 
-export const add           = paths => ({ type: OPEN_DIR, paths });
+export const addFolders    = paths => ({ type: OPEN_DIR, paths });
 export const remove        = path  => ({ type: REMOVE_DIR, path });
 export const refresh       = ()    => ({ type: REFRESH_DIRS });
 export const showModal     = ()    => ({ type: SHOW_MODAL });
@@ -15,3 +16,4 @@ export const closeModal    = ()    => ({ type: CLOSE_MODAL });
 export const updateModal   = tree  => ({ type: UPDATE_MODAL, tree });
 export const importConfig  = data  => ({ type: IMPORT_CONFIG, data });
 export const updateChecked = paths => ({ type: UPDATE_CHECKED, paths });
+export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
