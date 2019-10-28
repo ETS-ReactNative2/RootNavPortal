@@ -84,6 +84,9 @@ export default (state = initialState, action) => {
 //              Also contained is an extension+Thumb: object containing the data buffer for the thumbnail for each image extension
 //              So each folder is an object that contains objects for each of its files:
 //              files: { folderName: { file1: {rsml: true, png: true}, file2: {} }, folder2:{ file1: {}, file2: {png: true} } }
+//              This ensures the full file system can be reconstructed from the concatenated keys.
+//              if folder C:\Andrew\Desktop\RootNav has file object wheat_test2: { rsml: true, png: true, pngThumb: {} }
+//              Then C:\Andrew\Desktop\RootNav\wheat_test2.rsml and .png exist, which a thumbnail for that png
 
 /*
 Full example of state:
