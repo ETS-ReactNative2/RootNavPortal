@@ -1,4 +1,5 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES } from '../actions/galleryActions';
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
+    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {} };
 
@@ -49,6 +50,20 @@ export default (state = initialState, action) => {
                 files: {
                     ...state.files,
                     [action.folder]: action.files
+                }
+            }
+        case ADD_THUMB:
+            return {
+                ...state,
+                files: {
+                    ...state.files,
+                    [action.folder]: {
+                        ...state.files[action.folder],
+                        [action.file]: {
+                            ...state.files[action.file],
+                            thumb: action.thumb
+                        }
+                    }
                 }
             }
         default: return state;
