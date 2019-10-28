@@ -55,8 +55,8 @@ export default class FolderView extends Component<Props> {
 				<Card.Body>
 					Hello! I'm the body
 					{
-						(files && folder && files[folder]) ? Object.keys(files[folder]).forEach(file => {
-							console.log("Hello this is a loop")
+						(files && folder && files[folder]) ? Object.keys(files[folder]).map(file => {
+							console.log(file);
 							return <Thumbnail folder={folder} file={file}/>
 						}) : ""
 					}
