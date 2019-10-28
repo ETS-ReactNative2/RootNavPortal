@@ -11,7 +11,7 @@ export default class GalleryView extends Component<Props> {
   props: Props;
 
   render() {
-    const { folders } = this.props;
+    const { folders } = this.props; //state.gallery.folders - array of folder strings
     const StyledAccordion = styled(Accordion)` && {
         color: black;
     }`

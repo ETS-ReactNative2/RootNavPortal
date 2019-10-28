@@ -52,6 +52,8 @@ export default (state = initialState, action) => {
                     [action.folder]: action.files
                 }
             }
+        //Adds a thumbnail to a specific file object
+        //action.thumb = { ext: "png", thumb: {type: "Buffer", data: [x, x, x,]} }
         case ADD_THUMB:
             return {
                 ...state,
@@ -59,9 +61,9 @@ export default (state = initialState, action) => {
                     ...state.files,
                     [action.folder]: {
                         ...state.files[action.folder],
-                        [action.file]: {
-                            ...state.files[action.file],
-                            thumb: action.thumb
+                        [action.fileName]: {
+                            ...state.files[action.folder][action.fileName],
+                            [action.thumb.ext+"Thumb"]: action.thumb.thumb,
                         }
                     }
                 }
@@ -69,3 +71,55 @@ export default (state = initialState, action) => {
         default: return state;
     }
 }
+
+
+// folders       = array of all full folder paths loaded into state
+// modalBody     = holds the tree structure anaylsed and displayed by the modal, used for component communication
+// hasReadConfig = ensures we only read the config at boot
+// checked:      = array of folder paths that represent what the user has ticked in the tree checklist
+// files         = represents all files loaded into state as an object of objects of objects
+//              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
+//              The actual file object contains extension: bool pairs that represent if the file name+ext exists
+//              This allows for easy adding to the structure when we start dealing with async API calls that result in filesystem changes
+//              Also contained is an extension+Thumb: object containing the data buffer for the thumbnail for each image extension
+//              So each folder is an object that contains objects for each of its files:
+//              files: { folderName: { file1: {rsml: true, png: true}, file2: {} }, folder2:{ file1: {}, file2: {png: true} } }
+
+/*
+Full example of state:
+
+state: {
+    gallery: {
+        folders: ["C:\Users\Andrew\Desktop\hkj"]
+        modal: false,
+        modalBody: [{
+            name: hkg, path: "C:\Users\Andrew\Desktop", children: [{name: ".vs", path: "..."}, {name: "output", path: "..."}] 
+        }]
+        hasReadConfig: true,
+        checked: [],
+        files: {
+            C:\Users\Andrew\Desktop\hkj: {
+                arch: {
+                    txt: true
+                },
+                heatMap: {
+                    png: true,
+                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] }
+                },
+                INEW_exp2,128,LN,1225,249: {
+                    png: true,
+                    rsml: true,
+                    txt: true, 
+                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] }
+                },
+                RS2,5,27,testset: {
+                    png: true,
+                    rsml: true,
+                    txt: true,
+                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] }
+                }
+            } 
+        }
+    }
+}
+*/

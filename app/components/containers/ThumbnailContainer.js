@@ -12,7 +12,7 @@ const mapStateToProps = (state, ownProps) => (
 );
 
 const mapDispatchToProps = dispatch => (
-    { addThumb: (folder, file, thumb) => dispatch(addThumb(folder, file, thumb)) }
+    { addThumb: (folder, fileName, thumb) => dispatch(addThumb(folder, fileName, thumb)) }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thumbnail)

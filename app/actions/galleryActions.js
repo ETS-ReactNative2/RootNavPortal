@@ -18,4 +18,4 @@ export const updateModal   = tree  => ({ type: UPDATE_MODAL, tree });
 export const importConfig  = data  => ({ type: IMPORT_CONFIG, data });
 export const updateChecked = paths => ({ type: UPDATE_CHECKED, paths });
 export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
-export const addThumb      = (folder, file, thumb) => ({ type: ADD_THUMB, folder, file, thumb})
+export const addThumb      = (folder, fileName, thumb) => ({ type: ADD_THUMB, folder, fileName, thumb}) //folder: full folder path string, fileName: file string, no ext
