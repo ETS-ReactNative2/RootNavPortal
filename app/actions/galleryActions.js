@@ -11,7 +11,7 @@ export const ADD_THUMB      = 'ADD_THUMB';
 
 export const addFolders    = paths => ({ type: OPEN_DIR, paths });
 export const remove        = path  => ({ type: REMOVE_DIR, path });
-export const refresh       = ()    => ({ type: REFRESH_DIRS });
+export const refreshFiles  = files => ({ type: REFRESH_DIRS, files});
 export const showModal     = ()    => ({ type: SHOW_MODAL });
 export const closeModal    = ()    => ({ type: CLOSE_MODAL });
 export const updateModal   = tree  => ({ type: UPDATE_MODAL, tree });

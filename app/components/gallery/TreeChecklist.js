@@ -52,7 +52,7 @@ export default class TreeChecklist extends Component<Props> {
             checkModel={'all'}
             onExpand={expanded => this.setState({ expanded })}
             icons={{
-            check: <i class="far fa-check-square"/>,
+            check: <i className="far fa-check-square"/>,
             uncheck: <i className="far fa-square"/>,
             halfCheck: <i className="far fa-minus-square"/>,
             expandClose: <i className="fas fa-chevron-right"/>,

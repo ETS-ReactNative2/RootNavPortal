@@ -2,7 +2,6 @@ import { connect } from 'react-redux';
 import Thumbnail from '../gallery/Thumbnail';
 import { addThumb } from '../../actions/galleryActions';
 
-console.log("RENDERING ME")
 const mapStateToProps = (state, ownProps) => (
     { 
         file: state.gallery.files[ownProps.folder][ownProps.file],

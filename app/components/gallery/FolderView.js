@@ -41,7 +41,7 @@ export default class FolderView extends Component<Props> {
       border: 1.2px solid black;
       border-radius: 1em;
     }`;
-
+	console.log(this.props);
 		readdir(folder, (err, files) => {
 			let matched = files.map(file => file.match(/(.+)\.(rsml|txt|png|jpg|jpeg)$/)) //Scan for file types we use
 			matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
@@ -64,8 +64,17 @@ export default class FolderView extends Component<Props> {
 		<div>
 			<StyledHR/>
 			<StyledFolderView>
-					Hello from {folder}!
-					<RemoveButton path={folder}/>
+				<i className="fas fa-chevron-right" /> 
+				<i className="fas fa-folder"/> 
+				Hello from {folder}!
+				<RemoveButton path={folder}/>
+				<br />
+				{
+					(files && folder) ? Object.keys(files).map(file => {
+							console.log(file);
+							return <Thumbnail folder={folder} file={file}/>
+						}) : ""
+				}
 			</StyledFolderView>
 		</div>
 		);

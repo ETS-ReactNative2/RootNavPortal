@@ -1,9 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './TopBar.css';
-import { ButtonToolbar } from 'react-bootstrap';
 import AddButton from '../containers/AddButtonContainer';
-import RefreshButton from '../buttons/RefreshButton';
+import RefreshButton from '../containers/RefreshButtonContainer';
 import ClearButton from '../buttons/ClearButton';
 import FilterBar from './FilterBar'
 import DateRange from './DateRange';

@@ -11,7 +11,11 @@ export default (state = initialState, action) => {
             ...state,
             folders: state.folders.concat(action.paths)
         };
-        case REFRESH_DIRS: return state;
+        case REFRESH_DIRS: 
+            return {
+                ...state,
+                files: action.files
+            }
         case REMOVE_DIR: return {
             ...state,
             folders: state.folders.filter(path => path != action.path)
