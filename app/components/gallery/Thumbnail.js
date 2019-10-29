@@ -34,7 +34,7 @@ export default class FolderView extends Component<Props> {
                 THumbnail
             <>
                 {
-                    (file.thumb) ? <a href={file.thumb}></a> : ""
+                    (file.thumb) ? <img src={file.thumb} /> : ""
                 }
             </>
             </div>
