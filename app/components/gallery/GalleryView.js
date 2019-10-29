@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './GalleryView.scss';
 import FolderView from '../containers/FolderViewContainer';
 import styled from 'styled-components';
 
@@ -13,8 +12,8 @@ export default class GalleryView extends Component<Props> {
     const { folders } = this.props;
 
     return (
-      <div className={styles.container} data-tid="container">
-        <div className={styles.title}>
+      <div className={"container"} data-tid="container">
+        <div className={"title"}>
           <h1>Open Folders</h1>
         </div>
         <div>

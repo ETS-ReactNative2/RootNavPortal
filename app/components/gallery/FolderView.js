@@ -26,9 +26,7 @@ export default class FolderView extends Component<Props> {
 		let structuredFiles = {};
 
 		const StyledFolderView = styled.div` && {
-			height: 4em;
-			border: solid 2px;
-			border-color: black;
+			height: 3em;
 			display: -ms-flexbox;
 			display: -webkit-flex;
 			display: flex;
@@ -36,10 +34,13 @@ export default class FolderView extends Component<Props> {
 			-webkit-align-items: center;
 			-webkit-box-align: center;
 			align-items: center;
-			border-radius: 1em;
 			margin: 1em;
-			padding-left: 2em;
 		}`;
+
+		const StyledHR = styled.hr` && {
+      border: 1.2px solid black;
+      border-radius: 1em;
+    }`;
 
 		readdir(folder, (err, files) => {
 			let matched = files.map(file => file.match(/(.+)\.(rsml|txt|png|jpg|jpeg)$/)) //Scan for file types we use
@@ -60,10 +61,13 @@ export default class FolderView extends Component<Props> {
 		});	
 
 		return (
-		<StyledFolderView>
-				Hello from {folder}!
-				<RemoveButton path={folder}/>
-		</StyledFolderView>
+		<div>
+			<StyledHR/>
+			<StyledFolderView>
+					Hello from {folder}!
+					<RemoveButton path={folder}/>
+			</StyledFolderView>
+		</div>
 		);
 	}
 }
