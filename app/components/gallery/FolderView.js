@@ -2,13 +2,13 @@
 import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
-import { Accordion, Card } from 'react-bootstrap';
 import { readdir } from 'fs';
+import styled from 'styled-components';
 
 type Props = {};
 
 export default class FolderView extends Component<Props> {
-  props: Props;
+	props: Props;
 
 	shouldComponentUpdate(nextProps, nextState) 
 	{
@@ -24,6 +24,22 @@ export default class FolderView extends Component<Props> {
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
 		const { folder, files, eventKey} = this.props; 
 		let structuredFiles = {};
+
+		const StyledFolderView = styled.div` && {
+			height: 4em;
+			border: solid 2px;
+			border-color: black;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-ms-flex-align: center;
+			-webkit-align-items: center;
+			-webkit-box-align: center;
+			align-items: center;
+			border-radius: 1em;
+			margin: 1em;
+			padding-left: 2em;
+		}`;
 
 		readdir(folder, (err, files) => {
 			let matched = files.map(file => file.match(/(.+)\.(rsml|txt|png|jpg|jpeg)$/)) //Scan for file types we use
@@ -44,23 +60,10 @@ export default class FolderView extends Component<Props> {
 		});	
 
 		return (
-		<Card>
-			<Accordion.Toggle as={Card.Header} eventKey={eventKey}>
+		<StyledFolderView>
 				Hello from {folder}!
 				<RemoveButton path={folder}/>
-			</Accordion.Toggle>
-			<Accordion.Collapse eventKey={eventKey}>
-				<Card.Body>
-					Hello! I'm the body
-					{
-						(files && folder) ? Object.keys(files).map(file => {
-							console.log(file);
-							return <Thumbnail folder={folder} file={file}/>
-						}) : ""
-					}
-				</Card.Body>
-			</Accordion.Collapse>
-		</Card>
+		</StyledFolderView>
 		);
 	}
 }
