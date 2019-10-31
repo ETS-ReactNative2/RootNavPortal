@@ -16,23 +16,28 @@ export default class GalleryView extends Component<Props> {
     }`
 
     const StyledDiv = styled.div` && {
-
+      position: fixed;
+      overflow-y: scroll;
+      bottom: 0;
+      top: 6em;
+      left: 0;
+      right: 0;
     }`
 
     return (
-      <div data-tid="container">
+      <StyledDiv data-tid="container">
         <div className={"title"}>
           <StyledH1>Open Folders</StyledH1>
         </div>
-        <StyledDiv>
+        <div>
           {
             folders.map((item, i) => {
               if (folders.length > 0)
                 return <FolderView key={item} folder={item} eventKey={i} />;
             })
           }
-        </StyledDiv>
-      </div>
+        </div>
+      </StyledDiv>
     );
   }
 }

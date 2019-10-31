@@ -34,12 +34,13 @@ export default class FolderView extends Component<Props> {
 			-webkit-align-items: center;
 			-webkit-box-align: center;
 			align-items: center;
-			margin: 1em;
+			margin: 1em 4.5em;
 		}`;
 
 		const StyledHR = styled.hr` && {
       border: 1.2px solid black;
-      border-radius: 1em;
+			border-radius: 1em;
+			margin: 0 4em;
     }`;
 	console.log(this.props);
 		readdir(folder, (err, files) => {
