@@ -22,7 +22,7 @@ export default class FolderView extends Component<Props> {
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { folder, files, eventKey} = this.props; 
+		const { folder, files, eventKey, isActive } = this.props; 
 		let structuredFiles = {};
 
 		const StyledFolderView = styled.div` && {
