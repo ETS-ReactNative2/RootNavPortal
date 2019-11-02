@@ -1,5 +1,6 @@
 export const OPEN_DIR       = 'OPEN_DIR';
 export const REMOVE_DIR     = 'REMOVE_DIR';
+export const TOGGLE_DIR     = 'TOGGLE_DIR';
 export const REFRESH_DIRS   = 'REFRESH_DIRS'
 export const SHOW_MODAL     = 'SHOW_MODAL';
 export const CLOSE_MODAL    = 'CLOSE_MODAL';
@@ -11,6 +12,7 @@ export const ADD_THUMB      = 'ADD_THUMB';
 export const UPDATE_FILTER_TEXT = 'UPDATE_FILTER_TEXT';
 
 export const addFolders    = paths => ({ type: OPEN_DIR, paths });
+export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
 export const remove        = path  => ({ type: REMOVE_DIR, path });
 export const refreshFiles  = files => ({ type: REFRESH_DIRS, files});
 export const showModal     = ()    => ({ type: SHOW_MODAL });

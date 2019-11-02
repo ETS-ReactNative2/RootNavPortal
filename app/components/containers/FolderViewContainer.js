@@ -12,7 +12,9 @@ const mapStateToProps = (state, ownProps) => (
 );
 
 const mapDispatchToProps = dispatch => (
-    { addFiles: (folder, files) => dispatch(addFiles(folder, files)) }
+    { 
+        addFiles: (folder, files) => dispatch(addFiles(folder, files))
+    }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(FolderView)

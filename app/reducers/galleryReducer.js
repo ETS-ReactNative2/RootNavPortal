@@ -1,15 +1,16 @@
-import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
+import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
 
 export default (state = initialState, action) => {
+    console.log(state);
     switch (action.type)
     {
         //Directory reducer actions
         case OPEN_DIR: return {
             ...state,
-            folders: state.folders.concat(action.paths)
+            folders: state.folders.concat(action.paths.map(path => ({'path': path, 'active': false})))
         };
         case REFRESH_DIRS: 
             return {
@@ -18,8 +19,12 @@ export default (state = initialState, action) => {
             }
         case REMOVE_DIR: return {
             ...state,
-            folders: state.folders.filter(path => path != action.path)
+            folders: state.folders.filter(folder => folder.path != action.path)
         };
+        case TOGGLE_DIR: return {
+            ...state,
+            folders: state.folders.map(folder => folder.path == action.path ? {'path':folder.path, 'active':!folder.active} : folder)
+        }
 
         //Modal reducer actions
         case SHOW_MODAL:

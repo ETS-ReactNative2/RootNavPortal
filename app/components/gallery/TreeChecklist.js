@@ -52,16 +52,16 @@ export default class TreeChecklist extends Component<Props> {
             checkModel={'all'}
             onExpand={expanded => this.setState({ expanded })}
             icons={{
-            check: <i className="far fa-check-square"/>,
-            uncheck: <i className="far fa-square"/>,
-            halfCheck: <i className="far fa-minus-square"/>,
-            expandClose: <i className="fas fa-chevron-right"/>,
-            expandOpen: <i className="fas fa-chevron-down"/>,
-            expandAll: <i className="fas fa-plus-square"/>,
-            collapseAll: <i className="fas fa-minus-square"/>,
-            parentClose: <i className="far fa-folder"/>,
-            parentOpen: <i className="far fa-folder-open"/>,
-            leaf: <i className="far fa-folder"/>,
+              check: <i className="far fa-check-square"/>,
+              uncheck: <i className="far fa-square"/>,
+              halfCheck: <i className="far fa-minus-square"/>,
+              expandClose: <i className="fas fa-chevron-right"/>,
+              expandOpen: <i className="fas fa-chevron-down"/>,
+              expandAll: <i className="fas fa-plus-square"/>,
+              collapseAll: <i className="fas fa-minus-square"/>,
+              parentClose: <i className="far fa-folder"/>,
+              parentOpen: <i className="far fa-folder-open"/>,
+              leaf: <i className="far fa-folder"/>,
             }}
             showExpandAll={true}
           />
