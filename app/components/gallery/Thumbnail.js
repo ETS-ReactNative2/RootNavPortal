@@ -5,7 +5,7 @@ import { sep } from 'path';
 
 type Props = {};
 
-export default class FolderView extends Component<Props> {
+export default class Thumbnail extends Component<Props> {
   props: Props;
 
 	shouldComponentUpdate(nextProps, nextState) 
@@ -19,8 +19,7 @@ export default class FolderView extends Component<Props> {
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
         const { folder, file, fileName, addThumb } = this.props;
-        console.log("Thumbnail render")
-        console.log(file);
+
         Object.keys(file).forEach(ext => 
         {
             if (ext === 'jpg' || ext === 'png')
@@ -31,12 +30,11 @@ export default class FolderView extends Component<Props> {
 
 		return (
             <div>
-                THumbnail
-            <>
                 {
-                    (file.thumb) ? <img src={file.thumb} /> : ""
+                    (file.pngThumb) ? <img src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } /> :
+                    (file.jpgThumb) ? <img src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } /> : 
+                    ""
                 }
-            </>
             </div>
 		);
 	}

@@ -1,7 +1,7 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
-    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB } from '../actions/galleryActions';
+    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT } from '../actions/galleryActions';
 
-const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {} };
+const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -72,6 +72,11 @@ export default (state = initialState, action) => {
                     }
                 }
             }
+        case UPDATE_FILTER_TEXT:
+            return {
+                ...state,
+                filterText: action.text
+            }
         default: return state;
     }
 }
@@ -81,6 +86,7 @@ export default (state = initialState, action) => {
 // modalBody     = holds the tree structure anaylsed and displayed by the modal, used for component communication
 // hasReadConfig = ensures we only read the config at boot
 // checked:      = array of folder paths that represent what the user has ticked in the tree checklist
+// filterText:   = Persistence of what's in the filter bar
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists
@@ -104,6 +110,7 @@ state: {
         }]
         hasReadConfig: true,
         checked: [],
+        filterText: "",
         files: {
             C:\Users\Andrew\Desktop\hkj: {
                 arch: {
