@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css'; //CSS doesn't import properly. Obviously. Importing it in global has some effect. Still doesn't work.
 

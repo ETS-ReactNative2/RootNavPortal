@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import FolderView from '../containers/FolderViewContainer';
-import styled from 'styled-components';
+import { StyledHR, StyledGalleryViewDiv, StyledGalleryViewH1 } from './StyledComponents'
+
 
 type Props = {};
 
@@ -10,42 +11,20 @@ export default class GalleryView extends Component<Props> {
 
   render() {
     const { folders, toggleOpenFile } = this.props;
-
-    const StyledH1 = styled.h1` && {
-      margin-left: 1.5em
-    }`
-
-    const StyledDiv = styled.div` && {
-      position: fixed;
-      overflow-y: scroll;
-      bottom: 0;
-      top: 10em;
-      left: 0;
-      right: 0;
-    }`
-
-    const StyledHR = styled.hr` && {
-      border: 1.2px solid black;
-			border-radius: 1em;
-			margin: 0 4em;
-    }`;
-
-
     return (
       <div data-tid="container">
         <div className={"title"}>
-          <StyledH1>Open Folders</StyledH1>
+          <StyledGalleryViewH1>Open Folders</StyledGalleryViewH1>
         </div>
         <StyledHR/>
-        <StyledDiv>
+        <StyledGalleryViewDiv>
           {
             folders.map((item, i) => {
-              console.log(item);
               if (folders.length > 0)
-                return <div onClick={() => toggleOpenFile(item.path)}><FolderView key={item} folder={item.path} eventKey={i} isActive={item.active} /></div>;
+                return <div key={item} onClick={() => toggleOpenFile(item.path)}><FolderView folder={item.path} eventKey={i} isActive={item.active} /></div>;
             })
           }
-        </StyledDiv>
+        </StyledGalleryViewDiv>
       </div>
     );
   }

@@ -4,7 +4,6 @@ import moment from 'moment';
 import styles from './DateRange.scss'; //This doesn't work because css is fucked
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { formatDate, parseDate } from 'react-day-picker/moment';
-import styled from 'styled-components';
 
 export default class DateRange extends React.Component {
 

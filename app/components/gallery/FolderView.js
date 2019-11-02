@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
 import { readdir } from 'fs';
-import styled from 'styled-components';
+import { StyledHR, StyledFolderViewDiv } from './StyledComponents'
 
 type Props = {};
 
@@ -12,16 +12,15 @@ export default class FolderView extends Component<Props> {
 
 	shouldComponentUpdate(nextProps, nextState) 
 	{
-		console.log(nextProps, nextState, this.props);
 		if (!this.props.files) return true;
-		return Object.keys(nextProps.files).length != Object.keys(this.props.files).length; 
+		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
 	}
 
-	renderActive(StyledFolderView, StyledHR) {
+	renderActive() {
 		const { folder, files, eventKey, isActive } = this.props; 
 		return (
 			<div>
-				<StyledFolderView>
+				<StyledFolderViewDiv>
 					<i className="fas fa-chevron-down" /> 
 					<i className="fas fa-folder-open"/> 
 					Hello from {folder}!
@@ -30,26 +29,26 @@ export default class FolderView extends Component<Props> {
 					{
 						(files && folder) ? Object.keys(files).map(file => {
 								console.log(file);
-								return <Thumbnail folder={folder} file={file}/>
+								return <Thumbnail id={file} folder={folder} file={file}/>
 							}) : ""
 					}
-				</StyledFolderView>
+				</StyledFolderViewDiv>
 				<StyledHR/>
 			</div>
 			);
 	}
 
-	renderInactive(StyledFolderView, StyledHR) {
+	renderInactive() {
 		const { folder, files, eventKey, isActive } = this.props; 
 		return (
 			<div>
-				<StyledFolderView>
+				<StyledFolderViewDiv>
 					<i className="fas fa-chevron-right" /> 
 					<i className="fas fa-folder"/> 
 					Hello from {folder}!
 					<RemoveButton path={folder}/>
 					<br />
-				</StyledFolderView>
+				</StyledFolderViewDiv>
 				<StyledHR/>
 			</div>
 			);
@@ -81,27 +80,7 @@ export default class FolderView extends Component<Props> {
 			});		
 		}
 
-		const StyledFolderView = styled.div` && {
-			height: 3em;
-			display: -ms-flexbox;
-			display: -webkit-flex;
-			display: flex;
-			-ms-flex-align: center;
-			-webkit-align-items: center;
-			-webkit-box-align: center;
-			align-items: center;
-			margin: 1em 4.5em;
-		}`;
-
-		const StyledHR = styled.hr` && {
-      border: 1.2px solid black;
-			border-radius: 1em;
-			margin: 0 4em;
-    }`;
-	console.log(this.props);
-
-
-		if (isActive) return this.renderActive(StyledFolderView, StyledHR);
-		return this.renderInactive(StyledFolderView, StyledHR);
+		if (isActive) return this.renderActive();
+		return this.renderInactive();
 	}
 }

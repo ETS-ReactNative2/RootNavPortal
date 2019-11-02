@@ -1,9 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap';
-import styled from 'styled-components';
 import '../common.css';
 import each from 'async/each';
+import { StyledButton } from './StyledComponents'; 
 
 class RefreshButton extends Component {
     structuredFiles = {};
@@ -36,19 +35,6 @@ class RefreshButton extends Component {
     }
     render() {
         const { folders, files } = this.props;
-        const StyledButton = styled(Button)` && {
-            width: 2.5em;
-            height: 2.5em;
-            max-width: 2.5em;
-            min-width: 2.5em;
-            max-height: 2.5em;
-            min-height: 2.5em;
-            padding: 6px 0px;
-            text-align: center;
-            font-size: 20px;
-            border-radius: 30px;
-            margin: 0px 10px;
-        }`
         
         return (
             <StyledButton

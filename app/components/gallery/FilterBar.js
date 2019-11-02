@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import styled from 'styled-components';
+import { StyledFilterBarSpan } from './StyledComponents'
 
 type Props = {};
 
@@ -19,19 +19,15 @@ export default class FilterBar extends Component<Props> {
 
     const { updateFilterText, filterText } = this.props;
 
-    const StyledSpan = styled.span` && {
-      width: 50%;
-      margin: auto 0 auto 1em;
-    }`
     const clear  = () => updateFilterText("");
     const update = e => updateFilterText(e.target.value);
     console.log(this.state.text)
 
     return (
-      <StyledSpan>
+      <StyledFilterBarSpan>
         <div className="input-group">
           <input type="text" className="form-control" value={filterText} onChange={update}/>
-          <button className="btn bg-transparent" style={{'margin-left': '-40px', 'z-index': '100'}} onClick={clear}>
+          <button className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={clear}>
             <i className="fa fa-times"></i>
           </button>
           <div className="input-group-append">
@@ -43,7 +39,7 @@ export default class FilterBar extends Component<Props> {
             </div>
           </div>
         </div>
-      </StyledSpan>
+      </StyledFilterBarSpan>
     );
   }
 }

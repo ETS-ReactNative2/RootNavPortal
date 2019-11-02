@@ -1,14 +1,13 @@
 // @flow
 import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
-import styled from 'styled-components';
 import { ipcRenderer } from 'electron';
 import '../common.css';
 import TreeChecklist from '../containers/TreeChecklistContainer';
 import { existsSync, writeFile, mkdirSync } from 'fs';
 import { APPHOME, CONFIG } from '../../constants/globals';
-const dree = require('dree');
-
+import { StyledButton, StyledModal } from './StyledComponents'; 
+const dree = require('dree');  
 
 class AddButton extends Component {
 
@@ -19,23 +18,6 @@ class AddButton extends Component {
     }
 
     render() {
-    const StyledModal = styled(Modal)` && {
-        color: black;
-        white-space: pre-wrap;
-    }`     
-    const StyledButton = styled(Button)` && {
-        width: 2.5em;
-        height: 2.5em;
-        max-width: 2.5em;
-        min-width: 2.5em;
-        max-height: 2.5em;
-        min-height: 2.5em;
-        padding: 6px 0px;
-        text-align: center;
-        font-size: 20px;
-        border-radius: 30px;
-        margin: 0px 10px;
-    }`
         
         const openFileDialog = () => {
             ipcRenderer.send('openFolder', () => {
