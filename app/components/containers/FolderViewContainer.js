@@ -5,10 +5,9 @@ import { addFiles } from '../../actions/galleryActions';
 const mapStateToProps = (state, ownProps) => (
     { 
         files: state.gallery.files[ownProps.folder],
-        key: ownProps.key,
         folder: ownProps.folder,
         isActive: ownProps.isActive,
-        eventKey: ownProps.eventKey
+        filterText: state.gallery.filterText        
     }
 );
 

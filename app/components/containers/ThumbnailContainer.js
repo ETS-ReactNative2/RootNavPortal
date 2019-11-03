@@ -4,9 +4,9 @@ import { addThumb } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
-        file: state.gallery.files[ownProps.folder][ownProps.file],
+        file: state.gallery.files[ownProps.folder][ownProps.fileName],
         folder: ownProps.folder,
-        fileName: ownProps.file
+        fileName: ownProps.fileName
     }
 );
 
