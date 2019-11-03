@@ -3,9 +3,7 @@ import FilterBar from '../gallery/FilterBar';
 import { updateFilterText } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
-    { 
-        filterText: state.gallery.filterText,
-    }
+    { }
 );
 
 const mapDispatchToProps = dispatch => (

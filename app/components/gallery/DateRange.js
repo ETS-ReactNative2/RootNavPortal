@@ -30,8 +30,8 @@ export default class DateRange extends React.Component {
   }
 
   //State handlers, replace with Redux later
-  handleFromChange(from) { this.setState({ from }); }
-  handleToChange(to) { this.setState({ to }, this.showFromMonth); }
+  handleFromChange = from => this.setState({ from });
+  handleToChange   = to   => this.setState({ to }, this.showFromMonth);
 
   render()
   {

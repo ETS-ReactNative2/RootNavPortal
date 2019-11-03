@@ -6,27 +6,33 @@ type Props = {};
 
 export default class FilterBar extends Component<Props> {
   props: Props;
-  state = {
-    text: "hi"
+  constructor(props)
+  {
+      super(props);
+      this.ref = React.createRef();
   }
 
-  shouldComponentUpdate(nextProps, nextState) 
+  typingTimeout = 0;
+  typing = false;
+  text = "";
+
+  update = e =>
   {
-      return this.props.filterText !== nextProps.filterText
-   }
+      if (this.typingTimeout) clearTimeout(this.typingTimeout);
+      this.text   = e.target.value,
+      this.typing = false,
+      this.typingTimeout = setTimeout(() => this.props.updateFilterText(this.text), 750);
+  }
 
   render() {
+    const { updateFilterText } = this.props;
 
-    const { updateFilterText, filterText } = this.props;
-
-    const clear  = () => updateFilterText("");
-    const update = e => updateFilterText(e.target.value);
-    console.log(this.state.text)
+    const clear  = () => { updateFilterText(""); this.ref.current.value = "" }; 
 
     return (
       <StyledFilterBarSpan>
         <div className="input-group">
-          <input type="text" className="form-control" value={filterText} onChange={update}/>
+          <input type="text" className="form-control" placeholder="Filter images..." onChange={this.update} ref={this.ref}/>
           <button className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={clear}>
             <i className="fa fa-times"></i>
           </button>
