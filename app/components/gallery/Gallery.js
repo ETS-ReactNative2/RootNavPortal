@@ -21,7 +21,7 @@ export default class Gallery extends Component<Props> {
         readFile(APPHOME + CONFIG, "utf8", (err, data) => 
         {
           if (err) console.log(err); 
-          else this.props.importConfig(JSON.parse(data).map(path => ({'path': path, 'active': false})))
+          else this.props.importConfig(JSON.parse(data));
         }); 
       }
       else console.log("doesn't exist: " + APPHOME+CONFIG);     

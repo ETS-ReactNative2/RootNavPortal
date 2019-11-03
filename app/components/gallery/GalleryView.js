@@ -21,7 +21,7 @@ export default class GalleryView extends Component<Props> {
           {
             folders.map((item, i) => {
               if (folders.length > 0)
-                return <div key={item} onClick={() => toggleOpenFile(item.path)}><FolderView folder={item.path} key={i} isActive={item.active} /></div>;
+                return <div key={i} onClick={() => toggleOpenFile(item.path)}><FolderView folder={item.path} isActive={item.active} /></div>;
             })
           }
         </StyledGalleryViewDiv>

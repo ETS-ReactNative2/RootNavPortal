@@ -81,7 +81,7 @@ export default class FolderView extends Component<Props> {
 			});		
 		}
 
-		if (!filterText || Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase())))
+		if (!filterText || (files && Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase()))))
 		{
 			if (isActive) return this.renderActive();
 			return this.renderInactive();

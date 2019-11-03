@@ -10,7 +10,7 @@ export default (state = initialState, action) => {
         //Directory reducer actions
         case OPEN_DIR: return {
             ...state,
-            folders: state.folders.concat(action.paths.map(path => ({'path': path, 'active': false})))
+            folders: state.folders.concat(action.paths)
         };
         case REFRESH_DIRS: 
             return {
@@ -19,7 +19,7 @@ export default (state = initialState, action) => {
             }
         case REMOVE_DIR: return {
             ...state,
-            folders: state.folders.filter(folder => folder.path != action.path)
+            folders: state.folders.filter(folder => folder.path !== action.path)
         };
         case TOGGLE_DIR: return {
             ...state,
