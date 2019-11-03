@@ -12,12 +12,14 @@ export default class FolderView extends Component<Props> {
 
 	shouldComponentUpdate(nextProps, nextState) 
 	{
-		if (!this.props.files) return true;
+		if (nextProps.filterText !== this.props.filterText) return true;
+		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
+		
 	}
 
 	renderActive() {
-		const { folder, files, eventKey, isActive } = this.props; 
+		const { folder, files, filterText } = this.props; 
 		return (
 			<div>
 				<StyledFolderViewDiv>
@@ -25,11 +27,11 @@ export default class FolderView extends Component<Props> {
 					<i className="fas fa-folder-open"/> 
 					Hello from {folder}!
 					<RemoveButton path={folder}/>
-					<br />
 					{
 						(files && folder) ? Object.keys(files).map(file => {
-								console.log(file);
-								return <Thumbnail id={file} folder={folder} file={file}/>
+							if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
+								return <Thumbnail id={file} folder={folder} fileName={file}/>;
+								else return "";
 							}) : ""
 					}
 				</StyledFolderViewDiv>
@@ -39,7 +41,7 @@ export default class FolderView extends Component<Props> {
 	}
 
 	renderInactive() {
-		const { folder, files, eventKey, isActive } = this.props; 
+		const { folder } = this.props; 
 		return (
 			<div>
 				<StyledFolderViewDiv>
@@ -57,7 +59,7 @@ export default class FolderView extends Component<Props> {
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder } = this.props; 
+		const { isActive, folder, filterText, files } = this.props; 
 		if (!this.props.files) {
 			let structuredFiles = {};
 			readdir(folder, (err, files) => {
@@ -72,7 +74,6 @@ export default class FolderView extends Component<Props> {
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}
 				});
-				console.log(Object.keys(structuredFiles));
 				if (Object.keys(structuredFiles).length) 
 				{
 					this.props.addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
@@ -80,7 +81,11 @@ export default class FolderView extends Component<Props> {
 			});		
 		}
 
-		if (isActive) return this.renderActive();
-		return this.renderInactive();
+		if (!filterText || Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase())))
+		{
+			if (isActive) return this.renderActive();
+			return this.renderInactive();
+		}
+		else return "";
 	}
 }

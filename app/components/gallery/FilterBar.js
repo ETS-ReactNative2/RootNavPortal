@@ -21,7 +21,7 @@ export default class FilterBar extends Component<Props> {
       if (this.typingTimeout) clearTimeout(this.typingTimeout);
       this.text   = e.target.value,
       this.typing = false,
-      this.typingTimeout = setTimeout(() => this.props.updateFilterText(this.text), 750);
+      this.typingTimeout = setTimeout(() => this.props.updateFilterText(this.text), 250);
   }
 
   render() {

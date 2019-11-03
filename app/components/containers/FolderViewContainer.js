@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => (
         files: state.gallery.files[ownProps.folder],
         key: ownProps.key,
         folder: ownProps.folder,
-        eventKey: ownProps.eventKey
+        filterText: state.gallery.filterText        
     }
 );
 
