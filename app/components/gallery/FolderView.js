@@ -17,7 +17,7 @@ export default class FolderView extends Component<Props> {
 	}
 
 	renderActive() {
-		const { folder, files, eventKey, isActive } = this.props; 
+		const { folder, files } = this.props;
 		return (
 			<div>
 				<StyledFolderViewDiv>
@@ -39,7 +39,7 @@ export default class FolderView extends Component<Props> {
 	}
 
 	renderInactive() {
-		const { folder, files, eventKey, isActive } = this.props; 
+		const { folder } = this.props;
 		return (
 			<div>
 				<StyledFolderViewDiv>
