@@ -35,6 +35,7 @@ export default class TreeChecklist extends Component<Props> {
         {
             this.state.rendered = true;
             this.state.nodes = getNodes(this.props.tree);
+            this.props.tree.map((item, i) => this.state.checked.push(item.path));
         } 
 
         return (
