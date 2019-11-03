@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import Gallery from '../components/gallery/Gallery';
+import Gallery from '../components/containers/GalleryContainer';
 
 type Props = {};
 

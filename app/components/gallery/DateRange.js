@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 
-import styles from './DateRange.css'; //This doesn't work because css is fucked
+import styles from './DateRange.scss'; //This doesn't work because css is fucked
 import DayPickerInput from 'react-day-picker/DayPickerInput';
 import { formatDate, parseDate } from 'react-day-picker/moment';
 
@@ -30,19 +30,20 @@ export default class DateRange extends React.Component {
   }
 
   //State handlers, replace with Redux later
-  handleFromChange(from) { this.setState({ from }); }
-  handleToChange(to) { this.setState({ to }, this.showFromMonth); }
+  handleFromChange = from => this.setState({ from });
+  handleToChange   = to   => this.setState({ to }, this.showFromMonth);
 
   render()
   {
     const { from, to } = this.state;
     const modifiers = { start: from, end: to };
+
     return (
-      <span className="InputFromTo">
+      <span className={`${styles.DatePickerForm} InputFromTo`} style={{'display':'inline-flex', 'margin': 'auto 0.5em auto 2em'}}>
         <DayPickerInput
           value={from}
           placeholder="From"
-          format="LL"
+          format="L"
           formatDate={formatDate}
           parseDate={parseDate}
           dayPickerProps={{
@@ -54,14 +55,14 @@ export default class DateRange extends React.Component {
             onDayClick: () => this.to.getInput().focus(),
           }}
           onDayChange={this.handleFromChange}
-        />{' '}
-        —{' '}
-        <span className="InputFromTo-to">
+        />
+        <div style={{'padding':'0 5px', 'textAlign':'center', 'margin': 'auto 0px'}}>—</div>
+        <span className={`${styles.DatePickerForm} InputFromTo-to`}>
           <DayPickerInput
             ref={el => (this.to = el)}
             value={to}
             placeholder="To"
-            format="LL"
+            format="L"
             formatDate={formatDate}
             parseDate={parseDate}
             dayPickerProps={{

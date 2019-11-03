@@ -1,9 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-import styles from './TopBar.css';
-import { ButtonToolbar } from 'react-bootstrap';
-import Button from '../Button';
+import AddButton from '../containers/AddButtonContainer';
+import RefreshButton from '../containers/RefreshButtonContainer';
+import ClearButton from '../buttons/ClearButton';
+import FilterBar from '../containers/FilterBarContainer'
 import DateRange from './DateRange';
+import { StyledTopBarDiv, StyledTopBarHR } from './StyledComponents'
 
 type Props = {};
 
@@ -12,14 +14,15 @@ export default class TopBar extends Component<Props> {
 
   render() {
     return (
-      <div className={styles.container} data-tid="container">
-        <ButtonToolbar>
-          <Button variant="success" icon="plus"/>
-          <Button variant="primary" icon="sync"/>
-        </ButtonToolbar>
-          <input type="search" placeholder="Filter items"/>
+      <div>
+        <StyledTopBarDiv className="d-inline-flex" data-tid="container">
+          <AddButton />
+          <RefreshButton />
+          <FilterBar/>
           <DateRange />
-          <Button variant="danger" icon="times" />
+          <ClearButton />
+        </StyledTopBarDiv>
+        <StyledTopBarHR/>
       </div>
     );
   }
