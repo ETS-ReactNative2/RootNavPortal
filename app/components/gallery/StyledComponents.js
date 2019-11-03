@@ -27,7 +27,8 @@ export const StyledFolderViewDiv = styled.div` && {
       -webkit-align-items: center;
       -webkit-box-align: center;
       align-items: center;
-      margin: 1em 4.5em;
+      margin: 0 4.5em;
+      padding: 2em 0;
     }`;
     
 export const StyledFilterBarSpan = styled.span` && {
