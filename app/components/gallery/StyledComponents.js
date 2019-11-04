@@ -1,10 +1,15 @@
 import styled from 'styled-components';
+import RemoveButton from '../containers/RemoveButtonContainer';
 
 export const StyledHR = styled.hr` && {
       border: 1.2px solid black;
 			border-radius: 1em;
 			margin: 0 4em;
     }`;
+
+export const StyledIcon = styled.i` && {
+      width: 1.3em;
+}`
 
 export const StyledTopBarHR = styled.hr` && {
       border: 2px solid black;
@@ -49,3 +54,4 @@ export const StyledGalleryViewDiv = styled.div` && {
       right: 0;
     }`
     
+export const StyledRemoveButton = styled(RemoveButton)

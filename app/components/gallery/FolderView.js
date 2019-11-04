@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledHR, StyledFolderViewDiv } from './StyledComponents'
+import { StyledHR, StyledIcon, StyledFolderViewDiv } from './StyledComponents'
 
 type Props = {};
 
@@ -19,13 +19,13 @@ export default class FolderView extends Component<Props> {
 	}
 
 	renderActive() {
+
 		const { folder, files, filterText } = this.props; 
 		return (
 			<div>
 				<StyledFolderViewDiv>
-					<i className="fas fa-chevron-down" /> 
-					<i className="fas fa-folder-open"/> 
-					Hello from {folder}!
+					<StyledIcon className="fas fa-chevron-down fa-lg"/> 
+					{folder}
 					<RemoveButton path={folder}/>
 					{
 						(files && folder) ? Object.keys(files).map(file => {
@@ -45,9 +45,8 @@ export default class FolderView extends Component<Props> {
 		return (
 			<div>
 				<StyledFolderViewDiv>
-					<i className="fas fa-chevron-right" /> 
-					<i className="fas fa-folder"/> 
-					Hello from {folder}!
+					<StyledIcon className="fas fa-chevron-right fa-lg" /> 
+					{folder}
 					<RemoveButton path={folder}/>
 					<br />
 				</StyledFolderViewDiv>
