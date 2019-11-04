@@ -4,7 +4,6 @@ import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
 
 export default (state = initialState, action) => {
-    console.log(state);
     switch (action.type)
     {
         //Directory reducer actions

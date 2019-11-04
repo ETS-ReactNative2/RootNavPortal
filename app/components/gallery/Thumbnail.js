@@ -1,5 +1,6 @@
 // @flow
 import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
 import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 
@@ -7,11 +8,18 @@ type Props = {};
 
 export default class Thumbnail extends Component<Props> {
   props: Props;
+    windowObject = null;
 
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		return (JSON.stringify(nextProps.file) !== JSON.stringify(this.props.file));
 	}
+
+    openViewer = e => 
+    {
+        console.log("Double clicking");
+        if (!this.windowObject) this.windowObject = window.open(`file://${__dirname}/app.html`);
+    }    
 
 	render() {
         //folder - the full path to this folder - in state.gallery.folders
@@ -31,8 +39,8 @@ export default class Thumbnail extends Component<Props> {
 		return (
             <div>
                 {
-                    (file.pngThumb) ? <img src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } /> :
-                    (file.jpgThumb) ? <img src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } /> : 
+                    (file.pngThumb) ? <img src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> :
+                    (file.jpgThumb) ? <img src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> : 
                     ""
                 }
                 {fileName}
