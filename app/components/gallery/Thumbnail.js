@@ -18,7 +18,8 @@ export default class Thumbnail extends Component<Props> {
     openViewer = e => 
     {
         console.log("Double clicking");
-        if (!this.windowObject) this.windowObject = window.open(`file://${__dirname}/app.html#/viewer`);
+        console.log(`file://${__dirname}/app.html?gallery`)
+        if (!this.windowObject) this.windowObject = window.open(`file://${__dirname}/app.html?gallery`);
     }    
 
 	render() {
