@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
+import { ipcRenderer } from 'electron';
 
 type Props = {};
 
@@ -17,10 +18,19 @@ export default class Thumbnail extends Component<Props> {
 
     openViewer = e => 
     {
-        console.log("Double clicking");
         console.log(`file://${__dirname}/app.html?gallery`)
-        if (!this.windowObject) this.windowObject = window.open(`file://${__dirname}/app.html?gallery`);
-    }    
+        if (!this.windowObject) 
+        {
+            const { folder, file, fileName, addThumb } = this.props;
+            if (["jpg", "png"].some(ext => ext in file)) 
+            {
+                const ext = 'jpg' in file ? 'jpg' : 'png';
+                ipcRenderer.send('openViewer', folder + sep + fileName + "." + ext, () => {
+                    console.log("Sent open viewer");
+                })
+            }
+        }
+    }
 
 	render() {
         //folder - the full path to this folder - in state.gallery.folders
