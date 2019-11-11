@@ -76,7 +76,7 @@ app.on('ready', async () => {
     }
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
+  mainWindow.loadURL(`file://${__dirname}/app.html?home`);
   
   ipcMain.on('openFolder', (event, path) => {
     dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
@@ -96,7 +96,7 @@ app.on('ready', async () => {
       }
     });
   
-    subWindow.loadURL(`file://${__dirname}/app.html?viewer`);
+    subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
   });
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event

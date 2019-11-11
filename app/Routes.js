@@ -12,19 +12,19 @@ import ViewerPage from './containers/ViewerPage';
 
 class Routes extends Component {
 
-  static Views() {
+  static Views(arg = "") {
     return {
       [routes.COUNTER]: <CounterPage/>,
       [routes.GALLERY]: <GalleryPage/>,
-      [routes.VIEWER]: <ViewerPage/>,
+      [routes.VIEWER]: <ViewerPage path={arg.substring(1)}/>,
       [routes.HOME]: <HomePage/>
     }
   }
 
   static View(props) {
-    let name = props.location.search;
-    console.log(props)
-    let view = Routes.Views()[name];
+    let args = props.location.search.match(/(\?[^?]+)(\?.+)?/)
+    let name = args[1];
+    let view = Routes.Views(args[2])[name];
     if(view == null) 
       view = Routes.Views()[routes.HOME];
     return view;
