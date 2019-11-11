@@ -18,43 +18,6 @@ export default class FolderView extends Component<Props> {
 		
 	}
 
-	renderActive() {
-
-		const { folder, files, filterText } = this.props; 
-		return (
-			<div>
-				<StyledFolderViewDiv>
-					<StyledIcon className="fas fa-chevron-down fa-lg"/> 
-					{folder}
-					<RemoveButton path={folder}/>
-					{
-						(files && folder) ? Object.keys(files).map(file => {
-							if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
-								return <Thumbnail key={file} folder={folder} fileName={file}/>;
-								else return "";
-							}) : ""
-					}
-				</StyledFolderViewDiv>
-				<StyledHR/>
-			</div>
-			);
-	}
-
-	renderInactive() {
-		const { folder } = this.props; 
-		return (
-			<div>
-				<StyledFolderViewDiv>
-					<StyledIcon className="fas fa-chevron-right fa-lg" /> 
-					{folder}
-					<RemoveButton path={folder}/>
-					<br />
-				</StyledFolderViewDiv>
-				<StyledHR/>
-			</div>
-			);
-		}
-
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -82,8 +45,23 @@ export default class FolderView extends Component<Props> {
 
 		if (!filterText || (files && Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase()))))
 		{
-			if (isActive) return this.renderActive();
-			return this.renderInactive();
+			return (
+				<div>
+					<StyledFolderViewDiv>
+						<RemoveButton path={folder}/>
+						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/> 
+						{folder}
+						{
+							(isActive && files && folder) ? Object.keys(files).map(file => {
+								if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
+									return <Thumbnail key={file} folder={folder} fileName={file}/>;
+									else return "";
+								}) : ""
+						}
+					</StyledFolderViewDiv>
+					<StyledHR/>
+				</div>
+				);
 		}
 		else return "";
 	}

@@ -54,4 +54,3 @@ export const StyledGalleryViewDiv = styled.div` && {
       right: 0;
     }`
     
-export const StyledRemoveButton = styled(RemoveButton)
