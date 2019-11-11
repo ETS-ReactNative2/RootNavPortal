@@ -30,7 +30,7 @@ export default class FolderView extends Component<Props> {
 					{
 						(files && folder) ? Object.keys(files).map(file => {
 							if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
-								return <Thumbnail id={file} folder={folder} fileName={file}/>;
+								return <Thumbnail key={file} folder={folder} fileName={file}/>;
 								else return "";
 							}) : ""
 					}

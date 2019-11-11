@@ -7,6 +7,6 @@ export default class ViewerPage extends Component<Props> {
   props: Props;
 
   render() {
-    return <div>Hi I'm a window</div>;
+    return <div>Hi I'm a window, leading to {this.props.path}</div>;
   }
 }

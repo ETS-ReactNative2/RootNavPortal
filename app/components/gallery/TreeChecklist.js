@@ -18,6 +18,9 @@ export default class TreeChecklist extends Component<Props> {
 
     render() 
     {
+        let { rendered, nodes, checked, expanded } = this.state;
+        const { tree, updateChecked } = this.props;
+
         const getNodes = nodes => 
         {
             if (!nodes) return [];
@@ -31,23 +34,27 @@ export default class TreeChecklist extends Component<Props> {
             });
         }
 
-        if (!this.state.rendered) 
+        if (!rendered) 
         {
-            this.state.rendered = true;
-            this.state.nodes = getNodes(this.props.tree);
-            this.props.tree.map((item, i) => this.state.checked.push(item.path));
+            rendered = true;
+            nodes = getNodes(tree);
+            tree.map((item, i) => { 
+                checked.push(item.path);
+                expanded.push(item.path);
+            });
+            updateChecked(checked);
         } 
 
         return (
         <div>
           <CheckboxTree
-            nodes={this.state.nodes}
-            checked={this.state.checked}
-            expanded={this.state.expanded}
+            nodes={nodes}
+            checked={checked}
+            expanded={expanded}
             noCascade={true}
             onCheck={checked => {
-            this.setState({ checked });
-            this.props.updateChecked(checked);
+              this.setState({ checked });
+              updateChecked(checked);
             }}
             checkModel={'all'}
             onExpand={expanded => this.setState({ expanded })}

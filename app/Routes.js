@@ -1,5 +1,8 @@
-import React from 'react';
-import { Switch, Route } from 'react-router';
+import React, { Component } from 'react';
+import {
+  BrowserRouter as Router,
+  Route
+} from 'react-router-dom'
 import routes from './constants/routes';
 import App from './containers/App';
 import HomePage from './containers/HomePage';
@@ -7,13 +10,35 @@ import CounterPage from './containers/CounterPage';
 import GalleryPage from './containers/GalleryPage';
 import ViewerPage from './containers/ViewerPage';
 
-export default () => (
-  <App>
-    <Switch>
-      <Route path={routes.COUNTER} component={CounterPage} />
-      <Route path={routes.GALLERY} component={GalleryPage} />
-      <Route path={routes.VIEWER} component={ViewerPage} />
-      <Route path={routes.HOME} component={HomePage} />
-    </Switch>
-  </App>
-);
+class Routes extends Component {
+
+  static Views(arg = "") {
+    return {
+      [routes.COUNTER]: <CounterPage/>,
+      [routes.GALLERY]: <GalleryPage/>,
+      [routes.VIEWER]: <ViewerPage path={arg.substring(1)}/>,
+      [routes.HOME]: <HomePage/>
+    }
+  }
+
+  static View(props) {
+    let args = props.location.search.match(/(\?[^?]+)(\?.+)?/)
+    let name = args[1];
+    let view = Routes.Views(args[2])[name];
+    if(view == null) 
+      view = Routes.Views()[routes.HOME];
+    return view;
+  }
+  
+  render() {
+    return (
+      <Router>
+        <div>
+          <Route path='/' component={Routes.View}/>
+        </div>
+      </Router>
+    );
+  }
+}
+
+export default Routes

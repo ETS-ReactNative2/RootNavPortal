@@ -70,15 +70,34 @@ app.on('ready', async () => {
   mainWindow = new BrowserWindow({
     show: false,
     width: 1024,
-    height: 728
+    height: 728,
+    webPreferences: {
+      nodeIntegration: true,
+    }
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html`);
+  mainWindow.loadURL(`file://${__dirname}/app.html?home`);
   
   ipcMain.on('openFolder', (event, path) => {
-    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }, paths => event.sender.send('folderData', paths));
+    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
+      {
+        if (result.filePaths && !result.canceled)
+          event.sender.send('folderData', result.filePaths) 
+      });
   });
 
+  ipcMain.on('openViewer', (event, path) => {
+    console.log(path);
+    let subWindow = new BrowserWindow({
+      width: 1024,
+      height: 728,
+      webPreferences: {
+        nodeIntegration: true,
+      }
+    });
+  
+    subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
+  });
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
