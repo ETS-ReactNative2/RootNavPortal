@@ -20,13 +20,10 @@ class AddButton extends Component {
     render() {
         
         const openFileDialog = () => {
-            ipcRenderer.send('openFolder', () => {
-                console.log("Sent open folder");
-            })
+            ipcRenderer.send('openFolder')
         }
 
         ipcRenderer.on('folderData', (event, data) => {
-            if (!data) return;
             let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //Filter out files, with a depth of 5. Make an exclude regex of standard big paths, like OS folders, node_modules, other big dependency thinhs
             this.props.updateModalBody(tree);
             this.props.showModal();

@@ -79,7 +79,11 @@ app.on('ready', async () => {
   mainWindow.loadURL(`file://${__dirname}/app.html`);
   
   ipcMain.on('openFolder', (event, path) => {
-    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }, paths => event.sender.send('folderData', paths));
+    dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
+      {
+        if (result.filePaths && !result.canceled)
+          event.sender.send('folderData', result.filePaths) 
+      });
   });
 
   ipcMain.on('openViewer', (event, path) => {
