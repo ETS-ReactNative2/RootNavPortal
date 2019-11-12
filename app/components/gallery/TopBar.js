@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import AddButton from '../containers/AddButtonContainer';
 import RefreshButton from '../containers/RefreshButtonContainer';
-import ClearButton from '../buttons/ClearButton';
+import ClearButton from '../buttons/gallery/ClearButton';
 import FilterBar from '../containers/FilterBarContainer'
 import DateRange from './DateRange';
 import { StyledTopBarDiv, StyledTopBarHR } from './StyledComponents'

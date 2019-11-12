@@ -39,8 +39,8 @@ export default class FilterBar extends Component<Props> {
           <div className="input-group-append">
             <div className="input-group-text">
               <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="customCheck"/>
-                <label className="custom-control-label" htmlFor="customCheck">Analysed</label>
+                <input type="checkbox" className="custom-control-input" id="analysed"/>
+                <label className="custom-control-label" htmlFor="analysed">Analysed</label>
               </div>
             </div>
           </div>
