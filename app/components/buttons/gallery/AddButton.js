@@ -10,6 +10,11 @@ import { StyledButton, StyledModal } from '../StyledComponents';
 const dree = require('dree');  
 
 class AddButton extends Component {
+    constructor(props)
+    {
+        super(props);
+        this.tree = React.createRef();
+    }
 
     shouldComponentUpdate(nextProps, nextState)
     {   //Stops this component re-rendering (thus re-rendering the checklist) whenever state changes (by the checklist)
@@ -33,6 +38,7 @@ class AddButton extends Component {
             const folders = this.props.imports.map(path => ({'path': path, 'active': false}));
             this.props.addFolders(folders.filter(newfolder => !this.props.folders.some(folder => newfolder.path == folder.path)));
             this.props.closeModal();
+            this.tree.current.clear();
 
             if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
                 mkdirSync(APPHOME, '0777', true, err => {
@@ -43,6 +49,11 @@ class AddButton extends Component {
             });
         }
 
+        const close = () => {
+            this.tree.current.clear();
+            this.props.closeModal();
+        }
+
         return (
             <>
                 <StyledButton
@@ -50,15 +61,15 @@ class AddButton extends Component {
                     onClick={openFileDialog} 
                     className={`btn btn-default fas fa-plus button`} 
                 />
-                <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
+                <StyledModal show={this.props.modal} onHide={close}>
                     <Modal.Header closeButton>
                         <Modal.Title>Select Subfolders</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <TreeChecklist />
+                        <TreeChecklist ref={this.tree}/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="danger" onClick={this.props.closeModal}>
+                        <Button variant="danger" onClick={close}>
                             Cancel
                         </Button>
                         <Button variant="primary" onClick={importFolders}>

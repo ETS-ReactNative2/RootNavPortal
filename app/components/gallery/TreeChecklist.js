@@ -6,15 +6,17 @@ import 'react-checkbox-tree/lib/react-checkbox-tree.css'; //CSS doesn't import p
 type Props = {};
 
 export default class TreeChecklist extends Component<Props> {
-  props: Props;
+    props: Props;
 
-  //I think we'll probably need to sync this with Redux instead, with the some useful value that lets us traverse the tree better in state
-  state = {
+    //I think we'll probably need to sync this with Redux instead, with the some useful value that lets us traverse the tree better in state
+    state = {
         checked: [],
         expanded: [],
         rendered: false,
         nodes: []
     };
+    
+    close = () => this.setState({ rendered: false });
 
     render() 
     {
@@ -36,8 +38,8 @@ export default class TreeChecklist extends Component<Props> {
 
         if (!rendered) 
         {
-            rendered = true;
-            nodes = getNodes(tree);
+            this.setState({ rendered: true });
+            this.setState({ nodes: getNodes(tree) });
             tree.map((item, i) => { 
                 checked.push(item.path);
                 expanded.push(item.path);
