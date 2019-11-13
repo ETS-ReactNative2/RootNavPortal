@@ -16,7 +16,7 @@ export default class TreeChecklist extends Component<Props> {
         nodes: []
     };
     
-    close = () => this.setState({ rendered: false });
+    clear = () => this.setState({ rendered: false });
 
     render() 
     {
