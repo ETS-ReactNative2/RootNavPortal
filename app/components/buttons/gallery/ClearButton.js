@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import '../common.css';
-import { StyledButton } from './StyledComponents'; 
+import '../../common.css';
+import { StyledButton } from '../StyledComponents'; 
 
 class ClearButton extends Component {
     render() {

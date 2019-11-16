@@ -10,4 +10,4 @@ const mapDispatchToProps = dispatch => (
     { updateChecked: paths => dispatch(updateChecked(paths)) }
 );
 
-export default connect(mapStateToProps, mapDispatchToProps)(TreeChecklist)
+export default connect(mapStateToProps, mapDispatchToProps, null, {forwardRef: true})(TreeChecklist)

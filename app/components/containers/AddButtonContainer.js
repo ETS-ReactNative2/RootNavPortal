@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import Button from '../buttons/AddButton'
+import Button from '../buttons/gallery/AddButton'
 import { addFolders, showModal, closeModal, updateModal } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (

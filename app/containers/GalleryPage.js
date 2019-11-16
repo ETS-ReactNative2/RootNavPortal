@@ -1,13 +1,16 @@
-// @flow
-import React, { Component } from 'react';
-import Gallery from '../components/containers/GalleryContainer';
+import { connect } from 'react-redux';
+import Gallery from '../components/gallery/Gallery';
+import { importConfig } from '../actions/galleryActions';
 
-type Props = {};
+const mapStateToProps = state => (
+    { 
+        folders: state.gallery.folders,
+        hasReadConfig: state.gallery.hasReadConfig
+    }
+);
 
-export default class GalleryPage extends Component<Props> {
-  props: Props;
+const mapDispatchToProps = dispatch => (
+    { importConfig: data => dispatch(importConfig(data)) }
+);
 
-  render() {
-    return <Gallery />;
-  }
-}
+export default connect(mapStateToProps, mapDispatchToProps)(Gallery)

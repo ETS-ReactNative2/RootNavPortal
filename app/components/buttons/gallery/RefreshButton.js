@@ -1,8 +1,8 @@
 // @flow
 import React, { Component } from 'react';
-import '../common.css';
+import '../../common.css';
 import each from 'async/each';
-import { StyledButton } from './StyledComponents'; 
+import { StyledButton } from '../StyledComponents'; 
 
 class RefreshButton extends Component {
     structuredFiles = {};

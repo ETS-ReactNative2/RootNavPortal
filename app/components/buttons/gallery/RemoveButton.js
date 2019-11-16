@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import '../common.css';
-import { APPHOME, CONFIG } from '../../constants/globals';
+import '../../common.css';
+import { APPHOME, CONFIG } from '../../../constants/globals';
 import { existsSync, writeFile } from 'fs';
-import { StyledButton } from './StyledComponents'; 
+import { StyledButton } from '../StyledComponents'; 
 
 class RemoveButton extends Component {
 

@@ -1,5 +1,5 @@
 import { connect } from 'react-redux';
-import Button from '../buttons/RemoveButton'
+import Button from '../buttons/gallery/RemoveButton'
 import { remove } from '../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
