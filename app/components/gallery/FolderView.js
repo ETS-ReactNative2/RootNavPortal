@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledHR, StyledIcon, StyledFolderViewDiv } from './StyledComponents'
+import { StyledHR, StyledIcon, StyledFolderViewDiv, StyledRow } from './StyledComponents'
+import { Row, Container, Col } from 'react-bootstrap';
 
 type Props = {};
 
@@ -49,16 +50,22 @@ export default class FolderView extends Component<Props> {
 				<div>
 					<StyledFolderViewDiv>
 						<RemoveButton path={folder}/>
-						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/> 
-						{folder}
-						{
-							(isActive && files && folder) ? Object.keys(files).map(file => {
-								if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
-									return <Thumbnail key={file} folder={folder} fileName={file}/>;
-									else return "";
-								}) : ""
-						}
+						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
+						<Container>
+							<Row>{folder}</Row>
+						</Container>
 					</StyledFolderViewDiv>
+					{
+							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
+							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
+							.map((file, index) => {
+								return (
+									<div className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
+										<Thumbnail key={file} folder={folder} fileName={file}/>
+									</div>
+								);
+							})} </StyledRow></StyledFolderViewDiv> : ""							
+						}
 					<StyledHR/>
 				</div>
 				);
