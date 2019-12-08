@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { StyledTopBarDiv, StyledTopBarHR } from '../gallery/StyledComponents'
+import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
 import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
 import ToggleFolderButton from '../buttons/viewer/ToggleFolderButton';

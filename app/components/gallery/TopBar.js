@@ -5,7 +5,7 @@ import RefreshButton from '../containers/RefreshButtonContainer';
 import ClearButton from '../buttons/gallery/ClearButton';
 import FilterBar from '../containers/FilterBarContainer'
 import DateRange from './DateRange';
-import { StyledTopBarDiv, StyledTopBarHR } from './StyledComponents'
+import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
 
 type Props = {};
 

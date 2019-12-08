@@ -16,10 +16,15 @@ export default (state = initialState, action) => {
                 ...state,
                 files: action.files
             }
-        case REMOVE_DIR: return {
-            ...state,
-            folders: state.folders.filter(folder => folder.path !== action.path)
-        };
+        case REMOVE_DIR: {
+            const { [action.path]: omit, files } = state.folders // Remove path from state
+            return {
+                ...state,
+                folders: state.folders.filter(folder => folder.path !== action.path),
+                files,
+                checked: state.checked.filter(path => path !== action.path)
+            };
+        }
         case TOGGLE_DIR: return {
             ...state,
             folders: state.folders.map(folder => folder.path == action.path ? {'path':folder.path, 'active':!folder.active} : folder)

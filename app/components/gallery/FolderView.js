@@ -51,17 +51,15 @@ export default class FolderView extends Component<Props> {
 					<StyledFolderViewDiv>
 						<RemoveButton path={folder}/>
 						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
-						<Container>
-							<Row>{folder}</Row>
-						</Container>
+						{folder}
 					</StyledFolderViewDiv>
 					{
 							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
 							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
 							.map((file, index) => {
 								return (
-									<div className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
-										<Thumbnail key={file} folder={folder} fileName={file}/>
+									<div key={file} className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
+										<Thumbnail folder={folder} fileName={file}/>
 									</div>
 								);
 							})} </StyledRow></StyledFolderViewDiv> : ""							

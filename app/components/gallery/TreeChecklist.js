@@ -18,29 +18,29 @@ export default class TreeChecklist extends Component<Props> {
     
     clear = () => this.setState({ rendered: false });
 
+    getNodes = nodes => 
+    {
+        if (!nodes) return [];
+        return nodes.map((item, i) =>
+        {
+            return { 
+                value: item.path, 
+                label: item.name,
+                children: this.getNodes(item.children)
+            };
+        });
+    }
+
     render() 
     {
         let { rendered, nodes, checked, expanded } = this.state;
         const { tree, updateChecked } = this.props;
 
-        const getNodes = nodes => 
-        {
-            if (!nodes) return [];
-            return nodes.map((item, i) =>
-            {
-                return { 
-                    value: item.path, 
-                    label: item.name,
-                    children: getNodes(item.children)
-                };
-            });
-        }
-
         if (!rendered) 
         {
             this.setState({ rendered: true });
-            this.setState({ nodes: getNodes(tree) });
-            tree.map((item, i) => { 
+            this.setState({ nodes: this.getNodes(tree) });
+            tree.forEach(item => { 
                 checked.push(item.path);
                 expanded.push(item.path);
             });
