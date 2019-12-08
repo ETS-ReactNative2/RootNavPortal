@@ -3,7 +3,8 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledHR, StyledIcon, StyledFolderViewDiv } from './StyledComponents'
+import { StyledHR, StyledIcon, StyledFolderViewDiv, StyledRow } from './StyledComponents'
+import { Row, Container, Col } from 'react-bootstrap';
 
 type Props = {};
 
@@ -17,43 +18,6 @@ export default class FolderView extends Component<Props> {
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
 		
 	}
-
-	renderActive() {
-
-		const { folder, files, filterText } = this.props; 
-		return (
-			<div>
-				<StyledFolderViewDiv>
-					<StyledIcon className="fas fa-chevron-down fa-lg"/> 
-					{folder}
-					<RemoveButton path={folder}/>
-					{
-						(files && folder) ? Object.keys(files).map(file => {
-							if (!filterText || file.toLowerCase().includes(filterText.toLowerCase()))
-								return <Thumbnail key={file} folder={folder} fileName={file}/>;
-								else return "";
-							}) : ""
-					}
-				</StyledFolderViewDiv>
-				<StyledHR/>
-			</div>
-			);
-	}
-
-	renderInactive() {
-		const { folder } = this.props; 
-		return (
-			<div>
-				<StyledFolderViewDiv>
-					<StyledIcon className="fas fa-chevron-right fa-lg" /> 
-					{folder}
-					<RemoveButton path={folder}/>
-					<br />
-				</StyledFolderViewDiv>
-				<StyledHR/>
-			</div>
-			);
-		}
 
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
@@ -82,8 +46,29 @@ export default class FolderView extends Component<Props> {
 
 		if (!filterText || (files && Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase()))))
 		{
-			if (isActive) return this.renderActive();
-			return this.renderInactive();
+			return (
+				<div>
+					<StyledFolderViewDiv>
+						<RemoveButton path={folder}/>
+						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
+						<Container>
+							<Row>{folder}</Row>
+						</Container>
+					</StyledFolderViewDiv>
+					{
+							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
+							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
+							.map((file, index) => {
+								return (
+									<div className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
+										<Thumbnail key={file} folder={folder} fileName={file}/>
+									</div>
+								);
+							})} </StyledRow></StyledFolderViewDiv> : ""							
+						}
+					<StyledHR/>
+				</div>
+				);
 		}
 		else return "";
 	}

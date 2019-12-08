@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import RemoveButton from '../containers/RemoveButtonContainer';
+import { Row, Col } from 'react-bootstrap';
 
 export const StyledHR = styled.hr` && {
       border: 1.2px solid black;
@@ -24,7 +25,7 @@ export const StyledTopBarDiv = styled.div` && {
     }`;
 
 export const StyledFolderViewDiv = styled.div` && {
-      height: 3em;
+      min-height: 3em;
       display: -ms-flexbox;
       display: -webkit-flex;
       display: flex;
@@ -33,7 +34,7 @@ export const StyledFolderViewDiv = styled.div` && {
       -webkit-box-align: center;
       align-items: center;
       margin: 0 4.5em;
-      padding: 2em 0;
+      padding: 0.5em 0;
     }`;
     
 export const StyledFilterBarSpan = styled.span` && {
@@ -54,4 +55,16 @@ export const StyledGalleryViewDiv = styled.div` && {
       right: 0;
     }`
     
-export const StyledRemoveButton = styled(RemoveButton)
+export const StyledImage = styled.img` && {
+      max-width:10em;
+      max-height:10em;
+      
+}`
+
+export const StyledCol = styled(Col)` && {
+      text-align: center;
+}`
+
+export const StyledRow = styled(Row)` && {
+      padding-bottom: 1em; 
+}`

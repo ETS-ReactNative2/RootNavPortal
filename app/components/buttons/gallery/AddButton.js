@@ -35,7 +35,7 @@ class AddButton extends Component {
         });
 
         const importFolders = () => {
-            const folders = this.props.imports.map(path => ({'path': path, 'active': false}));
+            const folders = this.props.imports.map(path => ({'path': path, 'active': true}));
             this.props.addFolders(folders.filter(newfolder => !this.props.folders.some(folder => newfolder.path == folder.path)));
             this.props.closeModal();
             this.tree.current.clear();

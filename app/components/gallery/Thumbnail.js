@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
 import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
+import { StyledImage, StyledCol, StyledRow } from './StyledComponents'
+import { Row, Col } from 'react-bootstrap';
 
 type Props = {};
 
@@ -49,12 +50,14 @@ export default class Thumbnail extends Component<Props> {
 
 		return (
             <div>
+                <Row><Col>
                 {
-                    (file.pngThumb) ? <img src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> :
-                    (file.jpgThumb) ? <img src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> : 
+                    (file.pngThumb) ? <StyledImage className="rounded mx-auto d-block" src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> :
+                    (file.jpgThumb) ? <StyledImage className="rounded mx-auto d-block" src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> : 
                     ""
                 }
-                {fileName}
+                </Col></Row>
+                <StyledRow><StyledCol>{fileName}</StyledCol></StyledRow>
             </div>
             
 		);
