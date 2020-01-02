@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import GalleryView from '../gallery/GalleryView';
-import { remove, toggleOpenFile } from '../../actions/galleryActions';
+import GalleryView from '../../gallery/GalleryView';
+import { remove, toggleOpenFile } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
     { folders: state.gallery.folders }

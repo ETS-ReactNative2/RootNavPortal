@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import FolderView from '../gallery/FolderView';
-import { addFiles } from '../../actions/galleryActions';
+import FolderView from '../../gallery/FolderView';
+import { addFiles } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 

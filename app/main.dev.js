@@ -77,7 +77,8 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html?home`);
-  
+  mainWindow.webContents.openDevTools();
+
   ipcMain.on('openFolder', (event, path) => {
     dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
       {
@@ -95,6 +96,7 @@ app.on('ready', async () => {
         nodeIntegration: true,
       }
     });
+
   
     subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
   });

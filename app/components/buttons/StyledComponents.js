@@ -12,7 +12,7 @@ export const StyledButton = styled(Button)` && {
   text-align: center;
   font-size: 20px;
   border-radius: 30px;
-  margin: 0px 10px;
+  margin: 0px 0.5em;
 }`
 
 

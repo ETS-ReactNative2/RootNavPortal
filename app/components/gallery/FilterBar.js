@@ -32,8 +32,8 @@ export default class FilterBar extends Component<Props> {
     return (
       <StyledFilterBarSpan>
         <div className="input-group">
-          <input type="text" className="form-control" placeholder="Filter images..." onChange={this.update} ref={this.ref}/>
-          <button className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={clear}>
+          <input key={0} type="text" className="form-control" placeholder="Filter images..." onChange={this.update} ref={this.ref}/>
+          <button key={1} className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={clear}>
             <i className="fa fa-times"></i>
           </button>
           <div className="input-group-append">

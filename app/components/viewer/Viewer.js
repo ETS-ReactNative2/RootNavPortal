@@ -1,6 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import TopBar from './TopBar';
+import RightBar from './RightBar'
+import { StyledContainer } from './StyledComponents';
 
 type Props = {};
 
@@ -10,9 +12,10 @@ export default class Viewer extends Component<Props> {
   render() {
 
     return (
-      <div data-tid="container">
+      <StyledContainer>
           <TopBar path={this.props.path}/>
-      </div>
+          <RightBar/>
+      </StyledContainer>
     );
   }
 }

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import TreeChecklist from '../gallery/TreeChecklist';
-import { updateChecked } from '../../actions/galleryActions';
+import TreeChecklist from '../../gallery/TreeChecklist';
+import { updateChecked } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
     { tree: state.gallery.modalBody }

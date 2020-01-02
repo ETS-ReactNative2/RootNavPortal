@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import RefreshButton from '../buttons/gallery/RefreshButton';
-import { refreshFiles } from '../../actions/galleryActions';
+import RefreshButton from '../../buttons/gallery/RefreshButton';
+import { refreshFiles } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 

@@ -26,6 +26,7 @@ export default class Thumbnail extends Component<Props> {
             if (["jpg", "png"].some(ext => ext in file)) 
             {
                 const ext = 'jpg' in file ? 'jpg' : 'png';
+                console.log("HERE: " + folder + sep + fileName + "." + ext);
                 ipcRenderer.send('openViewer', folder + sep + fileName + "." + ext, () => {
                     console.log("Sent open viewer");
                 })

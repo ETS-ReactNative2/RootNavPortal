@@ -13,6 +13,7 @@ import ViewerPage from './containers/ViewerPage';
 class Routes extends Component {
 
   static Views(arg = "") {
+    console.log(arg);
     return {
       [routes.COUNTER]: <CounterPage/>,
       [routes.GALLERY]: <GalleryPage/>,
