@@ -1,18 +1,17 @@
 // @flow
 import React, { Component } from 'react';
-import TopBar from './TopBar';
 import { StyledListGroupItem } from './StyledComponents'
 
 type Props = {};
 
-export default class PluginGroup extends Component<Props> {
+export default class Plugin extends Component<Props> {
   props: Props;
 
   render() {
-    const { groupName } = this.props;
+    const { name, func, active } = this.props;
     return (
-        <StyledListGroupItem>
-          Hello from {groupName}!
+        <StyledListGroupItem action variant={active ? 'success' : 'light'} onClick={func}>
+          {name}
       </StyledListGroupItem>
     );
   }

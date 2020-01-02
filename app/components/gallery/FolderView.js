@@ -3,8 +3,9 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/RemoveButtonContainer';
 import Thumbnail from '../containers/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledHR, StyledIcon, StyledFolderViewDiv, StyledRow } from './StyledComponents'
-import { Row, Container, Col } from 'react-bootstrap';
+import { StyledHR, StyledFolderViewDiv, StyledRow } from './StyledComponents'
+import { StyledIcon } from '../CommonStyledComponents'
+import { Row } from 'react-bootstrap';
 
 type Props = {};
 
@@ -54,15 +55,15 @@ export default class FolderView extends Component<Props> {
 						{folder}
 					</StyledFolderViewDiv>
 					{
-							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
+							(isActive && files && folder) ? <StyledFolderViewDiv><Row> {Object.keys(files)
 							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
 							.map((file, index) => {
 								return (
-									<div key={file} className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
+									<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
 										<Thumbnail folder={folder} fileName={file}/>
 									</div>
 								);
-							})} </StyledRow></StyledFolderViewDiv> : ""							
+							})} </Row></StyledFolderViewDiv> : ""							
 						}
 					<StyledHR/>
 				</div>

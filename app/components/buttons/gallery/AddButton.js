@@ -55,7 +55,7 @@ class AddButton extends Component {
         }
 
         return (
-            <>
+            <React.Fragment>
                 <StyledButton
                     variant="success" 
                     onClick={openFileDialog} 
@@ -77,7 +77,7 @@ class AddButton extends Component {
                         </Button>
                     </Modal.Footer>
                 </StyledModal> 
-            </>
+            </React.Fragment>
         )
     }
 }

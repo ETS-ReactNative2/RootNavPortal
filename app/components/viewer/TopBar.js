@@ -5,6 +5,7 @@ import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
 import ToggleFolderButton from '../buttons/viewer/ToggleFolderButton';
 import ToggleMeasuresButton from '../buttons/viewer/ToggleMeasuresButton';
+import { StyledRow } from './StyledComponents';
 
 type Props = {};
 
@@ -15,13 +16,13 @@ export default class TopBar extends Component<Props> {
       const { path } = this.props;
     return (
       <div>
-        <StyledTopBarDiv className="d-inline-flex container" data-tid="container">
-            <div className="row" style={{display: 'block'}}>
-                <span className="col-sm">Date:</span>
-                <span className="col-sm">Tag: {path.substring(path.lastIndexOf('\\')+1, path.indexOf('.'))}</span>
-                <span className="col-sm">Number of Plants:</span>
-                <span className="col-sm">Captured On:</span>
-            </div>
+        <StyledTopBarDiv className="d-inline-flex" data-tid="container">
+            <StyledRow>
+                <div className="col-sm-3">Tag: {path.substring(path.lastIndexOf('\\')+1, path.indexOf('.'))}</div>
+                <div className="col-sm-3">Date:</div>
+                <div className="col-sm-3">Number of Plants:</div>
+                <div className="col-sm-3">Captured On:</div>
+            </StyledRow>
         </StyledTopBarDiv>
         <StyledTopBarHR/>
         <StyledTopBarDiv className="d-inline-flex container" data-tid="container">

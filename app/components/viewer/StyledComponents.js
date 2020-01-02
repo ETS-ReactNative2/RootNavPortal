@@ -1,5 +1,5 @@
 import styled from 'styled-components';
-import { Card, ListGroupItem } from 'react-bootstrap';
+import { Card, ListGroupItem, Row } from 'react-bootstrap';
 
 
 export const StyledListGroupItem = styled(ListGroupItem)` && {
@@ -11,6 +11,11 @@ export const StyledContainer = styled.div` && {
     display: flex;
     flex-direction:column;
     height: 100vh;
+    overflow: hidden;
+}`
+
+export const StyledRow = styled(Row)` && {
+    width: 100vw;
 }`
 
 export const StyledCardHeader = styled(Card.Header)` && {

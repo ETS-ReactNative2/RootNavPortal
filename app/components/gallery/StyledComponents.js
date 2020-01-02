@@ -7,10 +7,6 @@ export const StyledHR = styled.hr` && {
 			margin: 0 4em;
     }`;
 
-export const StyledIcon = styled.i` && {
-      width: 1.3em;
-}`
-
 export const StyledFolderViewDiv = styled.div` && {
       min-height: 3em;
       display: -ms-flexbox;
