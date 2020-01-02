@@ -5,8 +5,10 @@ import { Button } from 'react-bootstrap'
 
 import { PLUGINDIR } from '../../constants/globals'
 import Plugin from './Plugin';
-import { StyledCard, StyledCardHeader } from './StyledComponents'
+import { StyledCard, StyledCardHeader, StyledCenterListGroupItem } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
+import ClearButton from '../buttons/viewer/ClearButton';
+import RefreshButton from '../buttons/viewer/RefreshButton';
 
 
 type Props = {};
@@ -30,6 +32,10 @@ export default class RightBar extends Component<Props> {
   render() {
     return (
         <StyledCard>
+          <StyledCenterListGroupItem>
+            <RefreshButton/>
+            <ClearButton/>
+          </StyledCenterListGroupItem>
           {
             Object.entries(this.state.plugins).map((pluginGroup, i) => {
               const groupName = pluginGroup[0];

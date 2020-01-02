@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import styles from './Gallery.css';
 import TopBar from './TopBar';
-import GalleryView from '../containers/GalleryViewContainer';
+import GalleryView from '../containers/gallery/GalleryViewContainer';
 import { existsSync, readFile } from 'fs';
 import { APPHOME, CONFIG } from '../../constants/globals';
 

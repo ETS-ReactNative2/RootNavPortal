@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
-import RemoveButton from '../containers/RemoveButtonContainer';
-import Thumbnail from '../containers/ThumbnailContainer';
+import RemoveButton from '../containers/gallery/RemoveButtonContainer';
+import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
 import { StyledHR, StyledFolderViewDiv, StyledRow } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'

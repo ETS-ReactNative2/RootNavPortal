@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import FilterBar from '../gallery/FilterBar';
-import { updateFilterText } from '../../actions/galleryActions';
+import FilterBar from '../../gallery/FilterBar';
+import { updateFilterText } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { }

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
-import Thumbnail from '../gallery/Thumbnail';
-import { addThumb } from '../../actions/galleryActions';
+import Thumbnail from '../../gallery/Thumbnail';
+import { addThumb } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 

@@ -1,9 +1,9 @@
 // @flow
 import React, { Component } from 'react';
-import AddButton from '../containers/AddButtonContainer';
-import RefreshButton from '../containers/RefreshButtonContainer';
+import AddButton from '../containers/gallery/AddButtonContainer';
+import RefreshButton from '../containers/gallery/RefreshButtonContainer';
 import ClearButton from '../buttons/gallery/ClearButton';
-import FilterBar from '../containers/FilterBarContainer'
+import FilterBar from '../containers/gallery/FilterBarContainer'
 import DateRange from './DateRange';
 import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
 

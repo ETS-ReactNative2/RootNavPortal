@@ -7,6 +7,11 @@ export const StyledListGroupItem = styled(ListGroupItem)` && {
     color: black;
   }`
 
+export const StyledCenterListGroupItem = styled(StyledListGroupItem)` && {
+    display: flex;
+    justify-content: space-evenly;
+  }`
+
 export const StyledContainer = styled.div` && {  
     display: flex;
     flex-direction:column;
@@ -28,7 +33,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     flex:1;
     margin-left: auto;
-    width: 10em;
+    width: 15em;
     margin-bottom: 1em;
-    overflow-y:scroll;
+    overflow-y:auto;
 }`

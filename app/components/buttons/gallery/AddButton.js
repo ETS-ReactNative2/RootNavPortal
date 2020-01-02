@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { ipcRenderer } from 'electron';
 import '../../common.css';
-import TreeChecklist from '../../containers/TreeChecklistContainer';
+import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
 import { existsSync, writeFile, mkdirSync } from 'fs';
 import { APPHOME, CONFIG } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 

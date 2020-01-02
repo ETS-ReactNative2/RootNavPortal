@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import FolderView from '../containers/FolderViewContainer';
+import FolderView from '../containers/gallery/FolderViewContainer';
 import { StyledHR, StyledGalleryViewDiv, StyledGalleryViewH1 } from './StyledComponents'
 
 
