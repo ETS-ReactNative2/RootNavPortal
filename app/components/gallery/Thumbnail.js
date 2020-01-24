@@ -25,9 +25,7 @@ export default class Thumbnail extends Component<Props> {
             const { folder, file, fileName, addThumb } = this.props;
             if (["jpg", "png"].some(ext => ext in file)) 
             {
-                const ext = 'jpg' in file ? 'jpg' : 'png';
-                console.log("HERE: " + folder + sep + fileName + "." + ext);
-                ipcRenderer.send('openViewer', folder + sep + fileName + "." + ext, () => {
+                ipcRenderer.send('openViewer', folder + sep + fileName + "%" + Object.keys(file).filter(string => !string.includes("Thumb")).join("%"), () => { //% is the delimeter for file extensions in the URL bar
                     console.log("Sent open viewer");
                 })
             }

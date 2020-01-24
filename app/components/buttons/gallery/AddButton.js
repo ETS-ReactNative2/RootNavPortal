@@ -23,13 +23,13 @@ class AddButton extends Component {
     }
 
     render() {
-        
+
         const openFileDialog = () => {
             ipcRenderer.send('openFolder')
         }
 
         ipcRenderer.on('folderData', (event, data) => {
-            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //Filter out files, with a depth of 5. Make an exclude regex of standard big paths, like OS folders, node_modules, other big dependency thinhs
+            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this. Need to make an exclude regex for things like system folders and node_modules in case
             this.props.updateModalBody(tree);
             this.props.showModal();
         });

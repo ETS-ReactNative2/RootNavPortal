@@ -9,7 +9,7 @@ export default class ViewerPage extends Component<Props> {
   render() {
     return (
       <div>
-        <Viewer path={this.props.path} />
+        <Viewer path={this.props.path} exts={this.props.exts}/>
       </div>
     )
   }
