@@ -1,33 +1,33 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT } from '../actions/galleryActions';
 
-const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
+// const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
 
-export default (state = initialState, action) => {
+export default (state = null, action) => {
     switch (action.type)
     {
         //Directory reducer actions
         case OPEN_DIR: return {
             ...state,
-            folders: state.folders.concat(action.paths)
+            folders: state.folders.concat(action.payload)
         };
         case REFRESH_DIRS: 
             return {
                 ...state,
-                files: action.files
+                files: action.payload
             }
         case REMOVE_DIR: {
-            const { [action.path]: omit, files } = state.folders // Remove path from state
+            const { [action.payload]: omit, files } = state.folders // Remove path from state
             return {
                 ...state,
-                folders: state.folders.filter(folder => folder.path !== action.path),
+                folders: state.folders.filter(folder => folder.path !== action.payload),
                 files,
-                checked: state.checked.filter(path => path !== action.path)
+                checked: state.checked.filter(path => path !== action.payload)
             };
         }
         case TOGGLE_DIR: return {
             ...state,
-            folders: state.folders.map(folder => folder.path == action.path ? {'path':folder.path, 'active':!folder.active} : folder)
+            folders: state.folders.map(folder => folder.path == action.payload ? {'path':folder.path, 'active':!folder.active} : folder)
         }
 
         //Modal reducer actions
@@ -44,25 +44,25 @@ export default (state = initialState, action) => {
         case UPDATE_MODAL:
             return {
                 ...state,
-                modalBody: action.tree
+                modalBody: action.payload
             };
         case IMPORT_CONFIG:
             return {
                 ...state,
                 hasReadConfig: true,
-                folders: action.data
+                folders: action.payload
             };
         case UPDATE_CHECKED:
             return {
                 ...state,
-                checked: action.paths
+                checked: action.payload
             }
         case ADD_FILES:
             return {
                 ...state,
                 files: {
                     ...state.files,
-                    [action.folder]: action.files
+                    [action.payload.folder]: action.payload.files
                 }
             }
         //Adds a thumbnail to a specific file object
@@ -72,11 +72,11 @@ export default (state = initialState, action) => {
                 ...state,
                 files: {
                     ...state.files,
-                    [action.folder]: {
-                        ...state.files[action.folder],
-                        [action.fileName]: {
-                            ...state.files[action.folder][action.fileName],
-                            [action.thumb.ext+"Thumb"]: action.thumb.thumb,
+                    [action.payload.folder]: {
+                        ...state.files[action.payload.folder],
+                        [action.payload.fileName]: {
+                            ...state.files[action.payload.folder][action.payload.fileName],
+                            [action.payload.thumb.ext+"Thumb"]: action.payload.thumb.thumb,
                         }
                     }
                 }
@@ -84,7 +84,7 @@ export default (state = initialState, action) => {
         case UPDATE_FILTER_TEXT:
             return {
                 ...state,
-                filterText: action.text
+                filterText: action.payload
             }
         default: return state;
     }

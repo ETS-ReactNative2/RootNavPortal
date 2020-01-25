@@ -2,12 +2,16 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
-import { configureStore, history } from './store/configureStore';
+import Store from './store/configureStore';
 import './bootstrap.global.css';
 import './app.global.css';
 import './fontawesome.global.css';
+import { getInitialStateRenderer } from 'electron-redux';
 
-const store = configureStore();
+const initialState = {gallery: { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" }};
+
+const { configureStore, history } = Store('renderer');
+const store = configureStore(initialState, 'renderer');
 
 render(
   <AppContainer>

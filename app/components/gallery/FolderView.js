@@ -57,7 +57,6 @@ export default class FolderView extends Component<Props> {
 						if (ext == 'rsml')
 						{
 							readFile(folder+sep+name+"."+ext, 'utf8', (err, data) => {
-								console.log(data);
 								structuredFiles[name].parsedRSML = parser.parse(data, xmlOptions);
 							});
 						}

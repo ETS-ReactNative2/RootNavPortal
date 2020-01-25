@@ -14,6 +14,8 @@ import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
+import Store from './store/configureStore';
+const { configureStore } = Store('main');
 
 export default class AppUpdater {
   constructor() {
@@ -22,7 +24,9 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
- 
+const initialState = {gallery: { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" }};
+
+const store = configureStore(initialState, 'main');
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
