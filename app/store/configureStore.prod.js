@@ -1,34 +1,22 @@
 // @flow
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, compose } from 'redux';
 import thunk from 'redux-thunk';
 import { createHashHistory, createMemoryHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 import type { counterStateType } from '../reducers/types';
-import {
-    forwardToMain,
-    forwardToRenderer,
-    triggerAlias,
-    replayActionMain,
-    replayActionRenderer,
-} from 'electron-redux';
+import { electronEnhancer } from 'redux-electron-store';
 
 let history;
 
 function configureStore(initialState?: counterStateType, scope) {
-    const history = scope == 'main' ? createMemoryHistory() : createHashHistory();
+    const history     = scope == 'main' ? createMemoryHistory() : createHashHistory();
     const rootReducer = createRootReducer(history);
-    const router = routerMiddleware(history);
-    let middleware = [thunk];
+    const router      = routerMiddleware(history);
+    const middleware  = [thunk, router];
 
-    if (scope == 'main') middleware = [triggerAlias, ...middleware, forwardToRenderer];
-    else middleware = [forwardToMain, router, ...middleware]
-
-    const enhancer = applyMiddleware(...middleware);
-    const store = createStore(rootReducer, initialState, enhancer);
-
-    if (scope == 'main') replayActionMain(store);
-    else replayActionRenderer(store);
+    const enhancer = compose(applyMiddleware(...middleware), electronEnhancer({ dispatchProxy: a => store.dispatch(a)})); 
+    const store    = createStore(rootReducer, initialState, enhancer); //Don't shorten this. It can be one lined, yes, but ^this^ requires the variable hoisting from const to work, else it's undefined
     return store;
 }
 

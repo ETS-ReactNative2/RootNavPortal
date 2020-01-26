@@ -6,12 +6,10 @@ import Store from './store/configureStore';
 import './bootstrap.global.css';
 import './app.global.css';
 import './fontawesome.global.css';
-import { getInitialStateRenderer } from 'electron-redux';
 
-const initialState = {gallery: { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" }};
 
 const { configureStore, history } = Store('renderer');
-const store = configureStore(initialState, 'renderer');
+const store = configureStore({}, 'renderer');
 
 render(
   <AppContainer>

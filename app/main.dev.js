@@ -15,7 +15,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import Store from './store/configureStore';
-const { configureStore } = Store('main');
+const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 
 export default class AppUpdater {
   constructor() {
@@ -24,9 +24,15 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
-const initialState = {gallery: { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" }};
+const store = configureStore({}, 'main');
 
-const store = configureStore(initialState, 'main');
+//Hot reload reducers in main process
+ipcMain.on('renderer-reload', (event, action) => {
+  delete require.cache[require.resolve('./reducers')];
+  store.replaceReducer(require('./reducers'));
+  event.returnValue = true;
+});
+
 let mainWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
