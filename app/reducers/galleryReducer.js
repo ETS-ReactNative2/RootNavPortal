@@ -17,7 +17,7 @@ export default (state = initialState, action) => {
                 files: action.files
             }
         case REMOVE_DIR: {
-            const { [action.path]: omit, files } = state.folders // Remove path from state
+            const { [action.path]: omit, ...files } = state.files // Remove the files relating to this path.
             return {
                 ...state,
                 folders: state.folders.filter(folder => folder.path !== action.path),

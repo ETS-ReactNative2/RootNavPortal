@@ -14,6 +14,11 @@ class AddButton extends Component {
     {
         super(props);
         this.tree = React.createRef();
+        ipcRenderer.on('folderData', (event, data) => {
+            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this. Need to make an exclude regex for things like system folders and node_modules in case
+            this.props.updateModalBody(tree);
+            this.props.showModal();
+        });
     }
 
     shouldComponentUpdate(nextProps, nextState)
@@ -22,43 +27,36 @@ class AddButton extends Component {
         //Other state is for data passing and internals
     }
 
-    render() {
+    openFileDialog() {
+        ipcRenderer.send('openFolder')
+    }
 
-        const openFileDialog = () => {
-            ipcRenderer.send('openFolder')
-        }
+    importFolders() {
+        const folders = this.props.imports.map(path => ({'path': path, 'active': true}));
+        this.props.addFolders(folders.filter(newfolder => !this.props.folders.some(folder => newfolder.path == folder.path)));
+        this.props.closeModal();
+        this.tree.current.clear();
 
-        ipcRenderer.on('folderData', (event, data) => {
-            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this. Need to make an exclude regex for things like system folders and node_modules in case
-            this.props.updateModalBody(tree);
-            this.props.showModal();
-        });
-
-        const importFolders = () => {
-            const folders = this.props.imports.map(path => ({'path': path, 'active': true}));
-            this.props.addFolders(folders.filter(newfolder => !this.props.folders.some(folder => newfolder.path == folder.path)));
-            this.props.closeModal();
-            this.tree.current.clear();
-
-            if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-                mkdirSync(APPHOME, '0777', true, err => {
-                     if (err) console.log(err) 
-                });
-            writeFile(APPHOME + CONFIG , JSON.stringify(folders, null, 4), err => {
-                if (err) console.log(err); //idk do some handling here
+        if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
+            mkdirSync(APPHOME, '0777', true, err => {
+                 if (err) console.log(err) 
             });
-        }
+        writeFile(APPHOME + CONFIG , JSON.stringify(folders, null, 4), err => {
+            if (err) console.log(err); //idk do some handling here
+        });
+    }
 
-        const close = () => {
-            this.tree.current.clear();
-            this.props.closeModal();
-        }
+    close() {
+        this.tree.current.clear();
+        this.props.closeModal();
+    }
 
+    render() {
         return (
             <React.Fragment>
                 <StyledButton
                     variant="success" 
-                    onClick={openFileDialog} 
+                    onClick={this.openFileDialog} 
                     className={`btn btn-default fas fa-plus button`} 
                 />
                 <StyledModal show={this.props.modal} onHide={close}>
@@ -69,10 +67,10 @@ class AddButton extends Component {
                         <TreeChecklist ref={this.tree}/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="danger" onClick={close}>
+                        <Button variant="danger" onClick={this.close}>
                             Cancel
                         </Button>
-                        <Button variant="primary" onClick={importFolders}>
+                        <Button variant="primary" onClick={this.importFolders}>
                             Import
                         </Button>
                     </Modal.Footer>
