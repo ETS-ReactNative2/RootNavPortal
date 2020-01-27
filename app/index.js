@@ -2,12 +2,14 @@ import React from 'react';
 import { render } from 'react-dom';
 import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
-import { configureStore, history } from './store/configureStore';
+import Store from './store/configureStore';
 import './bootstrap.global.css';
 import './app.global.css';
 import './fontawesome.global.css';
 
-const store = configureStore();
+
+const { configureStore, history } = Store('renderer');
+const store = configureStore({}, 'renderer');
 
 render(
   <AppContainer>
