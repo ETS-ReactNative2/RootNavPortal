@@ -27,26 +27,26 @@ class AddButton extends Component {
         //Other state is for data passing and internals
     }
 
-    openFileDialog() {
-        ipcRenderer.send('openFolder')
-    }
-
-    importFolders() {
-        const folders = this.props.imports.map(path => ({'path': path, 'active': true}));
+    importFolders = () => {
+        const folders = this.props.imports.map(path => ({'path': path, 'active': false}));
         this.props.addFolders(folders.filter(newfolder => !this.props.folders.some(folder => newfolder.path == folder.path)));
         this.props.closeModal();
         this.tree.current.clear();
 
         if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
             mkdirSync(APPHOME, '0777', true, err => {
-                 if (err) console.log(err) 
+                if (err) console.log(err) 
             });
         writeFile(APPHOME + CONFIG , JSON.stringify(folders, null, 4), err => {
             if (err) console.log(err); //idk do some handling here
         });
     }
 
-    close() {
+    openFileDialog = () => {
+        ipcRenderer.send('openFolder')
+    }
+
+    close = () => {
         this.tree.current.clear();
         this.props.closeModal();
     }
