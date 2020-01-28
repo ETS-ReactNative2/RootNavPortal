@@ -1,11 +1,11 @@
 // @flow
 import fs from 'fs';
 import React, { Component } from 'react';
-import { Button } from 'react-bootstrap'
+import { Button, Row } from 'react-bootstrap'
 
 import { PLUGINDIR } from '../../constants/globals'
 import Plugin from './Plugin';
-import { StyledCard, StyledCardHeader, StyledCenterListGroupItem } from './StyledComponents'
+import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
@@ -41,14 +41,27 @@ export default class RightBar extends Component<Props> {
               const groupName = pluginGroup[0];
               return (
                 <React.Fragment key={i}>
-                  <StyledCardHeader variant="light" as={Button} onClick={() => this.togglePluginGroup(groupName)}>{groupName} Measurements <StyledIcon className={"fas fa-chevron-" + (this.state[groupName] ?  "down" : "right") + " fa-lg"}/></StyledCardHeader>
+                  <StyledCardHeader variant="light" as={Button} onClick={() => this.togglePluginGroup(groupName)}>
+                    <div className="container">
+                    <Row>
+                      <StyledChevron className="col-3">
+                        <StyledIcon className={"fas fa-chevron-" + (this.state[groupName] ?  "down" : "right") + " fa-lg"}/>
+                      </StyledChevron>
+                      <div className="col-9">
+                        {groupName} Measurements
+                      </div>
+                    </Row>
+                    </div>
+                  </StyledCardHeader>
                   {
                     this.state[groupName] ? Object.entries(pluginGroup[1]).map((plugin, i) => {
-                      return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}><Plugin 
-                        key={i} 
-                        name={plugin[0]} 
-                        func={plugin[1].function} 
-                        active={plugin[1].active}/></div>
+                      return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
+                        <Plugin 
+                          key={i} 
+                          name={plugin[0]} 
+                          func={plugin[1].function} 
+                          active={plugin[1].active}/>
+                      </div>
                     }) : ""
                   }
                 </React.Fragment>

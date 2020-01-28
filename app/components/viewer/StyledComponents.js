@@ -37,3 +37,8 @@ export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     margin-bottom: 1em;
     overflow-y:auto;
 }`
+
+export const StyledChevron = styled.div` && {
+    align-items: center;
+    display: flex;
+}`
