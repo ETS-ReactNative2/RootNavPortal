@@ -10,7 +10,7 @@ class RefreshButton extends Component {
             <StyledButton
                 variant="primary" 
                 className={`btn btn-default fas fa-sync button`} 
-                onClick={""}
+                onClick={() => {}}
             />    
         )
     }

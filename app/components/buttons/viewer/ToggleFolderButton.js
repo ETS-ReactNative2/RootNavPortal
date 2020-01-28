@@ -10,7 +10,7 @@ class RemoveButton extends Component {
         return (
             <StyledButton
                 variant="dark" 
-                onClick={""} 
+                onClick={() => {}} 
                 className={`btn btn-default fas fa-folder button`} 
             />    
         )

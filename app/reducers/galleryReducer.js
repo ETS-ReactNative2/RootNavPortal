@@ -1,5 +1,5 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
-    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT } from '../actions/galleryActions';
+    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_PARSED_RSML } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
 
@@ -85,6 +85,20 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 filterText: action.text
+            }
+        case UPDATE_PARSED_RSML:
+            return {
+                ...state,
+                files: {
+                    ...state.files,
+                    [action.folder]: {
+                        ...state.files[action.folder],
+                        [action.fileName]: {
+                            ...state.files[action.folder][action.fileName],
+                            parsedRSML: action.rsml,
+                        }
+                    }
+                }
             }
         default: return state;
     }

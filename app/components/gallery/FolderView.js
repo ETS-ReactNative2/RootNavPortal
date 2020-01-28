@@ -2,12 +2,11 @@
 import React, { Component } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
-import { readdir, readFile } from 'fs';
+import { readdir } from 'fs';
 import { StyledHR, StyledFolderViewDiv, StyledRow } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import { Row } from 'react-bootstrap';
-import parser from 'fast-xml-parser';
-import { sep } from 'path';
+
 type Props = {};
 
 export default class FolderView extends Component<Props> {
@@ -21,21 +20,6 @@ export default class FolderView extends Component<Props> {
 	}
 
 	render() {
-
-		let xmlOptions = {
-			attributeNamePrefix: "@_",
-			attrNodeName: "attr", //default is 'false'
-			textNodeName: "#text",
-			ignoreAttributes: false,
-			ignoreNameSpace: false,
-			allowBooleanAttributes: false,
-			parseNodeValue: true,
-			parseAttributeValue: true,
-			trimValues: true,
-			decodeHTMLchar: true,
-			cdataTagName: "__cdata", //default is 'false'
-			cdataPositionChar: "\c"
-		};
 
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -52,14 +36,6 @@ export default class FolderView extends Component<Props> {
 						if (!structuredFiles[name]) structuredFiles[name] = {} // if there is rsml and the png you'll get filename: {rsml: true, png: true}
 
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
-						
-						//Unsure about how well this well scale. I think the parsing is sync, but it's apparently so fast it might not matter at all. Depends how much RSML we have.
-						if (ext == 'rsml')
-						{
-							readFile(folder+sep+name+"."+ext, 'utf8', (err, data) => {
-								structuredFiles[name].parsedRSML = parser.parse(data, xmlOptions);
-							});
-						}
 					}
 				});
 				if (Object.keys(structuredFiles).length) 

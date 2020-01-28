@@ -9,7 +9,7 @@ class RemoveButton extends Component {
         return (
             <StyledButton
                 variant="info" 
-                onClick={""} 
+                onClick={() => {}} 
                 className={`btn btn-default fa fa-chart-line button`} 
             />    
         )

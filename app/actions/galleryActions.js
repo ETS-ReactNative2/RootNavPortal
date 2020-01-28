@@ -10,6 +10,7 @@ export const UPDATE_CHECKED = 'UPDATE_CHECKED';
 export const ADD_FILES      = 'ADD_FILES';
 export const ADD_THUMB      = 'ADD_THUMB';
 export const UPDATE_FILTER_TEXT = 'UPDATE_FILTER_TEXT';
+export const UPDATE_PARSED_RSML = "UPDATE_PARSED_RSML";
 
 export const addFolders    = paths => ({ type: OPEN_DIR, paths });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -23,3 +24,4 @@ export const updateChecked = paths => ({ type: UPDATE_CHECKED, paths });
 export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
 export const addThumb      = (folder, fileName, thumb) => ({ type: ADD_THUMB, folder, fileName, thumb}) //folder: full folder path string, fileName: file string, no ext
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
+export const updateParsedRSML = (folder, fileName, rsml) => ({type: UPDATE_PARSED_RSML, folder, fileName, rsml});

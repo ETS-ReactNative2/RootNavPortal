@@ -285,6 +285,7 @@
     "redux": "^4.0.1",
     "redux-electron-store": "^0.6.6",
     "redux-thunk": "^2.3.0",
+    "simplify-js": "^1.2.3",
     "source-map-support": "^0.5.9",
     "styled-components": "^4.4.0",
     "typescript": "^3.6.4"

@@ -16,7 +16,7 @@ export default class Viewer extends Component<Props> {
       <StyledContainer>
           <TopBar path={this.props.path} />
           <Render path={this.props.path} />
-          <RightBar/>
+          {/* <RightBar/> */}
       </StyledContainer>
     );
   }
