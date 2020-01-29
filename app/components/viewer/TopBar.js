@@ -13,12 +13,13 @@ export default class TopBar extends Component<Props> {
   props: Props;
 
   render() {
-      const { path } = this.props;
+    const { path } = this.props;
+    let tag = path ? path.match(/(.+\\|\/)(.+)/)[2] : ""; //Matches the file path into the absolute directory path and file name
     return (
       <div>
         <StyledTopBarDiv className="d-inline-flex" data-tid="container">
             <StyledRow>
-                <div className="col-sm-3">Tag: {path.substring(path.lastIndexOf('\\')+1, path.indexOf('.'))}</div>
+                <div className="col-sm-3">Tag: {tag}</div>
                 <div className="col-sm-3">Date:</div>
                 <div className="col-sm-3">Number of Plants:</div>
                 <div className="col-sm-3">Captured On:</div>

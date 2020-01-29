@@ -68,8 +68,8 @@ export default class Render extends Component<Props> {
         
         //Canvas settings
         ctx.strokeStyle = '#f53';
-        ctx.lineWidth  = 4;
-        ctx.lineCap    = ctx.lineJoin ='round';
+        ctx.lineWidth   = 4;
+        ctx.lineCap     = ctx.lineJoin ='round';
 
         //Debug drawing shit
         ctx.beginPath();
