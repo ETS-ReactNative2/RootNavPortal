@@ -35,6 +35,10 @@ export default class Render extends Component<Props> {
     //Fires on each component update - not initial render - which is fine since our ref for drawing won't be active in render, and the state change from reading RSML will trigger an update
     componentDidUpdate()
     {
+        this.draw();
+    }
+
+    draw = () => {
         const { file } = this.props;
         const ctx = this.canvas.current.getContext("2d");
 
@@ -59,12 +63,12 @@ export default class Render extends Component<Props> {
     {
         const canvas = this.canvas.current;
         const ctx = canvas.getContext("2d");
-        canvas.width  = "2000";  //defaults to 300x150
-        canvas.height = "2000"; //We'll need to upscale the DOM DPI, and then scale it down to fit the UI to get a high res canvas
+        canvas.width  = "1200";  //defaults to 300x150
+        canvas.height = "1200"; //We'll need to upscale the DOM DPI, and then scale it down to fit the UI to get a high res canvas
         
         //Canvas settings
         ctx.strokeStyle = '#f53';
-        ctx.lineWidth  = 2;
+        ctx.lineWidth  = 4;
         ctx.lineCap    = ctx.lineJoin ='round';
 
         //Debug drawing shit
@@ -79,7 +83,20 @@ export default class Render extends Component<Props> {
         ctx.lineTo(140, 140)
         ctx.stroke();
         // ctx.translate(-100, -100);
-        // ctx.scale(0.9, 0.9)        
+        ctx.scale(0.5, 0.5)
+        this.draw();    
+        document.addEventListener("keydown", this.loadNextRSML, false);
+    }
+
+    componentWillUnmount()
+    {
+        document.removeEventListener("keydown", this.loadNextRSML, false);
+    }
+
+    loadNextRSML = e =>
+    {
+        if (e.key != "ArrowLeft" && e.key != "ArrowRight") return;
+        
     }
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
@@ -94,9 +111,9 @@ export default class Render extends Component<Props> {
             this.rsmlPoints.push(
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'], 
                 points: rsml.geometry.rootnavspline.point.map(p => ({ //Maybe we should just extract Mike's splines instead and use them, I think this does nearly the same. Should compare results.
-                    x: p.attr[attributeNamePrefix + 'x'], //options are: use the polylines, either simplified or not, or the splines
-                    y: p.attr[attributeNamePrefix + 'y'] // ask Mike about if cubic spline interpolation is better than the more exact (albeit uglier) polylines
-                }))
+                    x: p.attr[attributeNamePrefix + 'x'],             //options are: use the polylines, either simplified or not, or the splines
+                    y: p.attr[attributeNamePrefix + 'y']              // ask Mike about if cubic spline interpolation is better than the more exact (albeit uglier) polylines
+                })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });
         }
         if (rsml.root)

@@ -5,9 +5,7 @@ import { createHashHistory, createMemoryHistory } from 'history';
 import { routerMiddleware, routerActions } from 'connected-react-router';
 import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
-import * as counterActions from '../actions/counter';
 import * as galleryActions from '../actions/galleryActions';
-import type { counterStateType } from '../reducers/types';
 import { electronEnhancer } from 'redux-electron-store';
 
 let history;
@@ -15,7 +13,7 @@ let history;
 //configureStore now takes a 'scope' arg, either 'main' or 'renderer', to reflect which Redux store is being configured
 //There is a store in each process now, which have an IPC layer to sync up. Oddly, it seems like they only init with the last action's data
 //
-const configureStore = (initialState?: counterStateType, scope) => {
+const configureStore = (initialState, scope) => {
   const rootReducer = createRootReducer(history);
 
   // Redux Configuration
@@ -37,7 +35,6 @@ const configureStore = (initialState?: counterStateType, scope) => {
 
   // Redux DevTools Configuration
   const actionCreators = {
-    ...counterActions,
     ...galleryActions,
     ...routerActions
   };

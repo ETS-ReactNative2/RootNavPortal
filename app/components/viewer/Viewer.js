@@ -10,8 +10,6 @@ export default class Viewer extends Component<Props> {
   props: Props;
 
   render() {
-    console.log(this.props);
-
     return (
       <StyledContainer>
           <TopBar path={this.props.path} />

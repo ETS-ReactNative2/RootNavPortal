@@ -4,12 +4,11 @@ import thunk from 'redux-thunk';
 import { createHashHistory, createMemoryHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
-import type { counterStateType } from '../reducers/types';
 import { electronEnhancer } from 'redux-electron-store';
 
 let history;
 
-function configureStore(initialState?: counterStateType, scope) {
+function configureStore(initialState, scope) {
     const history     = scope == 'main' ? createMemoryHistory() : createHashHistory();
     const rootReducer = createRootReducer(history);
     const router      = routerMiddleware(history);

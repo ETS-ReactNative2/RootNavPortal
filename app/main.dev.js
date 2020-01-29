@@ -86,7 +86,7 @@ app.on('ready', async () => {
     }
   });
 
-  mainWindow.loadURL(`file://${__dirname}/app.html?home`);
+  mainWindow.loadURL(`file://${__dirname}/app.html?gallery`);
   mainWindow.webContents.openDevTools();
 
   ipcMain.on('openFolder', (event, path) => {
