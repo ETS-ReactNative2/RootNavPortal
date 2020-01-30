@@ -4,8 +4,6 @@ import { updateParsedRSML } from '../../../actions/galleryActions'; //still in t
 
 const mapStateToProps = (state, ownProps) => {
     let r = ownProps.path.match(/(.+\\|\/)(.+)/);
-    console.log(r);
-    console.log(state.gallery.files)
     return { 
         path: ownProps.path,
         file: state.gallery.files[r[1].slice(0, -1)][r[2]]

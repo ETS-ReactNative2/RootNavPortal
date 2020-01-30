@@ -16,6 +16,7 @@ export default class Render extends Component<Props> {
 
     colours = {PRIMARY: '#f53', LATERAL: '#ffff00'};
     rsmlPoints = [];
+    canvasScaleDiv = 2; //Canvas scale is 1 / this. Used to clear the canvas with inverted scaling
 
     xmlOptions = {
         attributeNamePrefix: "@_",
@@ -40,17 +41,18 @@ export default class Render extends Component<Props> {
 
     draw = () => {
         const { file } = this.props;
-        const ctx = this.canvas.current.getContext("2d");
+        const ctx    = this.canvas.current.getContext("2d");
+        const canvas = this.canvas.current;
+        ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv , canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
 
         if (file.parsedRSML) //Ready to draw!
         {
             const { simplifiedLines } = file.parsedRSML;
+           
             if (!simplifiedLines) return;
             simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
                 ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; 
-
-                //Draws a line
-                ctx.beginPath();
+                ctx.beginPath(); //Draw the actual line
                 line.points.forEach(point => {
                     ctx.lineTo(point.x, point.y);
                 })
@@ -82,33 +84,21 @@ export default class Render extends Component<Props> {
         ctx.lineTo(100, 100)
         ctx.lineTo(140, 140)
         ctx.stroke();
-        // ctx.translate(-100, -100);
-        ctx.scale(0.5, 0.5)
+
+        ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
         this.draw();    
-        document.addEventListener("keydown", this.loadNextRSML, false);
-    }
-
-    componentWillUnmount()
-    {
-        document.removeEventListener("keydown", this.loadNextRSML, false);
-    }
-
-    loadNextRSML = e =>
-    {
-        if (e.key != "ArrowLeft" && e.key != "ArrowRight") return;
-        
     }
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = rsml => {
-        const tolerance   = 0.1;
+        const tolerance   = 0.1; //Used for simplify
         const highQuality = true;
         const { attrNodeName, attributeNamePrefix } = this.xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
             
-            this.rsmlPoints.push(
+            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline, or wrap the return into a simplify call like simplify(xxx.map(), tolerance, highQuality)
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'], 
                 points: rsml.geometry.rootnavspline.point.map(p => ({ //Maybe we should just extract Mike's splines instead and use them, I think this does nearly the same. Should compare results.
                     x: p.attr[attributeNamePrefix + 'x'],             //options are: use the polylines, either simplified or not, or the splines
@@ -137,6 +127,7 @@ export default class Render extends Component<Props> {
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
             Array.isArray(scene) ? scene.forEach(plant => this.formatPoints(plant)) : Object.keys(scene).forEach(plant => this.formatPoints(scene[plant]));
             updateParsedRSML(r[1], r[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            this.rsmlPoints = [];
         }
 
         return (

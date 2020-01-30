@@ -19,15 +19,12 @@ export default class Thumbnail extends Component<Props> {
 
     openViewer = e => 
     {
-        console.log(`file://${__dirname}/app.html?gallery`)
         if (!this.windowObject) 
         {
             const { folder, file, fileName, addThumb } = this.props;
             if (["jpg", "png"].some(ext => ext in file)) 
             {
-                ipcRenderer.send('openViewer', folder + sep + fileName + "%" + Object.keys(file).filter(string => !string.includes("Thumb")).join("%"), () => { //% is the delimeter for file extensions in the URL bar
-                    console.log("Sent open viewer");
-                })
+                ipcRenderer.send('openViewer', folder + sep + fileName + "%" + Object.keys(file).filter(string => !string.includes("Thumb")).join("%"), () => {}) //% is the delimeter for file extensions in the URL bar
             }
         }
     }

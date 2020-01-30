@@ -98,7 +98,6 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('openViewer', (event, path) => {
-    console.log(path);
     let subWindow = new BrowserWindow({
       width: 1024,
       height: 728,
