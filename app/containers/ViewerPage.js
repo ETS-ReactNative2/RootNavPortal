@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import Viewer from '../components/viewer/Viewer';
+import Viewer from '../components/containers/viewer/ViewerContainer';
 type Props = {};
 
 export default class ViewerPage extends Component<Props> {

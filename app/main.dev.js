@@ -87,7 +87,11 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html?gallery`);
-  mainWindow.webContents.openDevTools();
+  mainWindow.webContents.on("did-frame-finish-load", () => {
+    mainWindow.webContents.once("devtools-opened", () => {
+      });
+    mainWindow.webContents.openDevTools();
+  });
 
   ipcMain.on('openFolder', (event, path) => {
     dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 

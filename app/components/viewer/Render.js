@@ -97,9 +97,8 @@ export default class Render extends Component<Props> {
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
-            
             this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline, or wrap the return into a simplify call like simplify(xxx.map(), tolerance, highQuality)
-                { type: rsml[attrNodeName][attributeNamePrefix + 'label'], 
+                { type: rsml[attrNodeName][attributeNamePrefix + 'label'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry.rootnavspline.point.map(p => ({ //Maybe we should just extract Mike's splines instead and use them, I think this does nearly the same. Should compare results.
                     x: p.attr[attributeNamePrefix + 'x'],             //options are: use the polylines, either simplified or not, or the splines
                     y: p.attr[attributeNamePrefix + 'y']              // ask Mike about if cubic spline interpolation is better than the more exact (albeit uglier) polylines
@@ -108,8 +107,7 @@ export default class Render extends Component<Props> {
         }
         if (rsml.root)
         {
-           Array.isArray(rsml.root) ? rsml.root.forEach(root => this.formatPoints(root)) //XMl parsing results in this check being required here too
-            : Object.keys(rsml.root).forEach(root => this.formatPoints(rsml.root[root]));
+           Array.isArray(rsml.root) ? rsml.root.forEach(root => this.formatPoints(root)) : this.formatPoints(rsml.root); //XMl parsing results in this check being required here too
         }
     }
 
@@ -123,9 +121,9 @@ export default class Render extends Component<Props> {
             //Ingest the RSML here if it's not cached in state
             let data = readFileSync(r[1] + sep + r[2] + ".rsml", 'utf8');
             let rsmlJson = parser.parse(data, this.xmlOptions);
-            const { scene } = rsmlJson.rsml;
+            const { scene: { plant } } = rsmlJson.rsml;
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
-            Array.isArray(scene) ? scene.forEach(plant => this.formatPoints(plant)) : Object.keys(scene).forEach(plant => this.formatPoints(scene[plant]));
+            Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
             updateParsedRSML(r[1], r[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             this.rsmlPoints = [];
         }
