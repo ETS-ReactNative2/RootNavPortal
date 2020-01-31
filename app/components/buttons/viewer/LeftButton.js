@@ -9,7 +9,7 @@ class RemoveButton extends Component {
         return (
             <StyledButton
                 variant="secondary" 
-                onClick={() => {}} 
+                onClick={() => this.props.click(-1)} 
                 className={`btn btn-default fas fa-arrow-left button`} 
             />    
         )

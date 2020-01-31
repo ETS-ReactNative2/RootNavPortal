@@ -21,17 +21,21 @@ props: Props;
 
     componentDidMount()
     {
-        document.addEventListener("keydown", this.loadNextRSML, false);
+        document.addEventListener("keydown", this.handleClick, false);
     }
 
     componentWillUnmount()
     {
-        document.removeEventListener("keydown", this.loadNextRSML, false);
+        document.removeEventListener("keydown", this.handleClick, false);
     }
 
-    loadNextRSML = e =>
+    handleClick = e =>
     {
         if (e.key != this.LEFT_KEY && e.key != this.RIGHT_KEY) return;
+        this.loadNextRSML(e.key == this.LEFT_KEY ? -1 : 1);
+    }
+
+    loadNextRSML = direction => {
         let split = this.state.path.match(/(.+\\|\/)(.+)/);
         let folder = split[1].replace(/\\\\/g, '\\').slice(0, -1); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?)
         let keys = Object.keys(this.props.files[folder])
@@ -40,7 +44,7 @@ props: Props;
         let initialIndex = index;
         do 
         {
-            index += e.key == this.LEFT_KEY ? -1 : 1;
+            index += direction;
             if (index < 0) index = keys.length - 1; //Wrap left or right around the array if out of bounds
             if (index == keys.length) index = 0;
             file = this.props.files[folder][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
@@ -57,7 +61,7 @@ props: Props;
     {
         return (
             <StyledContainer>
-                <TopBar path={this.state.path} />
+                <TopBar path={this.state.path} buttonHandler={this.loadNextRSML}/>
                 <Render path={this.state.path} />
                 {/* <RightBar/> */}
             </StyledContainer>

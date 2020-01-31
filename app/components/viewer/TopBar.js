@@ -28,8 +28,8 @@ export default class TopBar extends Component<Props> {
         <StyledTopBarHR/>
         <StyledTopBarDiv className="d-inline-flex container" data-tid="container">
             <ToggleFolderButton />
-            <LeftButton />
-            <RightButton />
+            <LeftButton click={this.props.buttonHandler}/>
+            <RightButton click={this.props.buttonHandler}/>
             <ToggleMeasuresButton />
             <div className="custom-control custom-checkbox">
                 <input type="checkbox" className="custom-control-input" id="architecture"/>
