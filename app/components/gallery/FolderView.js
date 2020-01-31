@@ -27,7 +27,7 @@ export default class FolderView extends Component<Props> {
 		if (!this.props.files) {
 			let structuredFiles = {};
 			readdir(folder, (err, files) => {
-				let matched = files.map(file => file.match(/(.+)\.(rsml|tiff|png|jpg|jpeg)$/)) //Scan for file types we use
+				let matched = files.map(file => file.match(/(.+)\.(rsml|png|jpg|jpeg)$/)) //Scan for file types we use
 				matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
 					if (regex) 
 					{

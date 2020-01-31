@@ -34,24 +34,30 @@ export default class Thumbnail extends Component<Props> {
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
         const { folder, file, fileName, addThumb } = this.props;
-        if (["jpg", "png"].some(ext => ext in file && !(ext + "Thumb" in file))) 
+        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
-            const ext = 'jpg' in file ? 'jpg' : 'png';
-
+            const ext = Object.keys(file).find(ext => ext.match(/png|jpg|jpeg/));
+            
+            //Tif files "don't support buffer" apparently, when thumbnailing, so uhh... :shrug:
             imageThumbail(folder + sep + fileName + "." + ext).then(thumb => 
             {
                 addThumb(folder, fileName, {ext: ext, thumb}) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
             }).catch(err => console.error(err));
         }
 
-		return (
+        let image;
+        Object.keys(file).forEach(key => {
+            if (key.includes("Thumb"))
+            {
+                let source = 'data:image/'+key.substring(0.3)+';base64,' + btoa(String.fromCharCode.apply(null, file[key]));
+                image = <StyledImage className="rounded mx-auto d-block" src={ source } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> 
+            }
+        })
+
+        return (
             <div>
                 <Row><Col>
-                {
-                    (file.pngThumb) ? <StyledImage className="rounded mx-auto d-block" src={'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, file.pngThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> :
-                    (file.jpgThumb) ? <StyledImage className="rounded mx-auto d-block" src={'data:image/jpg;base64,' + btoa(String.fromCharCode.apply(null, file.jpgThumb)) } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> : 
-                    ""
-                }
+                { image }
                 </Col></Row>
                 <StyledRow><StyledCol>{fileName}</StyledCol></StyledRow>
             </div>
