@@ -16,6 +16,11 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
+import axios from 'axios';
+import { API_PATH } from './constants/globals.js';
+
+global.API_STATUS = false;
+axios.get(API_PATH + "/model").then(res => global.API_STATUS = true).catch(err => global.API_STATUS = false);
 
 export default class AppUpdater {
   constructor() {
