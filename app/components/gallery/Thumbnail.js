@@ -33,7 +33,7 @@ export default class Thumbnail extends Component<Props> {
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
         const { folder, file, fileName, addThumb } = this.props;
-        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumbw" in file))) 
+        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
             const ext = Object.keys(file).find(ext => ext.match(/png|jpg|jpeg/));
             
