@@ -3,8 +3,7 @@ import React, { Component } from 'react';
 import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
-import { StyledImage, StyledCol, StyledRow } from './StyledComponents'
-import { Row, Col } from 'react-bootstrap';
+import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
 
 type Props = {};
 
@@ -34,7 +33,7 @@ export default class Thumbnail extends Component<Props> {
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
         const { folder, file, fileName, addThumb } = this.props;
-        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumb" in file))) 
+        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumbw" in file))) 
         {
             const ext = Object.keys(file).find(ext => ext.match(/png|jpg|jpeg/));
             
@@ -50,18 +49,19 @@ export default class Thumbnail extends Component<Props> {
             if (key.includes("Thumb"))
             {
                 let source = 'data:image/'+key.substring(0.3)+';base64,' + btoa(String.fromCharCode.apply(null, file[key]));
-                image = <StyledImage className="rounded mx-auto d-block" src={ source } onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}/> 
+                image = <StyledImage className="card-img-top" src={ source }/> 
             }
         })
 
         return (
-            <div>
-                <Row><Col>
-                { image }
-                </Col></Row>
-                <StyledRow><StyledCol>{fileName}</StyledCol></StyledRow>
-            </div>
-            
+            <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
+                <div>{image}</div>
+                <StyledCardBody>
+                    <StyledCardText>
+                        {fileName}
+                    </StyledCardText>
+                </StyledCardBody>
+            </StyledImageCard>            
 		);
 	}
 }

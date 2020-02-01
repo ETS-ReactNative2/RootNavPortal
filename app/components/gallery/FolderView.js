@@ -3,9 +3,9 @@ import React, { Component } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledHR, StyledFolderViewDiv, StyledRow } from './StyledComponents'
+import { StyledFolderViewDiv, StyledRow, StyledCardHeader } from './StyledComponents'
+import { Card } from 'react-bootstrap'
 import { StyledIcon } from '../CommonStyledComponents'
-import { Row } from 'react-bootstrap';
 
 type Props = {};
 
@@ -23,7 +23,7 @@ export default class FolderView extends Component<Props> {
 
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder, filterText, files } = this.props; 
+		const { isActive, folder, filterText, files, toggleOpenFile } = this.props; 
 		if (!this.props.files) {
 			let structuredFiles = {};
 			readdir(folder, (err, files) => {
@@ -48,25 +48,28 @@ export default class FolderView extends Component<Props> {
 		if (!filterText || (files && Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase()))))
 		{
 			return (
-				<div>
-					<StyledFolderViewDiv>
-						<RemoveButton path={folder}/>
-						<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
-						{folder}
-					</StyledFolderViewDiv>
+				<Card className="bg-light">
+					<StyledCardHeader onClick={() => toggleOpenFile(folder)}>
+						<StyledFolderViewDiv>
+							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
+							{folder}
+							<div style={{marginLeft: "auto", marginRight: "0"}}>
+								<RemoveButton path={folder}/>
+							</div>
+						</StyledFolderViewDiv>
+					</StyledCardHeader>
 					{
-							(isActive && files && folder) ? <StyledFolderViewDiv><Row> {Object.keys(files)
+							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
 							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
 							.map((file, index) => {
 								return (
-									<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6">
+									<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
 										<Thumbnail folder={folder} fileName={file}/>
 									</div>
 								);
-							})} </Row></StyledFolderViewDiv> : ""							
+							})} </StyledRow></StyledFolderViewDiv> : ""							
 						}
-					<StyledHR/>
-				</div>
+				</Card>
 				);
 		}
 		else return "";

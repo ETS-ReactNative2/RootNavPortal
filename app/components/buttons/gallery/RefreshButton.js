@@ -3,13 +3,14 @@ import React, { Component } from 'react';
 import '../../common.css';
 import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
+import { readdir } from 'fs';
 
 class RefreshButton extends Component {
     structuredFiles = {};
 
-    onClick = () => {
+    onClick = (folders, files) => {
         each(folders, (folder, callback) => {
-            readdir(folder, (err, files) => {
+            readdir(folder.path, (err, files) => {
                 if (!this.structuredFiles[folder]) this.structuredFiles[folder] = {};
 
                 let matched = files.map(file => file.match(/(.+)\.(rsml|txt|png|jpg|jpeg)$/)) //Scan for file types we use
@@ -27,6 +28,7 @@ class RefreshButton extends Component {
             }), err => {
                 if (Object.keys(this.structuredFiles).length) 
                 {
+                    console.log(this.structuredFiles);
                     if (err) console.error(err)
                     else this.props.refreshFiles(this.structuredFiles); //Add our struct with the folder as the key to state
                 }
@@ -40,7 +42,7 @@ class RefreshButton extends Component {
             <StyledButton
                 variant="primary" 
                 className={`btn btn-default fas fa-sync button`} 
-                onClick={this.refresh}
+                onClick={() => this.onClick(folders, files)}
             />    
         )
     }

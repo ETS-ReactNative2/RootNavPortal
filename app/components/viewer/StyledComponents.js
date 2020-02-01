@@ -5,12 +5,12 @@ import { Card, ListGroupItem, Row } from 'react-bootstrap';
 export const StyledListGroupItem = styled(ListGroupItem)` && {
     padding: 0.5em; 0px;
     color: black;
-  }`
+}`
 
 export const StyledCenterListGroupItem = styled(StyledListGroupItem)` && {
     display: flex;
     justify-content: space-evenly;
-  }`
+}`
 
 export const StyledContainer = styled.div` && {  
     display: flex;

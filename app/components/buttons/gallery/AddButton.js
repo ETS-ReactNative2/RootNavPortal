@@ -62,7 +62,7 @@ class AddButton extends Component {
                 />
                 <StyledModal show={this.props.modal} onHide={close}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Select Subfolders</Modal.Title>
+                        <Modal.Title>Select plant image folders</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <TreeChecklist ref={this.tree}/>

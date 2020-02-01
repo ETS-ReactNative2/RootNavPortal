@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import GalleryView from '../../gallery/GalleryView';
-import { remove, toggleOpenFile } from '../../../actions/galleryActions';
+import { remove } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
     { folders: state.gallery.folders }
@@ -9,7 +9,6 @@ const mapStateToProps = state => (
 const mapDispatchToProps = dispatch => (
     { 
         remove: () => dispatch(remove()),
-        toggleOpenFile: (file) => dispatch(toggleOpenFile(file))
     }
 );
 
