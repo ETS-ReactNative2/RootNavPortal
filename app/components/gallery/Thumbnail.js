@@ -25,7 +25,7 @@ export default class Thumbnail extends Component<Props> {
             const { folder, file, fileName } = this.props;
             if (IMAGE_EXTS.some(ext => ext in file)) 
             {
-                ipcRenderer.send('openViewer', folder + sep + fileName + "%" + Object.keys(file).filter(string => !string.includes("Thumb")).join("%"), () => {}) //% is the delimeter for file extensions in the URL bar
+                ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).filter(string => !string.includes("Thumb")).join("|"), () => {}) //| is the delimeter for file extensions in the URL bar
             }
         }
     }

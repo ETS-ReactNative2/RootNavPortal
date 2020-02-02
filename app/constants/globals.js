@@ -13,4 +13,4 @@ export const DATA_EXTS = ['rsml'];
 export const ALL_EXTS = IMAGE_EXTS.concat(DATA_EXTS);
 
 export const IMAGE_EXTS_REGEX = new RegExp(IMAGE_EXTS.join("|"), 'i') // Regex for all image extensions (i - case insensitive)
-export const ALL_EXTS_REGEX = new RegExp(`(.+)\.(${IMAGE_EXTS.join("|")})$`, 'i'); // Regex for all files (i - case insensitive)
+export const ALL_EXTS_REGEX = new RegExp(`(.+)\.(${ALL_EXTS.join("|")})$`, 'i'); // Regex for all files (i - case insensitive)

@@ -18,11 +18,13 @@ class Routes extends Component {
   }
 
   static View(props) {
-    let args = props.location.search.match(/(\?[^?]+)\??([^%]+)?\%?(.+)?/) //this matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and %rsml%png%etc. The negated sets are to delimit the capture groups
+    let args = props.location.search.match(/(\?[^?]+)\??([^|]+)?\|?(.+)?/) //This matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and |rsml|png|etc. The negated sets are to delimit the capture groups
     let name = args[1] ? args[1] : "";
-    let exts = args[3] ? args[3].split('%') : "";
+    let path = args[2] ? args[2].replace(/%20/g, " ") : ""; //Replace any encoded spaces in the file path with a space.
+    let exts = args[3] ? args[3].split('|') : "";
 
-    let view = Routes.Views(args[2], exts)[name];
+
+    let view = Routes.Views(path, exts)[name];
     if(view == null) 
       view = Routes.Views()[routes.HOME];
     return view;
