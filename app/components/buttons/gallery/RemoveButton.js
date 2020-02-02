@@ -22,7 +22,10 @@ class RemoveButton extends Component {
         return (
             <StyledButton
                 variant="danger" 
-                onClick={deleteFolder} 
+                onClick={e => {
+                    deleteFolder();
+                    e.stopPropagation()
+                }} 
                 className={`btn btn-default fas fa-trash-alt button`} 
             />    
         )
