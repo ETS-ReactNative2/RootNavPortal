@@ -5,6 +5,7 @@ import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
 import { StyledTextOverflowContainer } from '../CommonStyledComponents'
+import { IMAGE_EXTS, IMAGE_EXTS_REGEX } from '../../constants/globals'
 
 type Props = {};
 
@@ -22,7 +23,7 @@ export default class Thumbnail extends Component<Props> {
         if (!this.windowObject) 
         {
             const { folder, file, fileName } = this.props;
-            if (["jpg", "png"].some(ext => ext in file)) 
+            if (IMAGE_EXTS.some(ext => ext in file)) 
             {
                 ipcRenderer.send('openViewer', folder + sep + fileName + "%" + Object.keys(file).filter(string => !string.includes("Thumb")).join("%"), () => {}) //% is the delimeter for file extensions in the URL bar
             }
@@ -34,9 +35,9 @@ export default class Thumbnail extends Component<Props> {
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
         const { folder, file, fileName, addThumb } = this.props;
-        if (["jpg", "png", "jpeg"].some(ext => ext in file && !(ext + "Thumb" in file))) 
+        if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
-            const ext = Object.keys(file).find(ext => ext.match(/png|jpg|jpeg/));
+            const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
             
             //Tif files "don't support buffer" apparently, when thumbnailing, so uhh... :shrug:
             imageThumbail(folder + sep + fileName + "." + ext, {responseType: 'base64'}).then(thumb => 

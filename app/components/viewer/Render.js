@@ -1,9 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { readFileSync } from 'fs';
+import simplify from 'simplify-js';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
-import simplify from 'simplify-js';
+import { IMAGE_EXTS_REGEX } from '../../constants/globals'
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -53,7 +54,7 @@ export default class Render extends Component<Props> {
             let image = new Image();
             let r = path.match(/(.+\\|\/)(.+)/); //Matches the file path into the absolute directory path and file name
 
-            const ext = Object.keys(file).find(ext => ext.match(/png|jpg|jpeg/));
+            const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
             image.src = r[1] + r[2] + "." + ext;
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);

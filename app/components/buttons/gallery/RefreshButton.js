@@ -4,6 +4,7 @@ import '../../common.css';
 import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
 import { readdir } from 'fs';
+import { ALL_EXTS_REGEX } from '../../../constants/globals'
 
 class RefreshButton extends Component {
     structuredFiles = {};
@@ -13,7 +14,7 @@ class RefreshButton extends Component {
             readdir(folder.path, (err, files) => {
                 if (!this.structuredFiles[folder]) this.structuredFiles[folder] = {};
 
-                let matched = files.map(file => file.match(/(.+)\.(rsml|txt|png|jpg|jpeg)$/)) //Scan for file types we use
+                let matched = files.map(file => file.match(ALL_EXTS_REGEX)) //Scan for file types we use
                 matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
                     if (regex) 
                     {

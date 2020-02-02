@@ -6,6 +6,7 @@ import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledRow, StyledCardHeader } from './StyledComponents'
 import { Card } from 'react-bootstrap'
 import { StyledIcon } from '../CommonStyledComponents'
+import { ALL_EXTS_REGEX } from '../../constants/globals'
 
 type Props = {};
 
@@ -27,7 +28,7 @@ export default class FolderView extends Component<Props> {
 		if (!this.props.files) {
 			let structuredFiles = {};
 			readdir(folder, (err, files) => {
-				let matched = files.map(file => file.match(/(.+)\.(rsml|png|jpg|jpeg)$/)) //Scan for file types we use
+				let matched = files.map(file => file.match(ALL_EXTS_REGEX)) //Scan for file types we use
 				matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
 					if (regex) 
 					{
