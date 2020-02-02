@@ -4,6 +4,7 @@ import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
+import { StyledTextOverflowContainer } from '../CommonStyledComponents'
 
 type Props = {};
 
@@ -58,7 +59,9 @@ export default class Thumbnail extends Component<Props> {
                 <div>{image}</div>
                 <StyledCardBody>
                     <StyledCardText>
-                        {fileName}
+                        <StyledTextOverflowContainer>
+                            {fileName}
+                        </StyledTextOverflowContainer>
                     </StyledCardText>
                 </StyledCardBody>
             </StyledImageCard>            

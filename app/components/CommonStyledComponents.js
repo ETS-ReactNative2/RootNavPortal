@@ -16,3 +16,9 @@ export const StyledTopBarDiv = styled.div` && {
 export const StyledIcon = styled.i` && {
     width: 1.3em;
 }`
+
+export const StyledTextOverflowContainer = styled.div` && {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}`
