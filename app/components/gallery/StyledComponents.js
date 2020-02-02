@@ -25,7 +25,7 @@ export const StyledGalleryViewH1 = styled.h1` && {
     
 export const StyledGalleryViewDiv = styled.div` && {
       position: fixed;
-      overflow-y: auto;
+      overflow-y: overlay;
       bottom: 0;
       top: 10em;
       left: 0;
