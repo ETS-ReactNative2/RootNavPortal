@@ -92,6 +92,9 @@ export default (state = initialState, action) => {
                     [action.fileName]: {
                         ...state.files[action.folder][action.fileName],
                         parsedRSML: action.rsml,
+                    }
+                }
+            }
         }
         default: return state;
     }
