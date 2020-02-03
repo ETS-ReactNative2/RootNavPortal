@@ -15,7 +15,7 @@ export default class FolderView extends Component<Props> {
 
 	shouldComponentUpdate(nextProps, nextState) 
 	{
-		if (nextProps.filterText !== this.props.filterText) return true;
+		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
 	}
@@ -24,7 +24,7 @@ export default class FolderView extends Component<Props> {
 
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder, filterText, files, toggleOpenFile } = this.props; 
+		const { isActive, folder, filterText, filterAnalysed, files, toggleOpenFile } = this.props; 
 		if (!this.props.files) {
 			let structuredFiles = {};
 			readdir(folder, (err, files) => {
@@ -45,8 +45,9 @@ export default class FolderView extends Component<Props> {
 				}
 			});		
 		}
-
-		if (!filterText || (files && Object.keys(files).some(file => file.toLowerCase().includes(filterText.toLowerCase()))))
+		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
+		if ((!filterText || (files && filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase())))) //Only display folder if there's no filterText, or any of the files includes the filter text
+		&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			return (
 				<Card className="bg-light">
@@ -60,8 +61,8 @@ export default class FolderView extends Component<Props> {
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
 					{
-							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {Object.keys(files)
-							.filter(file => !filterText || file.toLowerCase().includes(filterText.toLowerCase()))
+							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {filesList
+							.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
 							.map((file, index) => {
 								return (
 									<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>

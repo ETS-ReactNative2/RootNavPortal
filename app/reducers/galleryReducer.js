@@ -1,7 +1,8 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
-    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_PARSED_RSML } from '../actions/galleryActions';
+    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
+    UPDATE_PARSED_RSML } from '../actions/galleryActions';
 
-const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "" };
+const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "", filterAnalysed: false };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -20,7 +21,7 @@ export default (state = initialState, action) => {
             return {
                 ...state,
                 folders: state.folders.filter(folder => folder.path !== action.path),
-                files,
+                files: files ? files: {},
                 checked: state.checked.filter(path => path !== action.path)
             };
         }
@@ -77,6 +78,11 @@ export default (state = initialState, action) => {
             ...state,
             filterText: action.text
         }
+        case UPDATE_FILTER_ANALYSED:
+        return {
+            ...state,
+            filterAnalysed: action.checked
+        }
         case UPDATE_PARSED_RSML: return {
             ...state,
             files: {
@@ -86,9 +92,6 @@ export default (state = initialState, action) => {
                     [action.fileName]: {
                         ...state.files[action.folder][action.fileName],
                         parsedRSML: action.rsml,
-                    }
-                }
-            }
         }
         default: return state;
     }
