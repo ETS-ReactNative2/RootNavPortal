@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import TopBar from './TopBar';
+import TopBar from '../containers/viewer/TopBarContainer';
 import RightBar from './RightBar'
 import { StyledContainer } from './StyledComponents';
 import Render from '../containers/viewer/RenderContainer';
@@ -16,7 +16,9 @@ props: Props;
     constructor(props)
     {
         super(props);
-        this.state = { path: props.path};
+        const { addViewer, path } = props;
+        this.state = { path };
+        addViewer(process.pid);
     }
 
     componentDidMount()

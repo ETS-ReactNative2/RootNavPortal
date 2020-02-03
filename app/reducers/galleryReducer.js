@@ -11,11 +11,10 @@ export default (state = initialState, action) => {
             ...state,
             folders: state.folders.concat(action.paths)
         };
-        case REFRESH_DIRS: 
-            return {
-                ...state,
-                files: action.files
-            }
+        case REFRESH_DIRS: return {
+            ...state,
+            files: action.files
+        }
         case REMOVE_DIR: {
             const { [action.path]: omit, ...files } = state.files // Remove the files relating to this path.
             return {
@@ -31,75 +30,66 @@ export default (state = initialState, action) => {
         }
 
         //Modal reducer actions
-        case SHOW_MODAL:
-            return {
-                ...state,
-                modal: true
-            };
-        case CLOSE_MODAL:
-            return {
-                ...state,
-                modal: false
-            };
-        case UPDATE_MODAL:
-            return {
-                ...state,
-                modalBody: action.tree
-            };
-        case IMPORT_CONFIG:
-            return {
-                ...state,
-                hasReadConfig: true,
-                folders: action.data
-            };
-        case UPDATE_CHECKED:
-            return {
-                ...state,
-                checked: action.paths
+        case SHOW_MODAL: return {
+            ...state,
+            modal: true
+        };
+        case CLOSE_MODAL: return {
+            ...state,
+            modal: false
+        };
+        case UPDATE_MODAL: return {
+            ...state,
+            modalBody: action.tree
+        };
+        case IMPORT_CONFIG: return {
+            ...state,
+            hasReadConfig: true,
+            folders: action.data
+        };
+        case UPDATE_CHECKED: return {
+            ...state,
+            checked: action.paths
+        }
+        case ADD_FILES: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: action.files
             }
-        case ADD_FILES:
-            return {
-                ...state,
-                files: {
-                    ...state.files,
-                    [action.folder]: action.files
-                }
-            }
+        }
         //Adds a thumbnail to a specific file object
         //action.thumb = { ext: "png", thumb: {type: "Buffer", data: [x, x, x,]} }
-        case ADD_THUMB:
-            return {
-                ...state,
-                files: {
-                    ...state.files,
-                    [action.folder]: {
-                        ...state.files[action.folder],
-                        [action.fileName]: {
-                            ...state.files[action.folder][action.fileName],
-                            [action.thumb.ext+"Thumb"]: action.thumb.thumb,
-                        }
+        case ADD_THUMB: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: {
+                    ...state.files[action.folder],
+                    [action.fileName]: {
+                        ...state.files[action.folder][action.fileName],
+                        [action.thumb.ext+"Thumb"]: action.thumb.thumb,
                     }
                 }
             }
-        case UPDATE_FILTER_TEXT:
-            return {
-                ...state,
-                filterText: action.text
-            }
-        case UPDATE_PARSED_RSML:
-            return {
-                ...state,
-                files: {
-                    ...state.files,
-                    [action.folder]: {
-                        ...state.files[action.folder],
-                        [action.fileName]: {
-                            ...state.files[action.folder][action.fileName],
-                            parsedRSML: action.rsml,
-                        }
+        }
+        case UPDATE_FILTER_TEXT: return {
+            ...state,
+            filterText: action.text
+        }
+        case UPDATE_PARSED_RSML: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: {
+                    ...state.files[action.folder],
+                    [action.fileName]: {
+                        ...state.files[action.folder][action.fileName],
+                        parsedRSML: action.rsml,
                     }
                 }
             }
+        }
         default: return state;
     }
 }

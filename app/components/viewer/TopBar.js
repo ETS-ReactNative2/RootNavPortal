@@ -12,6 +12,14 @@ type Props = {};
 export default class TopBar extends Component<Props> {
   props: Props;
 
+  toggleArch = () => {
+      this.props.toggleArch(process.pid);
+  }
+
+  toggleSegMasks = () => {
+      this.props.toggleSegMasks(process.pid)
+  }
+
   render() {
     const { path } = this.props;
     let tag = path ? path.match(/(.+\\|\/)(.+)/)[2] : ""; //Matches the file path into the absolute directory path and file name
@@ -32,11 +40,11 @@ export default class TopBar extends Component<Props> {
             <RightButton click={this.props.buttonHandler}/>
             <ToggleMeasuresButton />
             <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="architecture"/>
+                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.toggleArch}/>
                 <label className="custom-control-label" htmlFor="architecture">Architecture</label>
             </div>
             <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="segMasks"/>
+                <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.toggleSegMasks}/>
                 <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
             </div>
         </StyledTopBarDiv>

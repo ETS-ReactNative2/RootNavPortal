@@ -6,7 +6,9 @@ const mapStateToProps = (state, ownProps) => {
     let r = ownProps.path.match(/(.+\\|\/)(.+)/);
     return { 
         path: ownProps.path,
-        file: state.gallery.files[r[1].slice(0, -1)][r[2]]
+        file: state.gallery.files[r[1].slice(0, -1)][r[2]],
+        architecture: state.viewer.viewers[process.pid].architecture,
+        segMasks: state.viewer.viewers[process.pid].segMasks
     }
 };
 

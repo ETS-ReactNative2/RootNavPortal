@@ -41,7 +41,7 @@ export default class Render extends Component<Props> {
     }
 
     draw = () => {
-        const { file, path } = this.props;
+        const { file, path, architecture, segMasks } = this.props;
         const ctx    = this.canvas.current.getContext("2d");
         const canvas = this.canvas.current;
         ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv , canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
@@ -58,14 +58,17 @@ export default class Render extends Component<Props> {
             image.src = r[1] + r[2] + "." + ext;
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);
-                simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-                    ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; //This means lines are only drawn if there's an image along with the RSML
-                    ctx.beginPath(); //Draw the actual line
-                    line.points.forEach(point => {
-                        ctx.lineTo(point.x, point.y);
-                    });
-                    ctx.stroke();
-                })
+                if (architecture)
+                {
+                    simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
+                        ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; //This means lines are only drawn if there's an image along with the RSML
+                        ctx.beginPath(); //Draw the actual line
+                        line.points.forEach(point => {
+                            ctx.lineTo(point.x, point.y);
+                        });
+                        ctx.stroke();
+                    })
+                }
             };            
         }
     }
