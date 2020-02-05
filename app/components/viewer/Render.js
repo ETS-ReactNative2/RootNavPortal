@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { readFileSync } from 'fs';
-import simplify from 'simplify-js';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
 import { IMAGE_EXTS_REGEX,   matchPathName } from '../../constants/globals'
@@ -91,35 +90,21 @@ export default class Render extends Component<Props> {
         ctx.lineWidth   = 4;
         ctx.lineCap     = ctx.lineJoin ='round';
 
-        //Debug drawing shit
-        ctx.beginPath();
-        ctx.rect(10, 10, 50, 50);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.lineTo(0, 0)
-        ctx.lineTo(10, 10)
-        ctx.lineTo(20, 20)
-        ctx.lineTo(100, 100)
-        ctx.lineTo(140, 140)
-        ctx.stroke();
-
         ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
         this.draw();    
     }
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = rsml => {
-        const tolerance   = 0.1; //Used for simplify
-        const highQuality = true;
         const { attrNodeName, attributeNamePrefix } = this.xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
-            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline, or wrap the return into a simplify call like simplify(xxx.map(), tolerance, highQuality)
+            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
-                points: rsml.geometry.rootnavspline.point.map(p => ({ //Maybe we should just extract Mike's splines instead and use them, I think this does nearly the same. Should compare results.
-                    x: p.attr[attributeNamePrefix + 'x'],             //options are: use the polylines, either simplified or not, or the splines
-                    y: p.attr[attributeNamePrefix + 'y']              // ask Mike about if cubic spline interpolation is better than the more exact (albeit uglier) polylines
+                points: rsml.geometry.rootnavspline.point.map(p => ({ 
+                    x: p.attr[attributeNamePrefix + 'x'],             
+                    y: p.attr[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });
         }

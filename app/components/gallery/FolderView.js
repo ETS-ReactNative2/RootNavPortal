@@ -6,7 +6,7 @@ import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledRow, StyledCardHeader } from './StyledComponents'
 import { Card } from 'react-bootstrap'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX } from '../../constants/globals'
+import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_CHANNEL } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 
@@ -52,7 +52,7 @@ export default class FolderView extends Component<Props> {
 								if (imageExt) apiFiles.push(folder + sep + file + "." + imageExt);
 							}
 						})
-						if (apiFiles.length) ipcRenderer.send('api-request', { paths: apiFiles });
+						if (apiFiles.length) ipcRenderer.send(API_CHANNEL, { paths: apiFiles });
 					}
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
 				}

@@ -3,13 +3,12 @@ import fs from 'fs';
 import React, { Component } from 'react';
 import { Button, Row } from 'react-bootstrap'
 
-import { PLUGINDIR } from '../../constants/globals'
+import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
-import { _require } from '../../constants/globals';
 
 type Props = {};
 

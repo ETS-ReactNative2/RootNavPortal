@@ -4,12 +4,13 @@ import { updateParsedRSML } from '../../../actions/galleryActions'; //still in t
 import { matchPathName } from '../../../constants/globals';
 
 const mapStateToProps = (state, ownProps) => {
-    let match = matchPathName(ownProps.path);
+    let match  = matchPathName(ownProps.path);
+    let viewer =  state.viewer.viewers[process.pid];
     return { 
         path: ownProps.path,
         file: state.gallery.files[match[1]][match[2]],
-        architecture: state.viewer.viewers[process.pid].architecture,
-        segMasks: state.viewer.viewers[process.pid].segMasks
+        architecture:  viewer ? viewer.architecture : false, //These prevent errors when unloading the viewer, since the action updates children before the process actually ends
+        segMasks: viewer ? viewer.segMasks : false
     }
 };
 

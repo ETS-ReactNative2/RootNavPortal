@@ -1,12 +1,11 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { API_PATH, matchPathName } from './constants/globals';
+import { API_PATH, API_CHANNEL, matchPathName, _require, INFLIGHT_REQS, API_POLLTIME } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream } from 'fs';
 import mFormData from 'form-data';
 import { remote } from 'electron';
 import { ipcRenderer } from 'electron';
-import { _require, INFLIGHT_REQS, API_POLLTIME } from './constants/globals';
 type Props = {};
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
@@ -22,7 +21,7 @@ export default class Backend extends Component<Props> {
         console.log("hello I am alive");
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
 
-        ipcRenderer.on('api-request', (event, data) => {
+        ipcRenderer.on(API_CHANNEL, (event, data) => {
             console.log("message received")
             console.log(data)
             this.queue.unshift(...data.paths); //data.paths must be an array

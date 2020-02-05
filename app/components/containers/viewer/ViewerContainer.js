@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Viewer from '../../viewer/Viewer';
-import { addViewer } from '../../../actions/viewerActions';
+import { addViewer, removeViewer } from '../../../actions/viewerActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
     path: ownProps.path,
@@ -9,7 +9,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    addViewer: viewerID => dispatch(addViewer(viewerID))
+    addViewer:    viewerID => dispatch(addViewer(viewerID)),
+    removeViewer: viewerID => dispatch(removeViewer(viewerID))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Viewer)

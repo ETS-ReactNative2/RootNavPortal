@@ -270,7 +270,7 @@
     "fast-xml-parser": "^3.16.0",
     "form-data": "^3.0.0",
     "history": "^4.7.2",
-    "image-thumbnail": "chagrilled/image-thumbnail",
+    "image-thumbnail": "https://github.com/chagrilled/image-thumbnail",
     "jquery": "^3.4.1",
     "moment": "^2.24.0",
     "react": "^16.10.2",
@@ -287,7 +287,6 @@
     "redux": "^4.0.1",
     "redux-electron-store": "^0.6.6",
     "redux-thunk": "^2.3.0",
-    "simplify-js": "^1.2.3",
     "source-map-support": "^0.5.9",
     "styled-components": "^4.4.0",
     "typescript": "^3.6.4"

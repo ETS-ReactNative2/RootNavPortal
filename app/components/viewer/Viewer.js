@@ -6,6 +6,7 @@ import { StyledContainer } from './StyledComponents';
 import Render from '../containers/viewer/RenderContainer';
 import { sep } from 'path';
 import { matchPathName } from '../../constants/globals';
+import { remote } from 'electron';
 type Props = {};
 
 export default class Viewer extends Component<Props> {
@@ -17,9 +18,13 @@ props: Props;
     constructor(props)
     {
         super(props);
-        const { addViewer, path } = props;
+        const { addViewer, removeViewer, path } = props;
         this.state = { path };
+
         addViewer(process.pid);
+        remote.getCurrentWindow().on('close', () => {
+            removeViewer(process.pid);
+        });
     }
 
     componentDidMount()
@@ -45,7 +50,7 @@ props: Props;
         let index = keys.indexOf(split[2]); //I'm thinking make a global func for splitting/getting dir path and file name given how much this regex pops up now
         let file;
         let initialIndex = index;
-        
+
         do 
         {
             index += direction;

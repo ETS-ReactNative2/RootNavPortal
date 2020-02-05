@@ -7,6 +7,8 @@ export const CONFIG  = 'config.json';
 export const API_HOST = 'http://127.0.0.1';
 export const API_PORT = 8841;
 export const API_PATH = API_HOST + ":" + API_PORT;
+export const API_CHANNEL = 'api-request';
+
 export const WINDOW_HEIGHT = 728;
 export const WINDOW_WIDTH = 1024;
 

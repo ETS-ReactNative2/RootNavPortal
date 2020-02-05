@@ -17,7 +17,7 @@ import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import axios from 'axios';
-import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH } from './constants/globals.js';
+import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_CHANNEL } from './constants/globals';
 
 global.API_STATUS = false;
 axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);
@@ -130,7 +130,6 @@ app.on('ready', async () => {
     });
   });
 
-
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
@@ -165,8 +164,7 @@ app.on('ready', async () => {
   });
   backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
-  ipcMain.on('api-request', (event, paths) => {
-    backendWindow.webContents.send('api-request', paths)
+  ipcMain.on(API_CHANNEL, (event, paths) => {
+    backendWindow.webContents.send(API_CHANNEL, paths)
   });
-  
 });
