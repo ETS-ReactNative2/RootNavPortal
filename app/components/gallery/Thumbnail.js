@@ -40,7 +40,7 @@ export default class Thumbnail extends Component<Props> {
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
             
             //Tif files "don't support buffer" apparently, when thumbnailing, so uhh... :shrug:
-            imageThumbail(folder + sep + fileName + "." + ext, {responseType: 'base64'}).then(thumb => 
+            imageThumbail.thumb(folder + sep + fileName + "." + ext, {responseType: 'base64'}).then(thumb => 
             {
                 addThumb(folder, fileName, {ext: ext, thumb}) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
             }).catch(err => console.error(err));

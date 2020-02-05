@@ -19,7 +19,7 @@ export default class Backend extends Component<Props> {
     constructor(props)
     {
         super(props)
-        console.log("hello I am alive")
+        console.log("hello I am alive");
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
 
         ipcRenderer.on('api-request', (event, data) => {

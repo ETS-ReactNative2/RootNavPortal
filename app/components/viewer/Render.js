@@ -5,6 +5,7 @@ import simplify from 'simplify-js';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
 import { IMAGE_EXTS_REGEX,   matchPathName } from '../../constants/globals'
+import imageThumb from 'image-thumbnail';
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -55,9 +56,14 @@ export default class Render extends Component<Props> {
             let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
-            image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext;
+            if (segMasks && file.first_order && file.second_order) 
+                imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                    .then(output => image.src = 'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, output)));
+            else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext;
+        
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);
+                
                 if (architecture)
                 {
                     simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
