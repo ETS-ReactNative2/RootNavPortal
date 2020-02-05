@@ -18,8 +18,6 @@ import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import axios from 'axios';
 import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH } from './constants/globals.js';
-import mFormData from 'form-data';
-import fs from 'fs';
 
 global.API_STATUS = false;
 axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);

@@ -4,7 +4,7 @@ import { readFileSync } from 'fs';
 import simplify from 'simplify-js';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
-import { IMAGE_EXTS_REGEX } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX,   matchPathName } from '../../constants/globals'
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -52,10 +52,10 @@ export default class Render extends Component<Props> {
             if (!simplifiedLines) return;
 
             let image = new Image();
-            let r = path.match(/(.+\\|\/)(.+)/); //Matches the file path into the absolute directory path and file name
+            let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
-            image.src = r[1] + r[2] + "." + ext;
+            image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext;
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);
                 if (architecture)
@@ -128,15 +128,14 @@ export default class Render extends Component<Props> {
         const { file, path, updateParsedRSML } = this.props;
         if (!file.parsedRSML && file.rsml)
         {
-            let r = path.match(/(.+\\|\/)(.+)/); //Matches the file path into the absolute directory path and file name
-            r[1] = r[1].slice(0, -1);
+            let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
-            let data = readFileSync(r[1] + sep + r[2] + ".rsml", 'utf8');
+            let data = readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8');
             let rsmlJson = parser.parse(data, this.xmlOptions);
             const { scene: { plant } } = rsmlJson.rsml;
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
             Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
-            updateParsedRSML(r[1], r[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            updateParsedRSML(matchedPath[1], matchedPath[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             this.rsmlPoints = [];
         }
 

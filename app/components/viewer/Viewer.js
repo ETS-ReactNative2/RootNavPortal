@@ -5,6 +5,7 @@ import RightBar from './RightBar'
 import { StyledContainer } from './StyledComponents';
 import Render from '../containers/viewer/RenderContainer';
 import { sep } from 'path';
+import { matchPathName } from '../../constants/globals';
 type Props = {};
 
 export default class Viewer extends Component<Props> {
@@ -38,12 +39,13 @@ props: Props;
     }
 
     loadNextRSML = direction => {
-        let split = this.state.path.match(/(.+\\|\/)(.+)/);
-        let folder = split[1].replace(/\\\\/g, '\\').slice(0, -1); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?)
-        let keys = Object.keys(this.props.files[folder])
+        let split = matchPathName(this.state.path); 
+        let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?)
+        let keys = Object.keys(this.props.files[folder]);
         let index = keys.indexOf(split[2]); //I'm thinking make a global func for splitting/getting dir path and file name given how much this regex pops up now
         let file;
         let initialIndex = index;
+        
         do 
         {
             index += direction;

@@ -6,6 +6,7 @@ import RightButton from '../buttons/viewer/RightButton';
 import ToggleFolderButton from '../buttons/viewer/ToggleFolderButton';
 import ToggleMeasuresButton from '../buttons/viewer/ToggleMeasuresButton';
 import { StyledRow } from './StyledComponents';
+import { matchPathName } from '../../constants/globals';
 
 type Props = {};
 
@@ -21,8 +22,8 @@ export default class TopBar extends Component<Props> {
   }
 
   render() {
-    const { path } = this.props;
-    let tag = path ? path.match(/(.+\\|\/)(.+)/)[2] : ""; //Matches the file path into the absolute directory path and file name
+    const { path, buttonHandler } = this.props;
+    let tag = path ? matchPathName(path)[2] : ""; //Matches the file path into the absolute directory path and file name
     return (
       <div>
         <StyledTopBarDiv className="d-inline-flex" data-tid="container">
@@ -36,8 +37,8 @@ export default class TopBar extends Component<Props> {
         <StyledTopBarHR/>
         <StyledTopBarDiv className="d-inline-flex container" data-tid="container">
             <ToggleFolderButton />
-            <LeftButton click={this.props.buttonHandler}/>
-            <RightButton click={this.props.buttonHandler}/>
+            <LeftButton click={buttonHandler}/>
+            <RightButton click={buttonHandler}/>
             <ToggleMeasuresButton />
             <div className="custom-control custom-checkbox">
                 <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.toggleArch}/>
