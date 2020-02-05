@@ -12,7 +12,7 @@ let history;
 //Some notes about the Redux changes:
 //configureStore now takes a 'scope' arg, either 'main' or 'renderer', to reflect which Redux store is being configured
 //There is a store in each process now, which have an IPC layer to sync up. Oddly, it seems like they only init with the last action's data
-//
+
 const configureStore = (initialState, scope) => {
   const rootReducer = createRootReducer(history);
 

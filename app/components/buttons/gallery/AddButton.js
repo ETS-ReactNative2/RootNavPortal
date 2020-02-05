@@ -36,10 +36,10 @@ class AddButton extends Component {
 
         if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
             mkdirSync(APPHOME, '0777', true, err => {
-                if (err) console.err(err) 
+                if (err) console.error(err) 
             });
         writeFile(APPHOME + CONFIG , JSON.stringify(config, null, 4), err => {
-            if (err) console.err(err); //idk do some handling here
+            if (err) console.error(err); //idk do some handling here
         });
     }
 

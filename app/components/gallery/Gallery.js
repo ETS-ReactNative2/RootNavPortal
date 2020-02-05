@@ -5,11 +5,17 @@ import TopBar from './TopBar';
 import GalleryView from '../containers/gallery/GalleryViewContainer';
 import { existsSync, readFile } from 'fs';
 import { APPHOME, CONFIG } from '../../constants/globals';
+import { remote } from 'electron';
 
 type Props = {};
 
 export default class Gallery extends Component<Props> {
   props: Props;
+  constructor(props)
+  {
+    super(props);
+    process.env.API_STATUS = remote.getGlobal('API_STATUS');
+  }
 
   render() {
 
@@ -19,11 +25,11 @@ export default class Gallery extends Component<Props> {
       {
         readFile(APPHOME + CONFIG, "utf8", (err, data) => 
         {
-          if (err) console.err(err); 
+          if (err) console.error(err); 
           else this.props.importConfig(JSON.parse(data));
         }); 
       }
-      else console.err("doesn't exist: " + APPHOME+CONFIG);     
+      else console.error("doesn't exist: " + APPHOME+CONFIG);     
     }
 
     return (

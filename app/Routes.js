@@ -6,13 +6,15 @@ import {
 import routes from './constants/routes';
 import GalleryPage from './containers/GalleryPage';
 import ViewerPage from './containers/ViewerPage';
+import Backend from './containers/Backend';
 
 class Routes extends Component {
 
   static Views(tag = "", exts = "") {
     return {
       [routes.GALLERY]: <GalleryPage/>,
-      [routes.VIEWER]: <ViewerPage path={tag} exts={exts}/>,
+      [routes.VIEWER]:  <ViewerPage path={tag} exts={exts}/>,
+      [routes.BACKEND]: <Backend />,
       [routes.HOME]: <GalleryPage/>
     }
   }

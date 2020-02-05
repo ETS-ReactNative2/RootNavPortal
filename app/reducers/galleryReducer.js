@@ -1,6 +1,6 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_FILE } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "", filterAnalysed: false };
 
@@ -96,6 +96,19 @@ export default (state = initialState, action) => {
                 }
             }
         }
+        case UPDATE_FILE: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: {
+                    ...state.files[action.folder],
+                    [action.fileName]: {
+                        ...state.files[action.folder][action.fileName],
+                        ...action.newExts
+                    }
+                }
+            }
+        }
         default: return state;
     }
 }
@@ -144,7 +157,9 @@ state: {
                     rsml: true,
                     txt: true, 
                     pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] },
-                    parsedRsML: { rsmlJSON: {}, simplifiedLines: [[{}, {}], [{}, {}]]}
+                    parsedRsML: { rsmlJSON: {}, simplifiedLines: [[{}, {}], [{}, {}]]},
+                    first_order: true,
+                    second_order: true
                 },
                 RS2,5,27,testset: {
                     png: true,

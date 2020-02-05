@@ -13,7 +13,7 @@ class RemoveButton extends Component {
             const filteredPaths = this.props.folders.filter(folder => folder.path !== this.props.path);
             if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
                 writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
-                    if (err) console.err(err); //idk do some handling here
+                    if (err) console.error(err); //idk do some handling here
                 });
 
             this.props.remove(this.props.path);
