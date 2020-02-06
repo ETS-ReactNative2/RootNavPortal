@@ -12744,7 +12744,7 @@ shallowequal@^1.1.0:
   resolved "https://registry.yarnpkg.com/shallowequal/-/shallowequal-1.1.0.tgz#188d521de95b9087404fd4dcb68b13df0ae4e7f8"
   integrity sha512-y0m1JoUZSlPAjXVtPPW70aZWfIL/dSP7AFkRnniLCrK/8MDKog3TySTBmckD+RObVxH0v4Tox67+F14PdED2oQ==
 
-sharp@^0.24.0:
+sharp@0.24.0, sharp@^0.24.0:
   version "0.24.0"
   resolved "https://registry.yarnpkg.com/sharp/-/sharp-0.24.0.tgz#1200f4bb36ccc2bb36a78f0bcba0302cf1f7a5fd"
   integrity sha512-kUtQE6+HJnNqO0H6ueOBtRXahktuqydIBaFMvhDelf/KaK9j/adEdjf4Y3+bbjYOa5i6hi2EAa2Y2G9umP4s2g==
