@@ -29,16 +29,16 @@ class AddButton extends Component {
 
     importFolders = () => {
         const { imports, addFolders, closeModal, folders} = this.props;
-        const config = imports.map(path => ({'path': path, 'active': false}));
+        const config = imports.map(path => ({'path': path, 'active': false})); //active never gets used or toggled in config, any point of having it?
         addFolders(config.filter(newfolder => !folders.some(folder => newfolder.path == folder.path)));
         closeModal();
         this.tree.current.clear();
 
         if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-            mkdirSync(APPHOME, '0777', true, err => {
-                if (err) console.error(err) 
+            mkdirSync(APPHOME, '0777', true, err => { //0777 HMMMM change later
+                if (err) console.error(err);
             });
-        writeFile(APPHOME + CONFIG , JSON.stringify(config, null, 4), err => {
+        writeFile(APPHOME + CONFIG , JSON.stringify(folders.concat(config), null, 4), err => {
             if (err) console.error(err); //idk do some handling here
         });
     }

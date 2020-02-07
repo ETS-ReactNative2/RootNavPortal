@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { readFileSync } from 'fs';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
-import { IMAGE_EXTS_REGEX,   matchPathName } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 type Props = {};
 
