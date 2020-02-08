@@ -42,18 +42,21 @@ class SettingsButton extends Component {
             <Container>
                 <Row>
                     <Col>
-                    <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={this.currentModel} onClick={e => e.stopPropagation()}>
-                        { API_MODELS.map((model, i) => model.displayName != this.currentModel ? 
-                            <Dropdown.Item 
-                                key={i} 
-                                onSelect={() => { this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.deleteMessage) }}
-                            >
-                                {model.displayName}
-                            </Dropdown.Item> 
-                            : "") }
-                    </DropdownButton>
+                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={this.currentModel} onClick={e => e.stopPropagation()}>
+                            { API_MODELS.map((model, i) => model.displayName != this.currentModel ? 
+                                <Dropdown.Item 
+                                    key={i} 
+                                    onSelect={() => { this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.deleteMessage) }}
+                                >
+                                    {model.displayName}
+                                </Dropdown.Item> 
+                                : "") 
+                            }
+                        </DropdownButton>
                     </Col>
-                    <Col><Button variant="danger" onClick={e => { e.stopPropagation(); this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button></Col>
+                    <Col> 
+                        <Button variant="danger" onClick={e => { e.stopPropagation(); this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
+                    </Col>
                 </Row>
             </Container>
         )
@@ -76,13 +79,14 @@ class SettingsButton extends Component {
                         <Modal.Title>Edit settings for <strong>{matchPathName(this.props.path)[2]}</strong></Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                    {this.renderModalBody()}
+                        {this.renderModalBody()}
                     </Modal.Body>
-                    <Modal.Footer>
+                    <Modal.Footer style={{'justifyContent': this.state.confirmText ? 'space-between' : 'flex-end'}}>
                         {this.state.confirmText && <Button variant="danger" onClick={e => {         
                                 e.stopPropagation();
                                 this.close();
-                            }}>Confirm
+                            }}>
+                                Confirm
                         </Button>}
 
                         <Button variant="secondary" onClick={e => {         
