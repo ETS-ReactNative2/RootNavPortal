@@ -10,7 +10,7 @@ const mapStateToProps = (state, ownProps) => (
 );
 
 const mapDispatchToProps = dispatch => (
-    { remove: (path) => dispatch(remove(path)) }
+    { remove: path => dispatch(remove(path)) }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Button)

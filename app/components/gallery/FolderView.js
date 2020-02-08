@@ -1,6 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
+import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledRow, StyledCardHeader } from './StyledComponents'
@@ -69,6 +70,7 @@ export default class FolderView extends Component<Props> {
 							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
 							{folder}
 							<div style={{marginLeft: "auto", marginRight: "0"}}>
+								<SettingsButton path={folder}/>
 								<RemoveButton path={folder}/>
 							</div>
 						</StyledFolderViewDiv>
