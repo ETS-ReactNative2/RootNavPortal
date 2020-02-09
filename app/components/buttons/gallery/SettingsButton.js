@@ -3,14 +3,19 @@ import React, { Component } from 'react';
 import '../../common.css';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
-import { API_MODELS, matchPathName } from '../../../constants/globals';
+import { API_MODELS, matchPathName, API_DELETE } from '../../../constants/globals';
+import { ipcRenderer } from 'electron';
 
 class SettingsButton extends Component {
 
-    currentModel = "Wheat (Blue Paper)"
+    REANALYSE = 0;
+    CHANGE_MODEL = 1;
+
+    currentModel = API_MODELS[0];
     state = { modal: false };
     deleteMessage = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
-    
+    actionFlag;
+
     constructor(props)
     {
         super(props);
@@ -29,6 +34,16 @@ class SettingsButton extends Component {
         setTimeout(() => this.setState({modal: true, confirmText}), 250)
     }
 
+    handleAction = () => {
+        ipcRenderer.send(API_DELETE, { path: this.props.path });
+        //if (this.actionFlag == this.CHANGE_MODEL) this.props.updateModel(path, this.currentModel.apiName); //Finish when model is in state
+    }
+
+    selectDropdown = model => {
+        this.currentModel = model; 
+        this.actionFlag = this.CHANGE_MODEL; 
+        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.deleteMessage)
+    }
 
     renderModalBody = () => {
         return this.state.confirmText ? 
@@ -42,20 +57,20 @@ class SettingsButton extends Component {
             <Container>
                 <Row>
                     <Col>
-                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={this.currentModel} onClick={e => e.stopPropagation()}>
-                            { API_MODELS.map((model, i) => model.displayName != this.currentModel ? 
+                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={this.currentModel.displayName} onClick={e => e.stopPropagation()}>
+                            { API_MODELS.map((model, i) => model.displayName != this.currentModel.displayName ? 
                                 <Dropdown.Item 
                                     key={i} 
-                                    onSelect={() => { this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.deleteMessage) }}
+                                    onSelect={() => { this.selectDropdown(model)}}
                                 >
-                                    {model.displayName}
+                                    {model.displayName} 
                                 </Dropdown.Item> 
                                 : "") 
                             }
                         </DropdownButton>
                     </Col>
                     <Col> 
-                        <Button variant="danger" onClick={e => { e.stopPropagation(); this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
+                        <Button variant="danger" onClick={e => { e.stopPropagation(); this.actionFlag = this.REANALYSE; this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
                     </Col>
                 </Row>
             </Container>
@@ -65,7 +80,7 @@ class SettingsButton extends Component {
     render() {    
     
         return (
-            <>
+        <>
             <StyledButton
                 variant="secondary" 
                 onClick={e => {
@@ -76,7 +91,7 @@ class SettingsButton extends Component {
             />
             <StyledModal show={this.state.modal} onHide={this.close}>
                     <Modal.Header closeButton>
-                        <Modal.Title>Edit settings for <strong>{matchPathName(this.props.path)[2]}</strong></Modal.Title>
+                        <Modal.Title>Edit settings for <b>{matchPathName(this.props.path)[2]}</b></Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         {this.renderModalBody()}
@@ -85,6 +100,7 @@ class SettingsButton extends Component {
                         {this.state.confirmText && <Button variant="danger" onClick={e => {         
                                 e.stopPropagation();
                                 this.close();
+                                this.handleAction();
                             }}>
                                 Confirm
                         </Button>}
@@ -97,8 +113,8 @@ class SettingsButton extends Component {
                         </Button>
 
                     </Modal.Footer>
-                </StyledModal>
-            </> 
+            </StyledModal>
+        </> 
         )
     }
 }
