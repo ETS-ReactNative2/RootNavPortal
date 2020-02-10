@@ -16,11 +16,6 @@ class SettingsButton extends Component {
     deleteMessage = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
     actionFlag;
 
-    constructor(props)
-    {
-        super(props);
-    }
-
     close = () => {
         this.setState({ modal: false, confirmText: "" });
     }
@@ -70,7 +65,7 @@ class SettingsButton extends Component {
                         </DropdownButton>
                     </Col>
                     <Col> 
-                        <Button variant="danger" onClick={e => { e.stopPropagation(); this.actionFlag = this.REANALYSE; this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
+                        <Button style={{'float': 'right'}}variant="danger" onClick={e => { e.stopPropagation(); this.actionFlag = this.REANALYSE; this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
                     </Col>
                 </Row>
             </Container>
@@ -80,7 +75,7 @@ class SettingsButton extends Component {
     render() {    
     
         return (
-        <>
+        <React.Fragment>
             <StyledButton
                 variant="secondary" 
                 onClick={e => {
@@ -89,32 +84,32 @@ class SettingsButton extends Component {
                 }} 
                 className={`btn btn-default fas fa-wrench button`} 
             />
-            <StyledModal show={this.state.modal} onHide={this.close}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Edit settings for <b>{matchPathName(this.props.path)[2]}</b></Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        {this.renderModalBody()}
-                    </Modal.Body>
-                    <Modal.Footer style={{'justifyContent': this.state.confirmText ? 'space-between' : 'flex-end'}}>
-                        {this.state.confirmText && <Button variant="danger" onClick={e => {         
-                                e.stopPropagation();
-                                this.close();
-                                this.handleAction();
-                            }}>
-                                Confirm
-                        </Button>}
-
-                        <Button variant="secondary" onClick={e => {         
+            <StyledModal show={this.state.modal} onHide={this.close} onClick={e => e.stopPropagation()}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit settings for <b>{matchPathName(this.props.path)[2]}</b></Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {this.renderModalBody()}
+                </Modal.Body>
+                <Modal.Footer style={{'justifyContent': this.state.confirmText ? 'space-between' : 'flex-end'}}>
+                    {this.state.confirmText && <Button variant="danger" onClick={e => {         
                             e.stopPropagation();
                             this.close();
+                            this.handleAction();
                         }}>
-                            Cancel
-                        </Button>
+                            Confirm
+                    </Button>}
 
-                    </Modal.Footer>
+                    <Button variant="secondary" onClick={e => {         
+                        e.stopPropagation();
+                        this.close();
+                    }}>
+                        Cancel
+                    </Button>
+
+                </Modal.Footer>
             </StyledModal>
-        </> 
+        </React.Fragment> 
         )
     }
 }
