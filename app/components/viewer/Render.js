@@ -41,7 +41,7 @@ export default class Render extends Component<Props> {
     }
 
     draw = () => {
-        const { file, path, architecture, segMasks } = this.props;
+        const { file, path, architecture, segMasks, updateFile } = this.props;
         const ctx    = this.canvas.current.getContext("2d");
         const canvas = this.canvas.current;
         ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv , canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
@@ -55,10 +55,17 @@ export default class Render extends Component<Props> {
             let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
-            console.log(ext);
             if (segMasks && file.first_order && file.second_order) //Composite the segmasks together
-                imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
-                    .then(output => image.src = 'data:image/png;base64,' + Buffer.from(output).toString('base64'));
+                if (!file.seg_mask) 
+                    imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                        .then(output => {
+                            updateFile(matchedPath[1], matchedPath[2], { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
+                            image.src = 'data:image/png;base64,' + output.toString('base64');
+                            console.log(Buffer.byteLength(output))
+                            console.log(Buffer.byteLength(output.toString('base64'), 'utf8'));
+                        });
+                else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
+            
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
                 let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
