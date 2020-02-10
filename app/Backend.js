@@ -47,11 +47,12 @@ export default class Backend extends Component<Props> {
     //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
+        const { files, resetFolder } = this.props;
         let newState = {}; //This will need to have an object for each file with the remaining extensions + thumbnails/removed extensions
-        Object.keys(this.props.files[path]).forEach(fileName => {
+        Object.keys(files[path]).forEach(fileName => {
             newState[fileName] = {}; //Init new folder object
             let queued = false; //Only allow file to be requeued once - else each seg mask/rsml will trigger it
-            Object.keys(this.props.files[path][fileName]).forEach(extension => { //For each extension in the state object
+            Object.keys(files[path][fileName]).forEach(extension => { //For each extension in the state object
                 
                 if (extension.match(/first_order|second_order|rsml/)) //If it's an API file
                 {
@@ -61,16 +62,16 @@ export default class Backend extends Component<Props> {
                             unlink(path + sep + fileName + "." + (extension != 'rsml' ? extension + ".png" : extension), err => {
                                 if (err) console.error(err);
                             });
-                            if (!queued) this.queue.push(path + sep + fileName + "." + Object.keys(this.props.files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX))); //Readd it to the queue
+                            if (!queued) this.queue.push(path + sep + fileName + "." + Object.keys(files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX))); //Readd it to the queue
                             queued = true;
                         }
                     });
                 }
-                else newState[fileName][extension] = this.props.files[path][fileName][extension]; //Otherwise copy the value for that ext to our reset state
+                else newState[fileName][extension] = files[path][fileName][extension]; //Otherwise copy the value for that ext to our reset state
             });
         });
          //This has been correct for my tests, but that's just with 3 files, unsure if it will stay sync with a big dataset - test later!;
-        // this.props.resetFolder(path, newState); //write this in
+        resetFolder(path, newState);
     }
 
     //Send the job off to the server
@@ -90,7 +91,7 @@ export default class Backend extends Component<Props> {
         const config = { headers: formData.getHeaders() };
 
          //Add file to inflight object with the model it's been processed with, and its ext, so we can requeue later if needed
-        this.inFlightFiles[matchedFile[1] + matchedFile[2]] = { model: "wheat_bluepaper", ext: matchedFile[3]}; //model: this.props.files[matchedFile[1]].attr.model;
+        this.inFlightFiles[matchedFile[1] + matchedFile[2]] = { model: "wheat_bluepaper", ext: matchedFile[3] }; //model: this.props.files[matchedFile[1]].attr.model;
         post(API_PATH + "/job", formData, config).then(res => 
         {
             if (res.data) setTimeout(() => this.pollJob(res.data[0], matchedFile[1] + matchedFile[2]), API_POLLTIME); //absolute path to file, with no ext
@@ -120,11 +121,11 @@ export default class Backend extends Component<Props> {
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
             let exts = {};
             let matchedPath = matchPathName(filePath);
-            if (this.inFlightFiles[filePath].model != 'wheat_bluepaper') //this.props.files[matchedPath[1]].attr.model //Has the model changed in state since we posted the request? Then ignore and requeue
-                this.queue.push(matchedPath[1] + sep + matchedPath[2] + this.inFlightFiles[filePath].ext); //Readd to queue
+            //if (this.inFlightFiles[filePath].model != this.props.files[matchedPath[1]].attr.model) //this.props.files[matchedPath[1]].attr.model //Has the model changed in state since we posted the request? Then ignore and requeue
+            //    this.queue.push(matchedPath[1] + sep + matchedPath[2] + this.inFlightFiles[filePath].ext); //Readd to queue
 
             responses.forEach(res => {
-                if (this.inFlightFiles[filePath].model != "wheat_bluepaper") return; //Ignore if model has changed, write nothing back -- this.props.files[matchedPath[1]].attr.model
+                //if (this.inFlightFiles[filePath].model != this.props.files[matchedPath[1]].attr.model) return; //Ignore if model has changed, write nothing back 
                  //If the model has changed, write nothing;
                 let type = res.config.url.match(/.+\/(.+)/)[1]; //returns rsml or first_order or second_order
 
