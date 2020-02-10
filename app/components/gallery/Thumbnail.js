@@ -50,7 +50,7 @@ export default class Thumbnail extends Component<Props> {
             if (key.includes("Thumb"))
             {
                 let source = 'data:image/png;base64,' + file[key].toString('base64');
-                image = <StyledImage className="card-img-top" src={ source }/> 
+                image = <StyledImage className={"card-img-top"} src={ source }/> 
             }
         })
 
