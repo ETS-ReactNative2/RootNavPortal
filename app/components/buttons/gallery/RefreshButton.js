@@ -29,7 +29,6 @@ class RefreshButton extends Component {
             }), err => {
                 if (Object.keys(this.structuredFiles).length) 
                 {
-                    console.log(this.structuredFiles);
                     if (err) console.error(err)
                     else this.props.refreshFiles(this.structuredFiles); //Add our struct with the folder as the key to state
                 }
