@@ -8,8 +8,6 @@ import { sep } from 'path';
 type Props = {};
 
 export default class Viewer extends Component<Props> {
-props: Props;
-
     LEFT_KEY  = "ArrowLeft";
     RIGHT_KEY = "ArrowRight";
 

@@ -10,8 +10,6 @@ import { StyledRow } from './StyledComponents';
 type Props = {};
 
 export default class TopBar extends Component<Props> {
-  props: Props;
-
   toggleArch = () => {
       this.props.toggleArch(process.pid);
   }

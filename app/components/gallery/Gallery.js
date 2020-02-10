@@ -9,8 +9,6 @@ import { APPHOME, CONFIG } from '../../constants/globals';
 type Props = {};
 
 export default class Gallery extends Component<Props> {
-  props: Props;
-
   render() {
 
     if (!this.props.hasReadConfig) 

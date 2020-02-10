@@ -8,8 +8,6 @@ import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
 type Props = {};
 
 export default class TopBar extends Component<Props> {
-  props: Props;
-
   render() {
     return (
       <div>

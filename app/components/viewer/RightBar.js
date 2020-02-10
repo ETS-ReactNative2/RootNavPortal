@@ -14,8 +14,6 @@ import RefreshButton from '../buttons/viewer/RefreshButton';
 type Props = {};
 
 export default class RightBar extends Component<Props> {
-  props: Props;
-
   constructor(props) 
   {
     super(props);
