@@ -1,4 +1,4 @@
-import { ADD_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS } from '../actions/viewerActions';
+import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS } from '../actions/viewerActions';
 
 const initialState = {viewers: {}};
 
@@ -13,6 +13,14 @@ export default (state = initialState, action) => {
                     architecture: true, 
                     segMasks: false 
                 }
+            }
+        }
+        case REMOVE_VIEWER: 
+        {
+            const { [action.viewerID]: removed, ...viewers } = state.viewers
+            return {
+                ...state,
+                viewers: viewers || {}
             }
         }
         case TOGGLE_ARCH: return {

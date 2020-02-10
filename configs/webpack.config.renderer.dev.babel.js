@@ -59,6 +59,14 @@ export default merge.smart(baseConfig, {
 
   module: {
     rules: [
+      { 
+        test: /node_modules\/axios/, 
+        resolve: { aliasFields: ["axios"] } 
+      },
+      {
+        test: /\.node$/,
+        loader: 'node-loader'
+      },
       {
         test: /\.jsx?$/,
         exclude: /node_modules/,

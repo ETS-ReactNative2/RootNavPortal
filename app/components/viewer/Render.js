@@ -1,10 +1,10 @@
 // @flow
 import React, { Component } from 'react';
 import { readFileSync } from 'fs';
-import simplify from 'simplify-js';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
-import { IMAGE_EXTS_REGEX } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
+import imageThumb from 'image-thumbnail';
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -51,12 +51,17 @@ export default class Render extends Component<Props> {
             if (!simplifiedLines) return;
 
             let image = new Image();
-            let r = path.match(/(.+\\|\/)(.+)/); //Matches the file path into the absolute directory path and file name
+            let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
-            image.src = r[1] + r[2] + "." + ext;
+            if (segMasks && file.first_order && file.second_order) 
+                imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                    .then(output => image.src = 'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, output)));
+            else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext;
+        
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);
+                
                 if (architecture)
                 {
                     simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
@@ -84,35 +89,21 @@ export default class Render extends Component<Props> {
         ctx.lineWidth   = 4;
         ctx.lineCap     = ctx.lineJoin ='round';
 
-        //Debug drawing shit
-        ctx.beginPath();
-        ctx.rect(10, 10, 50, 50);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.lineTo(0, 0)
-        ctx.lineTo(10, 10)
-        ctx.lineTo(20, 20)
-        ctx.lineTo(100, 100)
-        ctx.lineTo(140, 140)
-        ctx.stroke();
-
         ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
         this.draw();    
     }
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = rsml => {
-        const tolerance   = 0.1; //Used for simplify
-        const highQuality = true;
         const { attrNodeName, attributeNamePrefix } = this.xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
-            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline, or wrap the return into a simplify call like simplify(xxx.map(), tolerance, highQuality)
+            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
-                points: rsml.geometry.rootnavspline.point.map(p => ({ //Maybe we should just extract Mike's splines instead and use them, I think this does nearly the same. Should compare results.
-                    x: p.attr[attributeNamePrefix + 'x'],             //options are: use the polylines, either simplified or not, or the splines
-                    y: p.attr[attributeNamePrefix + 'y']              // ask Mike about if cubic spline interpolation is better than the more exact (albeit uglier) polylines
+                points: rsml.geometry.rootnavspline.point.map(p => ({ 
+                    x: p.attr[attributeNamePrefix + 'x'],             
+                    y: p.attr[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });
         }
@@ -127,15 +118,14 @@ export default class Render extends Component<Props> {
         const { file, path, updateParsedRSML } = this.props;
         if (!file.parsedRSML && file.rsml)
         {
-            let r = path.match(/(.+\\|\/)(.+)/); //Matches the file path into the absolute directory path and file name
-            r[1] = r[1].slice(0, -1);
+            let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
-            let data = readFileSync(r[1] + sep + r[2] + ".rsml", 'utf8');
+            let data = readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8');
             let rsmlJson = parser.parse(data, this.xmlOptions);
             const { scene: { plant } } = rsmlJson.rsml;
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
             Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
-            updateParsedRSML(r[1], r[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            updateParsedRSML(matchedPath[1], matchedPath[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             this.rsmlPoints = [];
         }
 

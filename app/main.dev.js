@@ -17,10 +17,10 @@ import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import axios from 'axios';
-import { API_PATH } from './constants/globals.js';
+import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE } from './constants/globals';
 
 global.API_STATUS = false;
-axios.get(API_PATH + "/model").then(res => global.API_STATUS = true).catch(err => global.API_STATUS = false);
+axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);
 
 export default class AppUpdater {
   constructor() {
@@ -39,6 +39,7 @@ ipcMain.on('renderer-reload', (event, action) => {
 });
 
 let mainWindow = null;
+let backendWindow = null;
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -84,8 +85,8 @@ app.on('ready', async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
     webPreferences: {
       nodeIntegration: true,
     }
@@ -108,16 +109,27 @@ app.on('ready', async () => {
 
   ipcMain.on('openViewer', (event, path) => {
     let subWindow = new BrowserWindow({
-      width: 1024,
-      height: 728,
+      width: WINDOW_WIDTH,
+      height: WINDOW_HEIGHT,
       webPreferences: {
         nodeIntegration: true,
       }
     });
 
-  
     subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
+    subWindow.webContents.on('did-finish-load', () => {
+      if (!subWindow) {
+        throw new Error('"subWindow" is not defined');
+      }
+      subWindow.show();
+      subWindow.focus();
+    });
+  
+    subWindow.on('closed', () => {
+      subWindow = null;
+    });
   });
+
   // @TODO: Use 'ready-to-show' event
   //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
@@ -142,4 +154,21 @@ app.on('ready', async () => {
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
+
+  //Open backend last
+  backendWindow = new BrowserWindow({
+    show: false,
+    width: WINDOW_WIDTH,
+    height: WINDOW_HEIGHT,
+    webPreferences: { nodeIntegration: true }
+  });
+  backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
+
+  ipcMain.on(API_ADD, (event, paths) => {
+    backendWindow.webContents.send(API_ADD, paths)
+  });
+
+  ipcMain.on(API_DELETE, (event, path) => {
+      backendWindow.webContents.send(API_DELETE, path);
+  });
 });

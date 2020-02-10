@@ -14,9 +14,9 @@ class RemoveButton extends Component {
             writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
                 if (err) console.err(err); //idk do some handling here
             });
-
         this.props.remove(this.props.path);
     }
+    
     render() { 
         return (
             <StyledButton
