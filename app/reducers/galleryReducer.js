@@ -113,7 +113,7 @@ export default (state = initialState, action) => {
             ...state,
             files: {
                 ...state.files,
-                [action.folder] : newState //Write over the folder's state with our object constructed in the backend
+                [action.folder] : action.newState //Write over the folder's state with our object constructed in the backend
             }
         }
         default: return state;
