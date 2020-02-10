@@ -18,7 +18,7 @@ export default class FolderView extends Component<Props> {
 	{
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
-		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
+		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
 	render() {
