@@ -11,8 +11,6 @@ import { matchPathName } from '../../constants/globals';
 type Props = {};
 
 export default class TopBar extends Component<Props> {
-  props: Props;
-
   toggleArch = () => {
       this.props.toggleArch(process.pid);
   }

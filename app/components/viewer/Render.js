@@ -8,7 +8,6 @@ import imageThumb from 'image-thumbnail';
 type Props = {};
 
 export default class Render extends Component<Props> {
-    props: Props;
     constructor(props)
     {
         super(props);

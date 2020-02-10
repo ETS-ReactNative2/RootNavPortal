@@ -7,8 +7,6 @@ import { StyledGalleryViewDiv, StyledGalleryViewH1, StyledFolderCard } from './S
 type Props = {};
 
 export default class GalleryView extends Component<Props> {
-  props: Props;
-
   render() {
     const { folders } = this.props;
     return (

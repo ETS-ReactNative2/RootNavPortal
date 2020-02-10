@@ -7,7 +7,6 @@ import { InputGroup } from 'react-bootstrap'
 type Props = {};
 
 export default class FilterBar extends Component<Props> {
-  props: Props;
   typingTimeout = 0;
   text = "";
 

@@ -13,7 +13,6 @@ class AddButton extends Component {
     constructor(props)
     {
         super(props);
-        this.tree = React.createRef();
         ipcRenderer.on('folderData', (event, data) => {
             let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this. Need to make an exclude regex for things like system folders and node_modules in case
             this.props.updateModalBody(tree);
@@ -32,7 +31,6 @@ class AddButton extends Component {
         const config = imports.map(path => ({'path': path, 'active': false})); //active never gets used or toggled in config, any point of having it?
         addFolders(config.filter(newfolder => !folders.some(folder => newfolder.path == folder.path)));
         closeModal();
-        this.tree.current.clear();
 
         if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
             mkdirSync(APPHOME, '0777', true, err => { //0777 HMMMM change later
@@ -47,11 +45,6 @@ class AddButton extends Component {
         ipcRenderer.send('openFolder')
     }
 
-    close = () => {
-        this.tree.current.clear();
-        this.props.closeModal();
-    }
-
     render() {
         return (
             <React.Fragment>
@@ -60,19 +53,19 @@ class AddButton extends Component {
                     onClick={this.openFileDialog} 
                     className={`btn btn-default fas fa-plus button`} 
                 />
-                <StyledModal show={this.props.modal} onHide={close}>
+                <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Select plant image folders</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <TreeChecklist ref={this.tree}/>
+                        <TreeChecklist/>
                     </Modal.Body>
                     <Modal.Footer>
-                        <Button variant="danger" onClick={this.close}>
+                        <Button variant="danger" onClick={this.props.closeModal}>
                             Cancel
                         </Button>
                         <Button variant="primary" onClick={this.importFolders}>
-                            Import
+                            Select
                         </Button>
                     </Modal.Footer>
                 </StyledModal> 

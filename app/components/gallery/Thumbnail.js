@@ -10,7 +10,6 @@ import { IMAGE_EXTS, IMAGE_EXTS_REGEX } from '../../constants/globals'
 type Props = {};
 
 export default class Thumbnail extends Component<Props> {
-  props: Props;
     windowObject = null;
 
 	shouldComponentUpdate(nextProps, nextState) 

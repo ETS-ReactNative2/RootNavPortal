@@ -14,8 +14,6 @@ import { sep } from 'path';
 type Props = {};
 
 export default class FolderView extends Component<Props> {
-	props: Props;
-
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;

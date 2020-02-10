@@ -10,13 +10,11 @@ import { remote } from 'electron';
 type Props = {};
 
 export default class Gallery extends Component<Props> {
-  props: Props;
   constructor(props)
   {
     super(props);
     process.env.API_STATUS = remote.getGlobal('API_STATUS');
   }
-
   render() {
 
     if (!this.props.hasReadConfig) 

@@ -5,8 +5,6 @@ import { StyledListGroupItem } from './StyledComponents'
 type Props = {};
 
 export default class Plugin extends Component<Props> {
-  props: Props;
-
   render() {
     const { name, func, active } = this.props;
     return (
