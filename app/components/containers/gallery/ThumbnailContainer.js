@@ -6,7 +6,9 @@ const mapStateToProps = (state, ownProps) => (
     { 
         file: state.gallery.files[ownProps.folder][ownProps.fileName],
         folder: ownProps.folder,
-        fileName: ownProps.fileName
+        fileName: ownProps.fileName,
+        queue: state.backend.queue,
+        inFlight: state.backend.inFlight
     }
 );
 

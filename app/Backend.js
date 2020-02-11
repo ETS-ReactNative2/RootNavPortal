@@ -73,8 +73,8 @@ export default class Backend extends Component<Props> {
                 
                 if (!queued)
                 {
-                    let file = path + sep + fileName;
-                    this.queue.push(file + "." + Object.keys(files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX))); //Readd it to the queue
+                    let file = path + sep + fileName + "." + Object.keys(files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX));
+                    this.queue.push(file); //Readd it to the queue
                     queuedFiles.push(file); //No extension in the state queue, figured it would make it easier to keep track of things if we don't require the extension to find it
                 } 
                 queued = true;
@@ -92,7 +92,7 @@ export default class Backend extends Component<Props> {
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
         let file = this.queue.shift();
         let matchedFile = file.match(/(.+\\|\/)(.+)(\..+)/); //Matches the file path into the absolute directory path/, file name and .ext
-        this.props.removeQueue(matchedFile[1] + matchedFile[2]);
+        this.props.removeQueue(matchedFile[1] + matchedFile[2] + matchedFile[3]);
 
         const formData = new mFormData();
         const filePath = matchedFile[1] + matchedFile[2] + matchedFile[3];

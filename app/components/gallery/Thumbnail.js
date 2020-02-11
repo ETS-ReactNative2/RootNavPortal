@@ -4,18 +4,24 @@ import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
-import { StyledTextOverflowContainer } from '../CommonStyledComponents'
 import { IMAGE_EXTS, IMAGE_EXTS_REGEX } from '../../constants/globals'
-
-type Props = {};
+import { Spinner } from 'react-bootstrap';
+import styled from 'styled-components';
 
 export default class Thumbnail extends Component<Props> {
     windowObject = null;
 
-	shouldComponentUpdate(nextProps, nextState) 
-	{
-		return (JSON.stringify(nextProps.file) !== JSON.stringify(this.props.file));
-	}
+    StyledSpinner = styled(Spinner)` && {
+        position: absolute;
+        right: 0.3em;
+        top: 0.1em;
+    }`;
+
+    StyledTextOverflowContainer = styled.div` && {
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+      }`
 
     openViewer = e => 
     {
@@ -33,7 +39,7 @@ export default class Thumbnail extends Component<Props> {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
-        const { folder, file, fileName, addThumb } = this.props;
+        const { folder, file, fileName, addThumb, queue, inFlight } = this.props;
         if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
@@ -52,16 +58,25 @@ export default class Thumbnail extends Component<Props> {
                 let source = 'data:image/png;base64,' + file[key].toString('base64');
                 image = <StyledImage className={"card-img-top"} src={ source }/> 
             }
-        })
+        });
+
+        let spinner;
+        if (inFlight[folder + sep + fileName])
+            spinner = <this.StyledSpinner animation="border" variant="success" />; //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
+        else if (queue.find(file => file.includes(folder + sep + fileName + "."))) //Try avoid files with subset names
+            spinner = <this.StyledSpinner animation="border" variant="secondary"/>;
 
         return (
             <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
-                <div>{image}</div>
+                <div>
+                    {spinner}
+                    {image}
+                </div>
                 <StyledCardBody>
                     <StyledCardText>
-                        <StyledTextOverflowContainer>
+                        <this.StyledTextOverflowContainer>
                             {fileName}
-                        </StyledTextOverflowContainer>
+                        </this.StyledTextOverflowContainer>
                     </StyledCardText>
                 </StyledCardBody>
             </StyledImageCard>            
