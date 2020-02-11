@@ -87,6 +87,8 @@ app.on('ready', async () => {
     show: false,
     width: WINDOW_WIDTH,
     height: WINDOW_HEIGHT,
+    minHeight: WINDOW_HEIGHT,
+    minWidth: WINDOW_WIDTH,
     webPreferences: {
       nodeIntegration: true,
     }
@@ -111,6 +113,8 @@ app.on('ready', async () => {
     let subWindow = new BrowserWindow({
       width: WINDOW_WIDTH,
       height: WINDOW_HEIGHT,
+      minHeight: WINDOW_HEIGHT,
+      minWidth: WINDOW_WIDTH,
       webPreferences: {
         nodeIntegration: true,
       }
@@ -158,8 +162,8 @@ app.on('ready', async () => {
   //Open backend last
   backendWindow = new BrowserWindow({
     show: false,
-    width: WINDOW_WIDTH,
-    height: WINDOW_HEIGHT,
+    width: 0,
+    height: 0,
     webPreferences: { nodeIntegration: true }
   });
   backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
