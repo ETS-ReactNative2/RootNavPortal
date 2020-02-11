@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import FolderView from '../containers/gallery/FolderViewContainer';
-import { StyledGalleryViewDiv, StyledGalleryViewH1, StyledFolderCard } from './StyledComponents'
+import { StyledGalleryViewDiv, StyledGalleryViewH1 } from './StyledComponents'
 
 
 type Props = {};
@@ -18,9 +18,7 @@ export default class GalleryView extends Component<Props> {
           {
             folders.map((item, i) => {
               if (folders.length > 0)
-                return <StyledFolderCard key={i}>
-                  <FolderView folder={item.path} isActive={item.active} />
-                </StyledFolderCard>;
+                return <FolderView key={i} folder={item.path} isActive={item.active} />;
             })
           }
         </StyledGalleryViewDiv>

@@ -4,8 +4,7 @@ import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
-import { StyledFolderViewDiv, StyledRow, StyledCardHeader } from './StyledComponents'
-import { Card } from 'react-bootstrap'
+import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
@@ -62,7 +61,7 @@ export default class FolderView extends Component<Props> {
 		&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			return (
-				<Card className="bg-light">
+				<StyledFolderCard className="bg-light">
 					<StyledCardHeader onClick={() => toggleOpenFile(folder)}>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
@@ -84,7 +83,7 @@ export default class FolderView extends Component<Props> {
 								);
 							})} </StyledRow></StyledFolderViewDiv> : ""							
 						}
-				</Card>
+				</StyledFolderCard>
 				);
 		}
 		else return "";
