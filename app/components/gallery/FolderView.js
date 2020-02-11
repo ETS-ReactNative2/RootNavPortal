@@ -86,7 +86,7 @@ export default class FolderView extends Component<Props> {
 							</StyledFolderViewDiv> 
 						: ""							
 					}
-				</Card>
+				</StyledFolderCard>
 				);
 		}
 		else return "";
