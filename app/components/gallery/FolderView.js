@@ -17,7 +17,7 @@ export default class FolderView extends Component<Props> {
 	{
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
-		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files))
+		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
 	render() {
@@ -73,17 +73,20 @@ export default class FolderView extends Component<Props> {
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
 					{
-							(isActive && files && folder) ? <StyledFolderViewDiv><StyledRow> {filesList
-							.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
-							.map((file, index) => {
-								return (
-									<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
-										<Thumbnail folder={folder} fileName={file}/>
-									</div>
-								);
-							})} </StyledRow></StyledFolderViewDiv> : ""							
-						}
-				</StyledFolderCard>
+						(isActive && files && folder) ? 
+							<StyledFolderViewDiv>
+								<StyledRow> {filesList
+									.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
+									.map((file, index) => (
+										<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
+											<Thumbnail folder={folder} fileName={file}/>
+										</div>
+									))} 
+								</StyledRow>
+							</StyledFolderViewDiv> 
+						: ""							
+					}
+				</Card>
 				);
 		}
 		else return "";

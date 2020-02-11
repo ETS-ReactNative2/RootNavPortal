@@ -1,10 +1,11 @@
 // @flow
 import React, { Component } from 'react';
-import { readFileSync } from 'fs';
+import { readFileSync, readFile } from 'fs';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
 import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
+import Tiff from 'tiff.js';
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -40,7 +41,7 @@ export default class Render extends Component<Props> {
     }
 
     draw = () => {
-        const { file, path, architecture, segMasks } = this.props;
+        const { file, path, architecture, segMasks, updateFile } = this.props;
         const ctx    = this.canvas.current.getContext("2d");
         const canvas = this.canvas.current;
         ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv , canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
@@ -54,29 +55,42 @@ export default class Render extends Component<Props> {
             let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
-            if (segMasks && file.first_order && file.second_order) 
-                imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
-                    .then(output => image.src = 'data:image/png;base64,' + btoa(String.fromCharCode.apply(null, output)));
-            else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext;
-        
+            if (segMasks && file.first_order && file.second_order) //Composite the segmasks together
+                if (!file.seg_mask) 
+                    imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                        .then(output => {
+                            updateFile(matchedPath[1], matchedPath[2], { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
+                            image.src = 'data:image/png;base64,' + output.toString('base64');
+                            console.log(Buffer.byteLength(output))
+                            console.log(Buffer.byteLength(output.toString('base64'), 'utf8'));
+                        });
+                else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
+            
+            else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
+            {
+                let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
+                ctx.drawImage(image.toCanvas(), 0, 0);
+                if (architecture) this.drawRSML(ctx, simplifiedLines);       
+            }
+            else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
+
             image.onload = () => {
                 ctx.drawImage(image, 0, 0);
-                
-                if (architecture)
-                {
-                    simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-                        ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; //This means lines are only drawn if there's an image along with the RSML
-                        ctx.beginPath(); //Draw the actual line
-                        line.points.forEach(point => {
-                            ctx.lineTo(point.x, point.y);
-                        });
-                        ctx.stroke();
-                    })
-                }
-            };            
+                if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+            };     
         }
     }
 
+    drawRSML = (ctx, simplifiedLines) => {
+        simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
+            ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; //This means lines are only drawn if there's an image along with the RSML
+            ctx.beginPath(); //Draw the actual line
+            line.points.forEach(point => {
+                ctx.lineTo(point.x, point.y);
+            });
+            ctx.stroke();
+        })
+    }
     componentDidMount()
     {
         const canvas = this.canvas.current;
@@ -101,7 +115,7 @@ export default class Render extends Component<Props> {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
             this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
-                points: rsml.geometry.rootnavspline.point.map(p => ({ 
+                points: rsml.geometry.polyline.point.map(p => ({ 
                     x: p.attr[attributeNamePrefix + 'x'],             
                     y: p.attr[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
@@ -126,6 +140,7 @@ export default class Render extends Component<Props> {
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
             Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
             updateParsedRSML(matchedPath[1], matchedPath[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            console.log(this.rsmlPoints.length);
             this.rsmlPoints = [];
         }
 
