@@ -1,11 +1,11 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, useState, useRef } from 'react';
 import imageThumbail from 'image-thumbnail';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
 import { IMAGE_EXTS, IMAGE_EXTS_REGEX } from '../../constants/globals'
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
 
 export default class Thumbnail extends Component<Props> {
@@ -21,7 +21,7 @@ export default class Thumbnail extends Component<Props> {
         text-overflow: ellipsis;
         white-space: nowrap;
         overflow: hidden;
-      }`
+    }`;
 
     openViewer = e => 
     {
@@ -35,11 +35,42 @@ export default class Thumbnail extends Component<Props> {
         }
     }
 
+    //Generates a spinner with tooltip overlay, which need to be in a function component for state hooks, or nothing
+    spinner = () => {
+        const [show, setShow] = useState(false);
+        const target = useRef(null);
+        const { folder, fileName, queue, inFlight } = this.props;
+
+         //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
+        let spinner, tooltipText;
+        if (inFlight[folder + sep + fileName])
+        {
+            spinner = <this.StyledSpinner ref={target} animation="border" variant="success" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            tooltipText = "Currently processing";
+        }
+        else if (queue.find(file => file.includes(folder + sep + fileName + "."))) //Try avoid files with subset names
+        {
+            spinner = <this.StyledSpinner ref={target} id={fileName} animation="border" variant="secondary" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            tooltipText = "Queued for processing";
+        }
+
+        return (
+            <>
+                <Overlay target={target.current} show={show} placement="top">
+                {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
+                    <Tooltip placement={top} {...props}> {tooltipText} </Tooltip>
+                )}
+                </Overlay>
+                {spinner}
+            </>
+        )
+    }
+
 	render() {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
-        const { folder, file, fileName, addThumb, queue, inFlight } = this.props;
+        const { folder, file, fileName, addThumb } = this.props;
         if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
@@ -60,16 +91,10 @@ export default class Thumbnail extends Component<Props> {
             }
         });
 
-        let spinner;
-        if (inFlight[folder + sep + fileName])
-            spinner = <this.StyledSpinner animation="border" variant="success" />; //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
-        else if (queue.find(file => file.includes(folder + sep + fileName + "."))) //Try avoid files with subset names
-            spinner = <this.StyledSpinner animation="border" variant="secondary"/>;
-
         return (
             <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
                 <div>
-                    {spinner}
+                    <this.spinner/>
                     {image}
                 </div>
                 <StyledCardBody>

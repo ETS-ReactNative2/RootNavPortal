@@ -164,8 +164,10 @@ app.on('ready', async () => {
     show: false,
     width: 0,
     height: 0,
-    webPreferences: { nodeIntegration: true }
+    webPreferences: { nodeIntegration: true },
+    frame: false
   });
+  
   backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
   ipcMain.on(API_ADD, (event, paths) => {

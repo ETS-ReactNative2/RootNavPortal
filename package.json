@@ -56,7 +56,7 @@
   },
   "main": "./app/main.prod.js",
   "build": {
-    "productName": "RootNav3",
+    "productName": "RootNav",
     "appId": "org.uon.RootNav",
     "files": [
       "app/dist/",
@@ -101,18 +101,18 @@
     "publish": {
       "provider": "github",
       "owner": "Chagrilled",
-      "repo": "RootNav3",
+      "repo": "RootNavPortal",
       "private": true
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Chagrilled/RootNav3.git"
+    "url": "git+https://github.com/Chagrilled/RootNavPortal.git"
   },
   "author": {
     "name": "Andrew Reynolds",
     "email": "andrew.n64@hotmail.com",
-    "url": "https://github.com/Chagrilled/RootNav3"
+    "url": "https://github.com/Chagrilled/RootNavPortal"
   },
   "contributors": [
     {
@@ -128,7 +128,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/Chagrilled/RootNav3/issues"
+    "url": "https://github.com/Chagrilled/RootNavPortal/issues"
   },
   "keywords": [
     "electron",
@@ -141,7 +141,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/Chagrilled/RootNav3#readme",
+  "homepage": "https://github.com/Chagrilled/RootNavPortal#readme",
   "jest": {
     "testURL": "http://localhost/",
     "moduleNameMapper": {
