@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import { APPHOME, CONFIG } from '../../../constants/globals';
 import { existsSync, writeFile } from 'fs';
 import { StyledButton } from '../StyledComponents'; 

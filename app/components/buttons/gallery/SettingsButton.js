@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
 import { API_MODELS, matchPathName, API_DELETE } from '../../../constants/globals';

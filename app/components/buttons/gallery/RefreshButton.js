@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
 import { readdir } from 'fs';

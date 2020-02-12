@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import { StyledButton } from '../StyledComponents'; 
 
 class RemoveButton extends Component {
