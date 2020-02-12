@@ -40,9 +40,9 @@ export default class FolderView extends Component<Props> {
 				});
 				if (Object.keys(structuredFiles).length) 
 				{
-					let apiFiles = [];
 					if (process.env.API_STATUS)
 					{
+						let apiFiles = [];
 						Object.keys(structuredFiles).forEach(file => {
 							if (!structuredFiles[file].rsml)
 							{
