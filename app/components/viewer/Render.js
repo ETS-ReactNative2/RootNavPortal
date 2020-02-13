@@ -6,6 +6,7 @@ import { sep } from 'path';
 import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 import Tiff from 'tiff.js';
+import { fabric } from 'fabric';
 type Props = {};
 
 export default class Render extends Component<Props> {
@@ -61,22 +62,26 @@ export default class Render extends Component<Props> {
                         .then(output => {
                             updateFile(matchedPath[1], matchedPath[2], { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
                             image.src = 'data:image/png;base64,' + output.toString('base64');
-                            console.log(Buffer.byteLength(output))
-                            console.log(Buffer.byteLength(output.toString('base64'), 'utf8'));
                         });
                 else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
                 let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
-                ctx.drawImage(image.toCanvas(), 0, 0);
-                if (architecture) this.drawRSML(ctx, simplifiedLines);       
+                // ctx.drawImage(image.toCanvas(), 0, 0);
+                // if (architecture) this.drawRSML(ctx, simplifiedLines); 
+                console.log("hi tif")
+                image.src = image.toDataURL();   
+                console.log(image.toDataURL())
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
             image.onload = () => {
-                ctx.drawImage(image, 0, 0);
-                if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                this.fabricCanvas.add(new fabric.Image(image, {
+                    left: 0, top: 0
+                }))
+                //ctx.drawImage(image, 0, 0);
+                //if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };     
         }
     }
@@ -95,15 +100,15 @@ export default class Render extends Component<Props> {
     {
         const canvas = this.canvas.current;
         const ctx = canvas.getContext("2d");
-        canvas.width  = "1200";  //defaults to 300x150
-        canvas.height = "1200"; //We'll need to upscale the DOM DPI, and then scale it down to fit the UI to get a high res canvas
+        canvas.width  = "2400";  //defaults to 300x150
+        canvas.height = "2400"; //We'll need to upscale the DOM DPI, and then scale it down to fit the UI to get a high res canvas
         
         //Canvas settings
         ctx.strokeStyle = '#f53';
         ctx.lineWidth   = 4;
         ctx.lineCap     = ctx.lineJoin ='round';
 
-        ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
+        //ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
         this.draw();    
     }
 
@@ -127,6 +132,16 @@ export default class Render extends Component<Props> {
         }
     }
 
+    FabricCanvas = () => {
+        this.fabricCanvas = new fabric.Canvas('c');
+        console.log(this.fabricCanvas)
+        this.fabricCanvas.initialize(document.getElementById('c'), {width: 1000, height: 1000}); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.add(new fabric.Rect({
+            left: 100, top: 100, fill: 'red', width: 20, height: 20
+        }))
+        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //This is the height of the actual drawing canvas
+        return <canvas id='c'></canvas>
+    }
     render() 
     {   
         const { file, path, updateParsedRSML } = this.props;
@@ -146,7 +161,8 @@ export default class Render extends Component<Props> {
 
         return (
             <div>
-                <canvas ref={this.canvas} />
+                <this.FabricCanvas />
+                <canvas ref={this.canvas} style={{width: '1200px', height: '1200px'}} />
             </div>
         );
     }
