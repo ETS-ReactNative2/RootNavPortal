@@ -7,7 +7,6 @@ import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 import Tiff from 'tiff.js';
 import { fabric } from 'fabric';
-type Props = {};
 
 export default class Render extends Component<Props> {
     constructor(props)
@@ -16,7 +15,7 @@ export default class Render extends Component<Props> {
         this.canvas = React.createRef();
     }
 
-    colours = {PRIMARY: '#f53', LATERAL: '#ffff00'};
+    colours = { PRIMARY: '#f53', LATERAL: '#ffff00' };
     rsmlPoints = [];
     canvasScaleDiv = 2; //Canvas scale is 1 / this. Used to clear the canvas with inverted scaling
 
@@ -67,34 +66,37 @@ export default class Render extends Component<Props> {
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
+                console.log("hi tif");
                 let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
                 // ctx.drawImage(image.toCanvas(), 0, 0);
-                // if (architecture) this.drawRSML(ctx, simplifiedLines); 
-                console.log("hi tif")
-                image.src = image.toDataURL();   
+                image.src = 'data:image/png;base64,' + image.readRGBAImage().toString('base64');
+                if (architecture) this.drawRSML(ctx, simplifiedLines); 
                 console.log(image.toDataURL())
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
             image.onload = () => {
+                console.log("Loaded")
                 this.fabricCanvas.add(new fabric.Image(image, {
-                    left: 0, top: 0
-                }))
+                    left: 0, top: 0, selectable: false
+                }));
                 //ctx.drawImage(image, 0, 0);
-                //if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };     
         }
     }
 
     drawRSML = (ctx, simplifiedLines) => {
         simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-            ctx.strokeStyle = line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL; //This means lines are only drawn if there's an image along with the RSML
-            ctx.beginPath(); //Draw the actual line
-            line.points.forEach(point => {
-                ctx.lineTo(point.x, point.y);
+            console.log(line.points);
+            let polyline = new fabric.Polyline(line.points, {
+                stroke: line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL,
+                fill: null,
+                strokeWidth: 4,
+                padding: 0
             });
-            ctx.stroke();
-        })
+            this.fabricCanvas.add(polyline);
+        });
     }
     componentDidMount()
     {
@@ -135,13 +137,11 @@ export default class Render extends Component<Props> {
     FabricCanvas = () => {
         this.fabricCanvas = new fabric.Canvas('c');
         console.log(this.fabricCanvas)
-        this.fabricCanvas.initialize(document.getElementById('c'), {width: 1000, height: 1000}); //This is the element size, these may need tweaking, maybe on the fly later
-        this.fabricCanvas.add(new fabric.Rect({
-            left: 100, top: 100, fill: 'red', width: 20, height: 20
-        }))
+        this.fabricCanvas.initialize(document.getElementById('c'), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
         this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //This is the height of the actual drawing canvas
         return <canvas id='c'></canvas>
     }
+
     render() 
     {   
         const { file, path, updateParsedRSML } = this.props;
