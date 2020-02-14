@@ -1,6 +1,6 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_FILE, RESET_FOLDER } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FILE, RESET_FOLDER } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "", filterAnalysed: false };
 
@@ -10,7 +10,7 @@ export default (state = initialState, action) => {
         //Directory reducer actions
         case OPEN_DIR: return {
             ...state,
-            folders: state.folders.concat(action.paths)
+            folders: state.folders.concat(action.folderInfo)
         };
         case REFRESH_DIRS: return {
             ...state,
@@ -27,7 +27,7 @@ export default (state = initialState, action) => {
         }
         case TOGGLE_DIR: return {
             ...state,
-            folders: state.folders.map(folder => folder.path == action.path ? {'path':folder.path, 'active':!folder.active} : folder)
+            folders: state.folders.map(folder => folder.path == action.path ? {...folder, 'active':!folder.active} : folder)
         }
 
         //Modal reducer actions
@@ -50,7 +50,7 @@ export default (state = initialState, action) => {
         };
         case UPDATE_CHECKED: return {
             ...state,
-            checked: action.paths
+            checked: action.checked
         }
         case ADD_FILES: return {
             ...state,
@@ -95,6 +95,10 @@ export default (state = initialState, action) => {
                     }
                 }
             }
+        }
+        case UPDATE_CHECKLIST_DROPDOWN: return {
+            ...state,
+            checked: state.checked.map(folder => action.path == folder.path ? folder : {...folder, model: action.model})
         }
         case UPDATE_FILE: return {
             ...state,

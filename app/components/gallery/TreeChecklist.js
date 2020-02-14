@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import CheckboxTree from 'react-checkbox-tree';
 import 'react-checkbox-tree/lib/react-checkbox-tree.css'; //CSS doesn't import properly. Obviously. Importing it in global has some effect. Still doesn't work.
-import TreeChecklistDropdown from './TreeChecklistDropdown';
+import TreeChecklistDropdown from '../containers/gallery/TreeChecklistDropdownContainer';
 type Props = {};
 
 export default class TreeChecklist extends Component<Props> {
@@ -20,6 +20,16 @@ export default class TreeChecklist extends Component<Props> {
     this.reset();
   }    
 
+  // Pass in array of checked paths, get back the paths model in state (if there), otherwise null.
+  // Needed because the treechecklist returns lists of strings, but we need lists of objects. 
+  getUpdatedCheckedWithModels = checkedStringList => {
+    const { checked } = this.state;
+    return checkedStringList.map(checkedString => {
+      const model = checked.find(test => test.path == checkedString) || "";
+      return { path: checkedString, model };
+    });
+  }
+
   reset = () => {
     const { tree, updateChecked } = this.props;
     const paths = tree.map(item => item.path);
@@ -28,7 +38,7 @@ export default class TreeChecklist extends Component<Props> {
       expanded: paths,
       nodes: this.getNodes(tree, paths)
     });
-    updateChecked(paths);
+    updateChecked(this.getUpdatedCheckedWithModels(paths));
   }
 
   getNodes = (nodes, checked) => 
@@ -97,7 +107,7 @@ export default class TreeChecklist extends Component<Props> {
           noCascade={true}
           onCheck={checked => {
             this.setState({ checked, nodes: this.refreshNodeLabels(nodes, checked) });
-            updateChecked(checked);
+            updateChecked(this.getUpdatedCheckedWithModels(checked));
           }}
           checkModel={'all'}
           onExpand={expanded => this.setState({ expanded })}

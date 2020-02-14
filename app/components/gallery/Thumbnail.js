@@ -78,17 +78,18 @@ export default class Thumbnail extends Component<Props> {
             //Tif files "don't support buffer" apparently, when thumbnailing, so uhh... :shrug:
             imageThumbail.thumb(folder + sep + fileName + "." + ext, { pngOptions: { force: true } }).then(thumb => 
             {
-                addThumb(folder, fileName, {ext: ext, thumb}) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
+                console.log(thumb);
+                addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
             }).catch(err => console.error(err));
         }
-
         let image;
         Object.keys(file).forEach(key => {
             if (key.includes("Thumb"))
             {
-                let source = 'data:image/png;base64,' + file[key].toString('base64');
+                console.log(file[key]);
+                let source = 'data:image/png;base64,' + Buffer.from(file[key]).toString('base64');
                 image = <StyledImage className={"card-img-top"} src={ source }/> 
-            }
+            } 
         });
 
         return (

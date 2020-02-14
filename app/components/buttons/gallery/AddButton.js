@@ -26,8 +26,8 @@ class AddButton extends Component {
     }
 
     importFolders = () => {
-        const { imports, addFolders, closeModal, folders} = this.props;
-        const config = imports.map(path => ({'path': path, 'active': false})); //active never gets used or toggled in config, any point of having it?
+        const { imports, addFolders, closeModal, folders } = this.props;
+        const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}));
         addFolders(config.filter(newfolder => !folders.some(folder => newfolder.path == folder.path)));
         closeModal();
 
@@ -63,7 +63,7 @@ class AddButton extends Component {
                         <Button variant="danger" onClick={this.props.closeModal}>
                             Cancel
                         </Button>
-                        <Button variant="primary" onClick={this.importFolders}>
+                        <Button variant="primary" onClick={() => { this.importFolders(); this.props.clearChecked() }}>
                             Select
                         </Button>
                     </Modal.Footer>
