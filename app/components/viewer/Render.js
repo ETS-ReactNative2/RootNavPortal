@@ -13,11 +13,34 @@ export default class Render extends Component<Props> {
     {
         super(props);
         this.canvas = React.createRef();
-    }
+        this.c = [...Array(5)].map(() => Math.random().toString(36)[2]).join('')
+        console.log(this.c);
 
-    colours = { PRIMARY: '#f53', LATERAL: '#ffff00' };
+    }
+    
+    getObjectByName = name => {
+        let object  = null,
+            objects = this.fabricCanvas.getObjects();
+            
+        console.log(name);
+        console.log(objects);
+        for (let i = 0, len = this.fabricCanvas.size(); i < len; i++) {
+          if (objects[i].name && objects[i].name === name) {
+            object = objects[i];
+            break;
+          }
+        }
+      
+        return object;
+    };
+
+    colours = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
     rsmlPoints = [];
     canvasScaleDiv = 2; //Canvas scale is 1 / this. Used to clear the canvas with inverted scaling
+    fabricCache = {
+        selectedID: null,
+    };
+    deleteKey = "Backspace";
 
     xmlOptions = {
         attributeNamePrefix: "@_",
@@ -37,15 +60,76 @@ export default class Render extends Component<Props> {
     //Fires on each component update - not initial render - which is fine since our ref for drawing won't be active in render, and the state change from reading RSML will trigger an update
     componentDidUpdate()
     {
+        this.setupCanvas();
         this.draw();
+    }
+
+    componentWillUnmount()
+    {
+        document.removeEventListener("keydown", this.handleDelete, false);
+    }
+
+    componentDidMount()
+    {
+        document.addEventListener("keydown", this.handleDelete, false);
+        this.setupCanvas();
+        this.draw();    
+    }
+
+    setupCanvas = () => {
+        this.fabricCanvas.initialize(document.getElementById(this.c), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true });
+        
+        this.fabricCanvas.on('mouse:over', e => {
+            if (e.target && e.target.selectable && e.target.get('name') != this.fabricCache.selectedID) 
+            {
+                e.target.set('stroke', this.colours.HOVERED);
+                this.fabricCanvas.renderAll();
+            }
+        });
+
+        this.fabricCanvas.on('mouse:out', e => {
+            if (e.target && e.target.selectable && this.fabricCache.selectedID != e.target.get('name'))
+            {
+                e.target.set('stroke', e.target.get('name').toString().includes(".") ? this.colours.LATERAL : this.colours.PRIMARY);
+                this.fabricCanvas.renderAll();
+            }
+        });
+
+        this.fabricCanvas.on('mouse:down', e => {
+            if (this.fabricCache.selectedID) 
+            {
+                let line =  this.getObjectByName(this.fabricCache.selectedID)
+                line.set('stroke', line.get('name').toString().includes(".") ? this.colours.LATERAL : this.colours.PRIMARY);
+                this.fabricCache.selectedID = null;
+                this.fabricCanvas.renderAll();
+            }
+            if (e.target.selectable) 
+            {
+                e.target.set('stroke', this.colours.HOVERED);
+                this.fabricCache.selectedID = e.target.name;
+                this.fabricCanvas.renderAll();
+            }
+        });
+    }
+
+    handleDelete = e =>
+    {
+        if (e.key != this.deleteKey) return;
+        if (this.fabricCache.selectedID)
+        {
+            this.fabricCanvas.remove(this.getObjectByName(this.fabricCache.selectedID));
+            this.fabricCache.selectedID = null;
+            //We need a save changes button, which will write ot back to simplifiedLines[id], send to Redux, and reconstruct RSML
+        }
     }
 
     draw = () => {
         const { file, path, architecture, segMasks, updateFile } = this.props;
         const ctx    = this.canvas.current.getContext("2d");
         const canvas = this.canvas.current;
-        ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv , canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
-
+        ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv, canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
+        
         if (file.parsedRSML) //Ready to draw!
         {
             const { simplifiedLines } = file.parsedRSML;
@@ -66,12 +150,10 @@ export default class Render extends Component<Props> {
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
-                console.log("hi tif");
                 let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
                 // ctx.drawImage(image.toCanvas(), 0, 0);
                 image.src = 'data:image/png;base64,' + image.readRGBAImage().toString('base64');
                 if (architecture) this.drawRSML(ctx, simplifiedLines); 
-                console.log(image.toDataURL())
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
@@ -88,30 +170,15 @@ export default class Render extends Component<Props> {
 
     drawRSML = (ctx, simplifiedLines) => {
         simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-            console.log(line.points);
             let polyline = new fabric.Polyline(line.points, {
                 stroke: line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL,
                 fill: null,
-                strokeWidth: 4,
-                padding: 0
+                strokeWidth: 8,
+                perPixelTargetFind: true,
+                name: line.id
             });
             this.fabricCanvas.add(polyline);
         });
-    }
-    componentDidMount()
-    {
-        const canvas = this.canvas.current;
-        const ctx = canvas.getContext("2d");
-        canvas.width  = "2400";  //defaults to 300x150
-        canvas.height = "2400"; //We'll need to upscale the DOM DPI, and then scale it down to fit the UI to get a high res canvas
-        
-        //Canvas settings
-        ctx.strokeStyle = '#f53';
-        ctx.lineWidth   = 4;
-        ctx.lineCap     = ctx.lineJoin ='round';
-
-        //ctx.scale(1 / this.canvasScaleDiv, 1 / this.canvasScaleDiv);
-        this.draw();    
     }
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
@@ -121,7 +188,8 @@ export default class Render extends Component<Props> {
         {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
             this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
-                { type: rsml[attrNodeName][attributeNamePrefix + 'label'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                { type: rsml[attrNodeName][attributeNamePrefix + 'label'],
+                id: rsml[attrNodeName][attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry.polyline.point.map(p => ({ 
                     x: p.attr[attributeNamePrefix + 'x'],             
                     y: p.attr[attributeNamePrefix + 'y']
@@ -135,15 +203,18 @@ export default class Render extends Component<Props> {
     }
 
     FabricCanvas = () => {
-        this.fabricCanvas = new fabric.Canvas('c');
+        let cName = 'c'+Date.now() % 50;
+
+        this.fabricCanvas = new fabric.Canvas(this.c);
         console.log(this.fabricCanvas)
-        this.fabricCanvas.initialize(document.getElementById('c'), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
-        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //This is the height of the actual drawing canvas
-        return <canvas id='c'></canvas>
+
+         //This is the height of the actual drawing canvas
+        return <canvas id={this.c}></canvas>
     }
 
     render() 
     {   
+        if (this.fabricCanvas) this.fabricCanvas.dispose();
         const { file, path, updateParsedRSML } = this.props;
         if (!file.parsedRSML && file.rsml)
         {
