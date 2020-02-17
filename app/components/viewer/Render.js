@@ -13,25 +13,15 @@ export default class Render extends Component<Props> {
     {
         super(props);
         this.canvas = React.createRef();
-        this.c = [...Array(5)].map(() => Math.random().toString(36)[2]).join('')
-        console.log(this.c);
-
+        this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join('')
     }
     
-    getObjectByName = name => {
-        let object  = null,
-            objects = this.fabricCanvas.getObjects();
-            
-        console.log(name);
-        console.log(objects);
-        for (let i = 0, len = this.fabricCanvas.size(); i < len; i++) {
-          if (objects[i].name && objects[i].name === name) {
-            object = objects[i];
-            break;
-          }
-        }
-      
-        return object;
+    //Objects are named by their RSML ID => laterals are parentID.latID
+    getObjectByName = name => {    
+        let objects = this.fabricCanvas.getObjects();
+        for (let i = 0; i < this.fabricCanvas.size(); i++)
+            if (objects[i].name && objects[i].name == name)
+                return objects[i];
     };
 
     colours = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
@@ -97,32 +87,49 @@ export default class Render extends Component<Props> {
         });
 
         this.fabricCanvas.on('mouse:down', e => {
-            if (this.fabricCache.selectedID) 
+            if (e.target && this.fabricCache.selectedID) 
             {
-                let line =  this.getObjectByName(this.fabricCache.selectedID)
+                let line = this.getObjectByName(this.fabricCache.selectedID)
                 line.set('stroke', line.get('name').toString().includes(".") ? this.colours.LATERAL : this.colours.PRIMARY);
                 this.fabricCache.selectedID = null;
                 this.fabricCanvas.renderAll();
             }
-            if (e.target.selectable) 
+            if (e.target && e.target.selectable) 
             {
                 e.target.set('stroke', this.colours.HOVERED);
                 this.fabricCache.selectedID = e.target.name;
                 this.fabricCanvas.renderAll();
             }
         });
-    }
+    };
+
+    getLaterals = primaryID => {
+        let laterals = []
+        
+        this.fabricCanvas.getObjects().forEach(object => {
+            if (object.name && object.name.startsWith(primaryID + '.'))
+                laterals.push(object);
+        });
+        return laterals;
+    };
 
     handleDelete = e =>
     {
         if (e.key != this.deleteKey) return;
-        if (this.fabricCache.selectedID)
+        const { selectedID } = this.fabricCache;
+        if (selectedID)
         {
-            this.fabricCanvas.remove(this.getObjectByName(this.fabricCache.selectedID));
+            this.fabricCanvas.remove(this.getObjectByName(selectedID));
+
+            if (!selectedID.includes('.'))
+                this.getLaterals(selectedID).forEach(lateral => {
+                    this.fabricCanvas.remove(lateral)
+                });
+
             this.fabricCache.selectedID = null;
-            //We need a save changes button, which will write ot back to simplifiedLines[id], send to Redux, and reconstruct RSML
+            //We need a save changes button, which will write it back to simplifiedLines[id], send to Redux, and reconstruct RSML
         }
-    }
+    };
 
     draw = () => {
         const { file, path, architecture, segMasks, updateFile } = this.props;
@@ -166,7 +173,7 @@ export default class Render extends Component<Props> {
                 if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };     
         }
-    }
+    };
 
     drawRSML = (ctx, simplifiedLines) => {
         simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
@@ -179,7 +186,7 @@ export default class Render extends Component<Props> {
             });
             this.fabricCanvas.add(polyline);
         });
-    }
+    };
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = rsml => {
@@ -200,17 +207,12 @@ export default class Render extends Component<Props> {
         {
            Array.isArray(rsml.root) ? rsml.root.forEach(root => this.formatPoints(root)) : this.formatPoints(rsml.root); //XMl parsing results in this check being required here too
         }
-    }
+    };
 
     FabricCanvas = () => {
-        let cName = 'c'+Date.now() % 50;
-
-        this.fabricCanvas = new fabric.Canvas(this.c);
-        console.log(this.fabricCanvas)
-
-         //This is the height of the actual drawing canvas
-        return <canvas id={this.c}></canvas>
-    }
+        this.fabricCanvas = new fabric.Canvas(this.canvasID);
+        return <canvas id={this.canvasID}></canvas>
+    };
 
     render() 
     {   
