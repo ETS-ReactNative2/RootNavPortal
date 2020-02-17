@@ -67,7 +67,7 @@ export default class Render extends Component<Props> {
     }
 
     setupCanvas = () => {
-        this.fabricCanvas.initialize(document.getElementById(this.c), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
         this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true });
         
         this.fabricCanvas.on('mouse:over', e => {
@@ -196,7 +196,7 @@ export default class Render extends Component<Props> {
             // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
             this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
                 { type: rsml[attrNodeName][attributeNamePrefix + 'label'],
-                id: rsml[attrNodeName][attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                id: rsml[attrNodeName][attributeNamePrefix + 'id'].toString(), //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry.polyline.point.map(p => ({ 
                     x: p.attr[attributeNamePrefix + 'x'],             
                     y: p.attr[attributeNamePrefix + 'y']
