@@ -222,8 +222,7 @@ export default class Render extends Component<Props> {
         {
             let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
-            let data = readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8');
-            let rsmlJson = parser.parse(data, this.xmlOptions);
+            let rsmlJson = parser.parse(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), this.xmlOptions);
             const { scene: { plant } } = rsmlJson.rsml;
             //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
             Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
