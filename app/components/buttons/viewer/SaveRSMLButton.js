@@ -2,14 +2,14 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 
-export default class ToggleMeasuresButton extends Component {
+export default class SaveRSMLButton extends Component {
 
     render() {    
         return (
             <StyledButton
-                variant="info" 
+                variant="primary" 
                 onClick={() => {}} 
-                className={`btn btn-default fa fa-chart-line button`} 
+                className={`btn btn-default fa fa-save button`} 
             />    
         )
     }

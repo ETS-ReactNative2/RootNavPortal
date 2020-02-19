@@ -116,6 +116,7 @@ export default class Render extends Component<Props> {
     handleDelete = e =>
     {
         if (e.key != this.deleteKey) return;
+        const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
         const { selectedID } = this.fabricCache;
         if (selectedID)
         {
@@ -125,21 +126,29 @@ export default class Render extends Component<Props> {
                 this.getLaterals(selectedID).forEach(lateral => {
                     this.fabricCanvas.remove(lateral)
                 });
+            
+            const simplifiedLines = editStack.length ? editStack[editStack.length - 1] : parsedRSML.simplifiedLines;
+            let editedLines = simplifiedLines.filter(line => {
+                if (selectedID.includes('.')) return selectedID != line.id
+                else return !line.id.startsWith(selectedID + '.') && line.id != selectedID;
+            });
 
+            pushEditStack(editedLines);
             this.fabricCache.selectedID = null;
             //We need a save changes button, which will write it back to simplifiedLines[id], send to Redux, and reconstruct RSML
         }
     };
 
     draw = () => {
-        const { file, path, architecture, segMasks, updateFile } = this.props;
+        const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
         const ctx    = this.canvas.current.getContext("2d");
         const canvas = this.canvas.current;
         ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv, canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
         
         if (file.parsedRSML) //Ready to draw!
         {
-            const { simplifiedLines } = file.parsedRSML;
+            //If there's something on the edit stack, grab the last one, else we use the file state RSML
+            const simplifiedLines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.simplifiedLines;
             if (!simplifiedLines) return;
 
             let image = new Image();
@@ -193,12 +202,12 @@ export default class Render extends Component<Props> {
         const { attrNodeName, attributeNamePrefix } = this.xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
-            // simplifiedLines: [ {type: "lat", points: [{x, y}] }]
-            this.rsmlPoints.push(   //To test alts, change rootnavspline to polyline
-                { type: rsml[attrNodeName][attributeNamePrefix + 'label'],
+            // simplifiedLines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
+            this.rsmlPoints.push({ //To test alts, change rootnavspline to polyline
+                type: rsml[attrNodeName][attributeNamePrefix + 'label'],
                 id: rsml[attrNodeName][attributeNamePrefix + 'id'].toString(), //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry.polyline.point.map(p => ({ 
-                    x: p.attr[attributeNamePrefix + 'x'],             
+                    x: p.attr[attributeNamePrefix + 'x'],
                     y: p.attr[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });

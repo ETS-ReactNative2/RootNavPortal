@@ -1,4 +1,4 @@
-import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS } from '../actions/viewerActions';
+import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, SAVE_RSML } from '../actions/viewerActions';
 
 const initialState = {viewers: {}};
 
@@ -11,7 +11,8 @@ export default (state = initialState, action) => {
                 ...state.viewers,
                 [action.viewerID]: { 
                     architecture: true, 
-                    segMasks: false 
+                    segMasks: false ,
+                    editStack: []
                 }
             }
         }
@@ -43,6 +44,36 @@ export default (state = initialState, action) => {
                 }
             }
         }
+        case PUSH_EDITSTACK: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    editStack: [...state.viewers[action.viewerID].editStack, action.lines] //Non-mutating push
+                }
+            }
+        }
+        case POP_EDITSTACK: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    editStack: state.viewers[action.viewerID].editStack.filter((edit, index) => index != state.viewers[action.viewerID].editStack.length - 1) //Non-mutating pop
+                }
+            }
+        }
+        case RESET_EDITSTACK: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    editStack: []
+                }
+            }
+        }
         default: return state;
     }
 }
@@ -50,17 +81,28 @@ export default (state = initialState, action) => {
 /*
 //Viewers are indexed by their process.pid values, as multiple viewers cannot interact/share their own state variables
 //Architecture - value of the architecture checkbox which defines whether or not to draw the RSML over the image
+//editStack - stores a history of edits -> each time the user does something to the canvas, the new state is pushed to the editStack
+//This lets us pop the stack to undo an action. The editStack is the first place to look for simplifiedLines
+//If the stack is empty, gallery.files.[file].parsedRSML.simplifiedLines will be used, which is what the RSML on disk represents
+//Each viewer process maintains its own editStack, and it is reset on file move
 
 state: {
     viewer: {
-        12188: {
-            architecture: true,
-            segMasks: false
-        },
-        1853: {
-            architecture: false
-            segMasks: true
+        viewers: {
+            12188: {
+                architecture: true,
+                segMasks: false,
+                editStack: [
+                    [{}, {}, {}],
+                    [{}, {}, {}]
+                ]
+            },
+            1853: {
+                architecture: false
+                segMasks: true,
+                editStack: []
+            }
         }
-    }
+    }   
 }
 */

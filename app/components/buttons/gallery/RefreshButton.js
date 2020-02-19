@@ -5,7 +5,7 @@ import { StyledButton } from '../StyledComponents';
 import { readdir } from 'fs';
 import { ALL_EXTS_REGEX } from '../../../constants/globals'
 
-class RefreshButton extends Component {
+export default class RefreshButton extends Component {
     structuredFiles = {};
 
     onClick = (folders, files) => {
@@ -46,5 +46,3 @@ class RefreshButton extends Component {
         )
     }
 }
-
-export default RefreshButton;

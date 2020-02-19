@@ -19,9 +19,9 @@ export default class Viewer extends Component<Props> {
         const { addViewer, removeViewer, path } = props;
         this.state = { path };
 
-        addViewer(process.pid);
+        addViewer();
         remote.getCurrentWindow().on('close', () => {
-            removeViewer(process.pid);
+            removeViewer();
         });
     }
 
@@ -38,6 +38,7 @@ export default class Viewer extends Component<Props> {
     handleClick = e =>
     {
         if (e.key != this.LEFT_KEY && e.key != this.RIGHT_KEY) return;
+        if (this.props.editStack.length) this.props.resetEditStack();
         this.loadNextRSML(e.key == this.LEFT_KEY ? -1 : 1);
     }
 

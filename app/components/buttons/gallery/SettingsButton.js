@@ -5,7 +5,7 @@ import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 're
 import { API_MODELS, matchPathName, API_DELETE } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
 
-class SettingsButton extends Component {
+export default class SettingsButton extends Component {
 
     REANALYSE = 0;
     CHANGE_MODEL = 1;
@@ -112,5 +112,3 @@ class SettingsButton extends Component {
         )
     }
 }
-
-export default SettingsButton;

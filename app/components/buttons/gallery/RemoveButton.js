@@ -4,7 +4,7 @@ import { APPHOME, CONFIG } from '../../../constants/globals';
 import { existsSync, writeFile } from 'fs';
 import { StyledButton } from '../StyledComponents'; 
 
-class RemoveButton extends Component {
+export default class RemoveButton extends Component {
 
     deleteFolder = () => {
         if (!this.props.path) return;
@@ -29,5 +29,3 @@ class RemoveButton extends Component {
         )
     }
 }
-
-export default RemoveButton;

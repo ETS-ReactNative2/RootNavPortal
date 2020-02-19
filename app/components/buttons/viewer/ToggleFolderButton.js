@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 
-class RemoveButton extends Component {
+export default class ToggleFolderButton extends Component {
 
     render() {    
     
@@ -15,5 +15,3 @@ class RemoveButton extends Component {
         )
     }
 }
-
-export default RemoveButton;
