@@ -38,11 +38,11 @@ export default class Viewer extends Component<Props> {
     handleClick = e =>
     {
         if (e.key != this.LEFT_KEY && e.key != this.RIGHT_KEY) return;
-        if (this.props.editStack.length) this.props.resetEditStack();
         this.loadNextRSML(e.key == this.LEFT_KEY ? -1 : 1);
     }
 
     loadNextRSML = direction => {
+        if (this.props.editStack.length) this.props.resetEditStack();
         let split = matchPathName(this.state.path); 
         let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?)
         let keys = Object.keys(this.props.files[folder]);

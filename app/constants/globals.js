@@ -31,3 +31,32 @@ export const API_MODELS = [
 ]
 
 export const matchPathName = path => path.match(/(.+)(?:\\|\/)(.+)/); //Matches the file's dir path and actual name. no trailing slash on the path
+
+export const xmlOptions = {
+    attributeNamePrefix: "@_",
+    attrNodeName: "attr", //default is 'false'
+    textNodeName: "#text",
+    ignoreAttributes: false,
+    ignoreNameSpace: false,
+    allowBooleanAttributes: false,
+    parseNodeValue: true,
+    parseAttributeValue: true,
+    trimValues: true,
+    decodeHTMLchar: true,
+    cdataTagName: "__cdata", //default is 'false'
+    cdataPositionChar: "\\c",
+    arrayMode: true,
+    parseTrueNumberOnly: false,
+};
+
+export const jsonOptions = {
+    attributeNamePrefix : "@_",
+    attrNodeName: "attr", //default is false
+    textNodeName : "#text",
+    ignoreAttributes: false,
+    cdataTagName: "__cdata", //default is false
+    cdataPositionChar: "\\c",
+    format: false,
+    indentBy: "  ",
+    supressEmptyNode: true,
+};

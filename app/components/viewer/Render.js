@@ -3,16 +3,16 @@ import React, { Component } from 'react';
 import { readFileSync, readFile } from 'fs';
 import parser from 'fast-xml-parser';
 import { sep } from 'path';
-import { IMAGE_EXTS_REGEX, matchPathName } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX, matchPathName, xmlOptions } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 import Tiff from 'tiff.js';
 import { fabric } from 'fabric';
+import sizeOf from 'image-size';
 
-export default class Render extends Component<Props> {
+export default class Render extends Component {
     constructor(props)
     {
         super(props);
-        this.canvas = React.createRef();
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join('')
     }
     
@@ -31,21 +31,6 @@ export default class Render extends Component<Props> {
         selectedID: null,
     };
     deleteKey = "Backspace";
-
-    xmlOptions = {
-        attributeNamePrefix: "@_",
-        attrNodeName: "attr", //default is 'false'
-        textNodeName: "#text",
-        ignoreAttributes: false,
-        ignoreNameSpace: false,
-        allowBooleanAttributes: false,
-        parseNodeValue: true,
-        parseAttributeValue: true,
-        trimValues: true,
-        decodeHTMLchar: true,
-        cdataTagName: "__cdata", //default is 'false'
-        cdataPositionChar: "\c"
-    };
 
     //Fires on each component update - not initial render - which is fine since our ref for drawing won't be active in render, and the state change from reading RSML will trigger an update
     componentDidUpdate()
@@ -68,7 +53,9 @@ export default class Render extends Component<Props> {
 
     setupCanvas = () => {
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
-        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true });
+        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //These really need evening. They both change the canvas.
+        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
+        //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
         
         this.fabricCanvas.on('mouse:over', e => {
             if (e.target && e.target.selectable && e.target.get('name') != this.fabricCache.selectedID) 
@@ -141,9 +128,6 @@ export default class Render extends Component<Props> {
 
     draw = () => {
         const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
-        const ctx    = this.canvas.current.getContext("2d");
-        const canvas = this.canvas.current;
-        ctx.clearRect(0, 0, canvas.width * this.canvasScaleDiv, canvas.height * this.canvasScaleDiv); //Multiply dimensions by the inverse of the scale to clear the whole thing properly
         
         if (file.parsedRSML) //Ready to draw!
         {
@@ -166,10 +150,16 @@ export default class Render extends Component<Props> {
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
-                let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) });
-                // ctx.drawImage(image.toCanvas(), 0, 0);
-                image.src = 'data:image/png;base64,' + image.readRGBAImage().toString('base64');
-                if (architecture) this.drawRSML(ctx, simplifiedLines); 
+                sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => { //Get size of tiff
+                    let canvas = new OffscreenCanvas(dimensions.width, dimensions.height); //Create offscreen canvas with its resolution
+                    let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
+                    canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
+                    this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
+                        left: 0, top: 0, selectable: false
+                    }));
+                    if (architecture) this.drawRSML(simplifiedLines); 
+                });
+                
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
@@ -178,13 +168,12 @@ export default class Render extends Component<Props> {
                 this.fabricCanvas.add(new fabric.Image(image, {
                     left: 0, top: 0, selectable: false
                 }));
-                //ctx.drawImage(image, 0, 0);
-                if (architecture) this.drawRSML(ctx, simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                if (architecture) this.drawRSML(simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };     
         }
     };
 
-    drawRSML = (ctx, simplifiedLines) => {
+    drawRSML = (simplifiedLines) => {
         simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
             let polyline = new fabric.Polyline(line.points, {
                 stroke: line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL,
@@ -198,15 +187,15 @@ export default class Render extends Component<Props> {
     };
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
-    formatPoints = rsml => {
-        const { attrNodeName, attributeNamePrefix } = this.xmlOptions;
+    formatPoints = (rsml, plantID) => {
+        const { attrNodeName, attributeNamePrefix } = xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
             this.rsmlPoints.push({ //To test alts, change rootnavspline to polyline
                 type: rsml[attrNodeName][attributeNamePrefix + 'label'],
-                id: rsml[attrNodeName][attributeNamePrefix + 'id'].toString(), //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
-                points: rsml.geometry.polyline.point.map(p => ({ 
+                id: plantID + "-" + rsml[attrNodeName][attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                points: rsml.geometry[0].polyline[0].point.map(p => ({ 
                     x: p.attr[attributeNamePrefix + 'x'],
                     y: p.attr[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
@@ -214,7 +203,7 @@ export default class Render extends Component<Props> {
         }
         if (rsml.root)
         {
-           Array.isArray(rsml.root) ? rsml.root.forEach(root => this.formatPoints(root)) : this.formatPoints(rsml.root); //XMl parsing results in this check being required here too
+           rsml.root.forEach(root => this.formatPoints(root, plantID));
         }
     };
 
@@ -226,16 +215,17 @@ export default class Render extends Component<Props> {
     render() 
     {   
         if (this.fabricCanvas) this.fabricCanvas.dispose();
+        const { attrNodeName, attributeNamePrefix } = xmlOptions;
         const { file, path, updateParsedRSML } = this.props;
+
         if (!file.parsedRSML && file.rsml)
         {
             let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
-            let rsmlJson = parser.parse(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), this.xmlOptions);
-            const { scene: { plant } } = rsmlJson.rsml;
-            //if the XML tag contains a single root/plant, it's an object, if it has multiple, it'll be an array of [0: {}, 1: {}, 2: {}, ...], hence the need for this check
-            Array.isArray(plant) ? plant.forEach(plantItem => this.formatPoints(plantItem)) : this.formatPoints(plant);
-            updateParsedRSML(matchedPath[1], matchedPath[2], {rsmlJson, simplifiedLines: this.rsmlPoints}); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            let rsmlJson = parser.parse(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
+            let plant = rsmlJson.rsml[0].scene[0].plant; 
+            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem[attrNodeName][attributeNamePrefix + 'id']))
+            updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, simplifiedLines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             console.log(this.rsmlPoints.length);
             this.rsmlPoints = [];
         }
@@ -243,34 +233,41 @@ export default class Render extends Component<Props> {
         return (
             <div>
                 <this.FabricCanvas />
-                <canvas ref={this.canvas} style={{width: '1200px', height: '1200px'}} />
             </div>
         );
     }
 }
 
-//parse the read RSML into an array of points, or several arrays of points, I guess lines for each primary and lateral else our line will be doing huge paths back and forth and fuck the metrics
-            //simplify points
 
-            /*
-            rsml:
-                scene: {}
-                    plant: {}
-                        root: []
-                            0: {}
-                                attr: {} @_label: primary
-                                geometry: {}
-                                    polyline: {}
-                                        point: [{ attr: {@_x: 123, @_y: 456}, {attr: @_x: 123, @_y: 456} }]
-                                    rootnavspline: I don't think we need splines
+/*
+Example of parsedJSON from XML. Everything is coerced into an array, so for all files, getting to the plants will be var.rsml[0].scene[0].plant[....]
+
+parsedJson: {}
+    rsml: [{}]
+        0: {
+            metadata: [{}]
+            scene: [{}]
+                0:  plant: [{}]
+                        0: {
+                                attr: {} @_label: primary, @_id: 1
+                                geometry: [{}]
+                                    0: {
+                                        polyline: [{}]
+                                            0: {
+                                                point: [{ attr: {@_x: 123, @_y: 456}, {attr: @_x: 123, @_y: 456} }]
+                                            }
+                                        rootnavspline: I don't think we need splines
                                         point: [{}]
-                                root: []
+                                    }
+                                root: {[]}
                                     0: {}
                                         attr: @_label "lat"
-                                        geometry: {}
+                                        geometry: [{}]
                                             spline/polyline:
-                            1:
-                            2:
-                    plant:
-                    plant:
-            */
+                        }
+                        1: {
+
+                        }
+                
+        }
+*/
