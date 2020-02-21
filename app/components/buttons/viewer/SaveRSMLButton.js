@@ -9,7 +9,10 @@ export default class SaveRSMLButton extends Component {
 
     newRSML = {};
     saveRSML = () => {
+        let parser = new Parser.j2xParser(jsonOptions);
+
         const { editStack, parsedRSML: { rsmlJson } } = this.props;
+        console.log(parser.parse(rsmlJson))
         if (!editStack.length) return;
 
         //Save top of editstack to state.files.[path1].[path2].parsedRSML.simplifiedLines
@@ -19,7 +22,6 @@ export default class SaveRSMLButton extends Component {
         this.newRSML = cloneDeep(rsmlJson);
         rsmlJson.rsml[0].scene[0].plant.forEach((plantItem, index) => this.deletePlants(plantItem, index));
         console.log(this.newRSML);
-        let parser = new Parser.j2xParser(jsonOptions);
         let newXML = parser.parse(this.newRSML); //Floats being truncated, and attributes not being de-prefixed
         console.log(newXML);
     };
@@ -30,11 +32,11 @@ export default class SaveRSMLButton extends Component {
         if (!rsml) return;
         const { attrNodeName, attributeNamePrefix } = jsonOptions;
         const { editStack } = this.props;
-        const plantID = rsml[attrNodeName][attributeNamePrefix + 'id'];
+        const plantID = rsml[attributeNamePrefix + 'id'];
         let plant = this.newRSML.rsml[0].scene[0].plant;
         
         if (!editStack[editStack.length - 1].some(line => line.id.startsWith(plantID + '-'))) //If no roots exist from this plant
-            plant.splice(plant.findIndex(i => i[attrNodeName][attributeNamePrefix + 'id'] == plantID), 1) //Splice out of array
+            plant.splice(plant.findIndex(i => i[attributeNamePrefix + 'id'] == plantID), 1) //Splice out of array
         else rsml.root.forEach(rootItem => this.deletePrimary(rootItem, plantID)) //if lines found at this level, pass each primary down for the same check
     };
 
@@ -44,11 +46,11 @@ export default class SaveRSMLButton extends Component {
         const { attrNodeName, attributeNamePrefix } = jsonOptions;
         const { editStack } = this.props;
         let plant = this.newRSML.rsml[0].scene[0].plant;
-        const primaryID = rsml[attrNodeName][attributeNamePrefix + 'id'];
-        let parentIndex = plant.findIndex(index => index[attrNodeName][attributeNamePrefix + 'id'] == parentID);
+        const primaryID = rsml[attributeNamePrefix + 'id'];
+        let parentIndex = plant.findIndex(index => index[attributeNamePrefix + 'id'] == parentID);
         
         if (!editStack[editStack.length - 1].some(line => line.id.startsWith(parentID + '-' + primaryID))) //If no roots exist from this primary
-            plant[parentIndex].root.splice(plant[parentIndex].root.findIndex(i => i[attrNodeName][attributeNamePrefix + 'id'] == primaryID), 1)//Indexes will change if already spliced, so we need to guarantee lookup
+            plant[parentIndex].root.splice(plant[parentIndex].root.findIndex(i => i[attributeNamePrefix + 'id'] == primaryID), 1)//Indexes will change if already spliced, so we need to guarantee lookup
         else if (rsml.root) 
             rsml.root.forEach(rootItem => this.deleteLateral(rootItem, parentID, primaryID))
     };
@@ -58,14 +60,14 @@ export default class SaveRSMLButton extends Component {
         if (!rsml) return;
         const { attrNodeName, attributeNamePrefix } = jsonOptions;
         const { editStack } = this.props;
-        const lateralID = rsml[attrNodeName][attributeNamePrefix + 'id'];
+        const lateralID = rsml[attributeNamePrefix + 'id'];
 
         let plant = this.newRSML.rsml[0].scene[0].plant;
-        let plantIndex   = plant.findIndex(index => index[attrNodeName][attributeNamePrefix + 'id'] == plantID);
-        let primaryIndex = plant[plantIndex].root.findIndex(index => index[attrNodeName][attributeNamePrefix + 'id'] == primaryID);
+        let plantIndex   = plant.findIndex(index => index[attributeNamePrefix + 'id'] == plantID);
+        let primaryIndex = plant[plantIndex].root.findIndex(index => index[attributeNamePrefix + 'id'] == primaryID);
 
         if (!editStack[editStack.length - 1].some(line => line.id == plantID + '-' + lateralID)) //lateral ID is 'primaryID.lateralID', so this is fine
-            plant[plantIndex].root[primaryIndex].root.splice(plant[plantIndex].root[primaryIndex].root.findIndex(i => i[attrNodeName][attributeNamePrefix + 'id'] == lateralID), 1)
+            plant[plantIndex].root[primaryIndex].root.splice(plant[plantIndex].root[primaryIndex].root.findIndex(i => i[attributeNamePrefix + 'id'] == lateralID), 1)
     };
 
     render() {    

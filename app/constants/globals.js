@@ -34,7 +34,7 @@ export const matchPathName = path => path.match(/(.+)(?:\\|\/)(.+)/); //Matches 
 
 export const xmlOptions = {
     attributeNamePrefix: "@_",
-    attrNodeName: "attr", //default is 'false'
+    // attrNodeName: "attr", //default is 'false'
     textNodeName: "#text",
     ignoreAttributes: false,
     ignoreNameSpace: false,
@@ -51,12 +51,12 @@ export const xmlOptions = {
 
 export const jsonOptions = {
     attributeNamePrefix : "@_",
-    attrNodeName: "attr", //default is false
+    // attrNodeName: "attr", //default is false
     textNodeName : "#text",
     ignoreAttributes: false,
     cdataTagName: "__cdata", //default is false
     cdataPositionChar: "\\c",
-    format: false,
+    format: true,
     indentBy: "  ",
     supressEmptyNode: true,
 };

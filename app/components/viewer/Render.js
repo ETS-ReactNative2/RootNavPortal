@@ -193,11 +193,11 @@ export default class Render extends Component {
         {
             // simplifiedLines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
             this.rsmlPoints.push({ //To test alts, change rootnavspline to polyline
-                type: rsml[attrNodeName][attributeNamePrefix + 'label'],
-                id: plantID + "-" + rsml[attrNodeName][attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                type: rsml[attributeNamePrefix + 'label'],
+                id: plantID + "-" + rsml[attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry[0].polyline[0].point.map(p => ({ 
-                    x: p.attr[attributeNamePrefix + 'x'],
-                    y: p.attr[attributeNamePrefix + 'y']
+                    x: p[attributeNamePrefix + 'x'],
+                    y: p[attributeNamePrefix + 'y']
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });
         }
@@ -223,8 +223,9 @@ export default class Render extends Component {
             let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
             let rsmlJson = parser.parse(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
+            console.log(rsmlJson);
             let plant = rsmlJson.rsml[0].scene[0].plant; 
-            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem[attrNodeName][attributeNamePrefix + 'id']))
+            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem[attributeNamePrefix + 'id']))
             updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, simplifiedLines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             console.log(this.rsmlPoints.length);
             this.rsmlPoints = [];
