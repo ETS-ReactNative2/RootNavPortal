@@ -27,8 +27,9 @@ class AddButton extends Component {
 
     importFolders = () => {
         const { imports, addFolders, closeModal, folders } = this.props;
-        const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}));
-        addFolders(config.filter(newfolder => !folders.some(folder => newfolder.path == folder.path)));
+        const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}))
+            .filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
+        addFolders(config);
         closeModal();
 
         if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.

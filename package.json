@@ -285,7 +285,7 @@
     "redux": "^4.0.1",
     "redux-electron-store": "^0.6.6",
     "redux-thunk": "^2.3.0",
-    "sharp": "^0.24.0",
+    "sharp": "^0.24.1",
     "source-map-support": "^0.5.9",
     "styled-components": "^5.0.1",
     "tiff.js": "^1.0.0"
