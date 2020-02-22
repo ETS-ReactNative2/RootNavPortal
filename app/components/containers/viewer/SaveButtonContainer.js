@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import SaveButton from '../../buttons/viewer/SaveRSMLButton';
-import { saveRSML } from '../../../actions/viewerActions';
+import { saveRSML, resetEditStack } from '../../../actions/viewerActions';
+import { updateFile } from '../../../actions/galleryActions';
 import { matchPathName } from '../../../constants/globals';
 
 const mapStateToProps = (state, ownProps) => {
@@ -14,7 +15,9 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => ({
-    saveRSML: (path, newRSML) => dispatch(saveRSML(path, newRSML))
+    saveRSML: (path, newRSML) => dispatch(saveRSML(path, newRSML)),
+    resetEditStack: () => dispatch(resetEditStack(process.pid)),
+    updateFile: (folder, fileName, newData) => dispatch(updateFile(folder, fileName, newData))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(SaveButton)

@@ -1,19 +1,19 @@
 // @flow
 import React, { Component } from 'react';
-import { readFileSync, readFile } from 'fs';
-import parser from 'fast-xml-parser';
+import { readFileSync } from 'fs';
+import parser from 'xml2json';
 import { sep } from 'path';
 import { IMAGE_EXTS_REGEX, matchPathName, xmlOptions } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 import Tiff from 'tiff.js';
-import { fabric } from 'fabric';
+import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 import sizeOf from 'image-size';
 
 export default class Render extends Component {
     constructor(props)
     {
         super(props);
-        this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join('')
+        this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
     }
     
     //Objects are named by their RSML ID => laterals are parentID.latID
@@ -26,7 +26,6 @@ export default class Render extends Component {
 
     colours = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
     rsmlPoints = [];
-    canvasScaleDiv = 2; //Canvas scale is 1 / this. Used to clear the canvas with inverted scaling
     fabricCache = {
         selectedID: null,
     };
@@ -91,7 +90,7 @@ export default class Render extends Component {
     };
 
     getLaterals = primaryID => {
-        let laterals = []
+        let laterals = [];
         
         this.fabricCanvas.getObjects().forEach(object => {
             if (object.name && object.name.startsWith(primaryID + '.'))
@@ -111,12 +110,12 @@ export default class Render extends Component {
 
             if (!selectedID.includes('.'))
                 this.getLaterals(selectedID).forEach(lateral => {
-                    this.fabricCanvas.remove(lateral)
+                    this.fabricCanvas.remove(lateral);
                 });
             
             const simplifiedLines = editStack.length ? editStack[editStack.length - 1] : parsedRSML.simplifiedLines;
             let editedLines = simplifiedLines.filter(line => {
-                if (selectedID.includes('.')) return selectedID != line.id
+                if (selectedID.includes('.')) return selectedID != line.id;
                 else return !line.id.startsWith(selectedID + '.') && line.id != selectedID;
             });
 
@@ -164,7 +163,6 @@ export default class Render extends Component {
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
             image.onload = () => {
-                console.log("Loaded")
                 this.fabricCanvas.add(new fabric.Image(image, {
                     left: 0, top: 0, selectable: false
                 }));
@@ -188,16 +186,15 @@ export default class Render extends Component {
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = (rsml, plantID) => {
-        const { attrNodeName, attributeNamePrefix } = xmlOptions;
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // simplifiedLines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
             this.rsmlPoints.push({ //To test alts, change rootnavspline to polyline
-                type: rsml[attributeNamePrefix + 'label'],
-                id: plantID + "-" + rsml[attributeNamePrefix + 'id'], //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                type: rsml.label,
+                id: plantID + "-" + rsml.id, //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
                 points: rsml.geometry[0].polyline[0].point.map(p => ({ 
-                    x: p[attributeNamePrefix + 'x'],
-                    y: p[attributeNamePrefix + 'y']
+                    x: parseFloat(p.x), //Floats still need to be transformed so Fabric can draw them right => but only in the line array, these never end up in the RSML/JSON
+                    y: parseFloat(p.y)
                 })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
             });
         }
@@ -209,25 +206,23 @@ export default class Render extends Component {
 
     FabricCanvas = () => {
         this.fabricCanvas = new fabric.Canvas(this.canvasID);
-        return <canvas id={this.canvasID}></canvas>
+        return <canvas id={this.canvasID}></canvas>;
     };
 
     render() 
     {   
         if (this.fabricCanvas) this.fabricCanvas.dispose();
-        const { attrNodeName, attributeNamePrefix } = xmlOptions;
         const { file, path, updateParsedRSML } = this.props;
 
         if (!file.parsedRSML && file.rsml)
         {
             let matchedPath = matchPathName(path);
             //Ingest the RSML here if it's not cached in state
-            let rsmlJson = parser.parse(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
-            console.log(rsmlJson);
+            let rsmlJson = parser.toJson(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
+
             let plant = rsmlJson.rsml[0].scene[0].plant; 
-            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem[attributeNamePrefix + 'id']))
+            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id));
             updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, simplifiedLines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
-            console.log(this.rsmlPoints.length);
             this.rsmlPoints = [];
         }
 

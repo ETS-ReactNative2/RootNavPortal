@@ -5,7 +5,6 @@ import { StyledButton } from '../StyledComponents';
 export default class UndoChanges extends Component {
 
     render() {    
-        console.log(this.props);
         return (
             <StyledButton
                 variant="warning" 
