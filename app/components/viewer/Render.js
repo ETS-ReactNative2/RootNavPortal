@@ -30,10 +30,14 @@ export default class Render extends Component {
         selectedID: null,
     };
     deleteKey = "Backspace";
-
+    lastPosX = 0;
+    lastPosY = 0;
+    zoom = 1; //Persist zoom over component renders - when the user does something to the canvas
+    
     //Fires on each component update - not initial render - which is fine since our ref for drawing won't be active in render, and the state change from reading RSML will trigger an update
-    componentDidUpdate()
-    {
+    componentDidUpdate(prevProps)
+    {   
+        if (this.props.path != prevProps.path) this.zoom = 1; //Reset zoom across different plants
         this.setupCanvas();
         this.draw();
     }
@@ -55,7 +59,8 @@ export default class Render extends Component {
         this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //These really need evening. They both change the canvas.
         //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
-        
+        this.fabricCanvas.setZoom(this.zoom);
+
         this.fabricCanvas.on('mouse:over', e => {
             if (e.target && e.target.selectable && e.target.get('name') != this.fabricCache.selectedID) 
             {
@@ -73,6 +78,15 @@ export default class Render extends Component {
         });
 
         this.fabricCanvas.on('mouse:down', e => {
+            let opt = e.e;
+            console.log(opt)
+            if (e.button === 3) //Right click = 3, middle 2, left 1
+            {
+                this.isDragging = true;
+                this.selection = false;
+                this.lastPosX = opt.clientX;
+                this.lastPosY = opt.clientY;
+            }
             if (e.target && this.fabricCache.selectedID) 
             {
                 let line = this.getObjectByName(this.fabricCache.selectedID)
@@ -86,6 +100,53 @@ export default class Render extends Component {
                 this.fabricCache.selectedID = e.target.name;
                 this.fabricCanvas.renderAll();
             }
+        });
+
+        this.fabricCanvas.on('mouse:move', opt => {
+            let e = opt.e;
+            if (this.isDragging) {
+                this.fabricCanvas.viewportTransform[4] += (e.clientX - this.lastPosX) * 3;
+                this.fabricCanvas.viewportTransform[5] += (e.clientY - this.lastPosY) * 3;
+                this.fabricCanvas.renderAll();
+                this.fabricCanvas.setZoom(this.zoom); //Expression has no effect but causes a canvas refresh and fixes hitboxes getting left behind on pan
+                this.lastPosX = e.clientX;
+                this.lastPosY = e.clientY;
+            }
+        });
+
+        this.fabricCanvas.on('mouse:wheel', opt => {
+            let delta = opt.e.deltaY;
+            let zoom = this.fabricCanvas.getZoom() + delta / 200;
+            if (zoom > 20) zoom = 20;
+            if (zoom < 1) zoom = 1;
+            this.zoom = zoom;
+            this.fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+            opt.e.preventDefault();
+            opt.e.stopPropagation();
+
+            let vpt = this.fabricCanvas.viewportTransform;
+            if (zoom < 400 / 3000) //Don't really know what the 3000 does, but it seems to need to be the same as the canvas dimensions
+            {
+                this.fabricCanvas.viewportTransform[4] = 200 - 3000 * zoom / 2; //Don't really know why these numbers are 200 and 400 either
+                this.fabricCanvas.viewportTransform[5] = 200 - 3000 * zoom / 2;
+            } 
+            else //This is meant to lock the canvas from going beyond its borders. It does something with un-screwing movement at least.
+            {
+                if (vpt[4] >= 0)
+                    this.fabricCanvas.viewportTransform[4] = 0;
+                else if (vpt[4] < this.fabricCanvas.getWidth() - 3000 * zoom)
+                    this.fabricCanvas.viewportTransform[4] = this.fabricCanvas.getWidth() - 3000 * zoom;
+                if (vpt[5] >= 0)
+                    this.fabricCanvas.viewportTransform[5] = 0;
+                else if (vpt[5] < this.fabricCanvas.getHeight() - 3000 * zoom) //height is 3000, so this will always be zero, so idk what it should be.
+                    this.fabricCanvas.viewportTransform[5] = this.fabricCanvas.getHeight() - 3000 * zoom;
+            }
+        });
+
+        this.fabricCanvas.on('mouse:up', e => {
+            this.isDragging = false;
+            this.selection = true;
+            this.fabricCanvas.renderAll();
         });
     };
 
@@ -178,7 +239,10 @@ export default class Render extends Component {
                 fill: null,
                 strokeWidth: 8,
                 perPixelTargetFind: true,
-                name: line.id
+                name: line.id,
+                lockMovementX: true,
+                lockMovementY: true,
+                strokeLineCap: "round"
             });
             this.fabricCanvas.add(polyline);
         });
@@ -205,7 +269,7 @@ export default class Render extends Component {
     };
 
     FabricCanvas = () => {
-        this.fabricCanvas = new fabric.Canvas(this.canvasID);
+        this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
         return <canvas id={this.canvasID}></canvas>;
     };
 

@@ -7,9 +7,8 @@ import Render from '../containers/viewer/RenderContainer';
 import { sep } from 'path';
 import { matchPathName } from '../../constants/globals';
 import { remote } from 'electron';
-type Props = {};
 
-export default class Viewer extends Component<Props> {
+export default class Viewer extends Component {
     LEFT_KEY  = "ArrowLeft";
     RIGHT_KEY = "ArrowRight";
 
@@ -20,8 +19,8 @@ export default class Viewer extends Component<Props> {
         this.state = { path };
 
         addViewer();
-        remote.getCurrentWindow().on('close', () => {
-            removeViewer();
+        remote.getCurrentWindow().on('close', () => { //These will cause memory leaks in prod if lots of viewers get opened
+            removeViewer(); //However, removing the listener seems to remove it from all viewers (in my limited test), which is bad too.
         });
     }
 
