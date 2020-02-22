@@ -10,11 +10,12 @@ export default class TreeChecklistDropdown extends Component<Props> {
 
     render() 
     {
-        const { name, checked, updateChecklistDropdown } = this.props;
+        console.log(this.props);
+        const { name, checked, updateChecklistDropdown, model } = this.props;
         return (
             <FormGroup as={Row}>
                 <div style={{width: "auto", paddingRight: "2em"}}>{name}</div>
-                {checked ? <FormControl as='select' onChange={e => updateChecklistDropdown(name, e.target.value)}>
+                {checked || model ? <FormControl defaultValue={model}  as='select' onChange={e => updateChecklistDropdown(name, e.target.value)} disabled={!!model}>
                     <option value={''}>Select Model</option>
                     { API_MODELS.map(model => <option key={model.apiName} value={model.apiName}>{model.displayName}</option>) }
                 </FormControl> : ""}

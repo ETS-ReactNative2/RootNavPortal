@@ -31,26 +31,31 @@ export default class TreeChecklist extends Component<Props> {
   }
 
   reset = () => {
-    const { tree, updateChecked } = this.props;
+    const { tree, updateChecked, importedFolders } = this.props;
     const paths = tree.map(item => item.path);
+    const importedFolderNames = importedFolders.map(it => it.path);
     this.setState({
-      checked: paths,
+      checked: paths.concat(importedFolderNames),
       expanded: paths,
-      nodes: this.getNodes(tree, paths)
+      nodes: this.getNodes(tree, paths, importedFolderNames)
     });
+    console.log(this.state);
     updateChecked(this.getUpdatedCheckedWithModels(paths));
   }
 
   getNodes = (nodes, checked) => 
   {
     if (!nodes) return [];
-    return nodes.map((item, i) => 
-      ({ 
+    return nodes.map((item, i) => {
+      const existingFolder = this.props.importedFolders.find(it => it.path==item.path);
+      return ({ 
         value: item.path, 
         children: this.getNodes(item.children, checked),
-        label: this.getDropdown(item.name, item.path, checked),
+        label: this.getDropdown(item.name, item.path, checked, existingFolder ? existingFolder.model : ""),
         name: item.name,
-      })
+        disabled: !!existingFolder,
+        existingFolder: existingFolder
+      })}
     );
   }
 
@@ -58,17 +63,17 @@ export default class TreeChecklist extends Component<Props> {
   refreshNodeLabels = (nodes, checked) => 
   {
     if (!nodes) return [];
-    return nodes.map((item, i) => 
-      ({
+    return nodes.map((item, i) => {
+      return ({
         ...item,
-        label: this.getDropdown(item.name, item.value, checked),
+        label: this.getDropdown(item.name, item.value, checked, item.existingFolder),
         children: this.refreshNodeLabels(item.children, checked),
       })
-    );
+    });
   }
 
   // Creates the dropdown, with props that determine whether the dropdown should show at all.
-  getDropdown = (name, value, checked) => <TreeChecklistDropdown name={name} checked={checked.includes(value)} />;
+  getDropdown = (name, value, checked, model) => <TreeChecklistDropdown name={name} checked={checked.includes(value)} model={model} />;
   
   render() 
   {

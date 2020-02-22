@@ -3,7 +3,10 @@ import TreeChecklist from '../../gallery/TreeChecklist';
 import { updateChecked } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
-    { tree: state.gallery.modalBody }
+    { 
+        tree: state.gallery.modalBody,
+        importedFolders: state.gallery.folders
+    }
 );
 
 const mapDispatchToProps = dispatch => (
