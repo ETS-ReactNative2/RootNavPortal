@@ -6,8 +6,9 @@ import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD } from '../../constants/globals'
+import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD, APPHOME, CONFIG } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
+import { existsSync, writeFile } from 'fs';
 import { sep } from 'path';
 
 type Props = {};
@@ -20,11 +21,30 @@ export default class FolderView extends Component<Props> {
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
-	render() {
+	onClickFile = (folder, isActive) => {
+		this.props.toggleOpenFile(folder);
+		this.writeFolderToggled(isActive);
+	}
 
+	writeFolderToggled = isActive => {
+        const { folders, folder: path } = this.props;
+        if (!path) return;
+        const updatedFolders = folders.map(folder => folder.path === path ? {...folder, active: isActive } : folder);
+        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
+            writeFile(APPHOME + CONFIG , JSON.stringify(updatedFolders, null, 4), err => {
+                if (err) {
+                    console.err("Could not write updated folder toggle!");
+                    console.err("Folder: " + path + " Active: " + isActive);
+                    console.err(err);
+                }
+            });
+    }
+
+
+	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder, filterText, filterAnalysed, files, toggleOpenFile, addFiles } = this.props; 
+		const { isActive, folder, filterText, filterAnalysed, files, addFiles } = this.props; 
 		if (!files) {
 			let structuredFiles = {};
 			readdir(folder, (err, folderFiles) => {
@@ -62,7 +82,7 @@ export default class FolderView extends Component<Props> {
 		{
 			return (
 				<StyledFolderCard className="bg-light">
-					<StyledCardHeader onClick={() => toggleOpenFile(folder)}>
+					<StyledCardHeader onClick={() => this.onClickFile(folder, isActive)}>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
 							{folder}

@@ -7,13 +7,17 @@ import { StyledButton } from '../StyledComponents';
 class RemoveButton extends Component {
 
     deleteFolder = () => {
-        if (!this.props.path) return;
-        const filteredPaths = this.props.folders.filter(folder => folder.path !== this.props.path);
+        const { folders, path } = this.props;
+        if (!path) return;
+        const filteredPaths = folders.filter(folder => folder.path !== path);
         if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
             writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
-                if (err) console.err(err); //idk do some handling here
+                if (err) {
+                    console.err("Could not delete folder '" + path + "'!");
+                    console.err(err);
+                }
             });
-        this.props.remove(this.props.path);
+        this.props.remove(path);
     }
     
     render() { 

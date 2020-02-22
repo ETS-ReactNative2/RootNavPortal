@@ -2,7 +2,8 @@
 import React, { Component } from 'react';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
-import { API_MODELS, matchPathName, API_DELETE } from '../../../constants/globals';
+import { API_MODELS, matchPathName, API_DELETE, APPHOME, CONFIG } from '../../../constants/globals';
+import { existsSync, writeFile } from 'fs';
 import { ipcRenderer } from 'electron';
 
 class SettingsButton extends Component {
@@ -26,6 +27,20 @@ class SettingsButton extends Component {
         }
     }
 
+    writeUpdatedModel = apiName => {
+        const { folders, path } = this.props;
+        if (!path) return;
+        const updatedFolders = folders.map(folder => folder.path === path ? {...folder, model: apiName } : folder);
+        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
+            writeFile(APPHOME + CONFIG , JSON.stringify(updatedFolders, null, 4), err => {
+                if (err) {
+                    console.err("Could not write updated model!");
+                    console.err("Folder: " + path + " Model: " + apiName);
+                    console.err(err);
+                }
+            });
+    }
+
     close = () => {
         this.setState({ modal: false, confirmText: "" });
     }
@@ -41,8 +56,12 @@ class SettingsButton extends Component {
 
     handleAction = () => {
         const { path, updateFolderModel } = this.props; 
+        const { apiName } = this.state.currentModel;
         ipcRenderer.send(API_DELETE, { path });
-        if (this.actionFlag == this.CHANGE_MODEL) updateFolderModel(path, this.state.currentModel.apiName); //Finish when model is in state
+        if (this.actionFlag == this.CHANGE_MODEL) {
+            updateFolderModel(path, apiName); //Finish when model is in state
+            this.writeUpdatedModel(apiName);
+        }
     }
 
     selectDropdown = model => {

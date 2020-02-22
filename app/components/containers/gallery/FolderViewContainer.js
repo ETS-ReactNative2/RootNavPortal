@@ -4,6 +4,7 @@ import { addFiles, toggleOpenFile } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
         files: state.gallery.files[ownProps.folder],
+        folders: state.gallery.folders,
         folder: ownProps.folder,
         isActive: ownProps.isActive,
         filterText: state.gallery.filterText,
