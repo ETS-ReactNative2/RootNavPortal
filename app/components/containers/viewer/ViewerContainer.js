@@ -1,16 +1,21 @@
 import { connect } from 'react-redux';
 import Viewer from '../../viewer/Viewer';
-import { addViewer, removeViewer } from '../../../actions/viewerActions';
+import { addViewer, removeViewer, resetEditStack } from '../../../actions/viewerActions';
 
-const mapStateToProps = (state, ownProps) => ({ 
-    path: ownProps.path,
-    exts: ownProps.exts,
-    files: state.gallery.files
-});
+const mapStateToProps = (state, ownProps) => { 
+    let viewer =  state.viewer.viewers[process.pid];
+    return {
+        path: ownProps.path,
+        exts: ownProps.exts,
+        files: state.gallery.files,
+        editStack: viewer ? viewer.editStack : false
+    }
+};
 
 const mapDispatchToProps = dispatch => ({
-    addViewer:    viewerID => dispatch(addViewer(viewerID)),
-    removeViewer: viewerID => dispatch(removeViewer(viewerID))
+    addViewer:      () => dispatch(addViewer(process.pid)),
+    removeViewer:   () => dispatch(removeViewer(process.pid)),
+    resetEditStack: () => dispatch(resetEditStack(process.pid))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Viewer)

@@ -6,7 +6,7 @@ import { API_MODELS, matchPathName, API_DELETE, APPHOME, CONFIG } from '../../..
 import { existsSync, writeFile } from 'fs';
 import { ipcRenderer } from 'electron';
 
-class SettingsButton extends Component {
+export default class SettingsButton extends Component {
 
     ACTION_NONE         = 0
     ACTION_REANALYSE    = 1;
@@ -137,5 +137,3 @@ class SettingsButton extends Component {
         )
     }
 }
-
-export default SettingsButton;

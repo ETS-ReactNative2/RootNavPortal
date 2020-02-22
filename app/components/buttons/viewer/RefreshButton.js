@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 
-class RefreshButton extends Component {
+export default class RefreshButton extends Component {
 
     render() {    
         return (
@@ -14,5 +14,3 @@ class RefreshButton extends Component {
         )
     }
 }
-
-export default RefreshButton;

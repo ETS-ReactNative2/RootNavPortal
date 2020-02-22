@@ -5,18 +5,19 @@ import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
 import ToggleFolderButton from '../buttons/viewer/ToggleFolderButton';
 import ToggleMeasuresButton from '../buttons/viewer/ToggleMeasuresButton';
+import ResetChangesButton from '../containers/viewer/ResetButtonContainer';
+import SaveRSMLButton from '../containers/viewer/SaveButtonContainer';
+import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
 import { StyledRow } from './StyledComponents';
 import { matchPathName } from '../../constants/globals';
 
-type Props = {};
-
 export default class TopBar extends Component<Props> {
   toggleArch = () => {
-      this.props.toggleArch(process.pid);
+      this.props.toggleArch();
   }
 
   toggleSegMasks = () => {
-      this.props.toggleSegMasks(process.pid)
+      this.props.toggleSegMasks()
   }
 
   render() {
@@ -46,6 +47,9 @@ export default class TopBar extends Component<Props> {
                 <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.toggleSegMasks}/>
                 <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
             </div>
+            <ResetChangesButton />
+            <UndoChangesButton />
+            <SaveRSMLButton path={path} />
         </StyledTopBarDiv>
       </div>
     );

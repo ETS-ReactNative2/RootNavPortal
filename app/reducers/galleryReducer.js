@@ -172,7 +172,7 @@ state: {
                     rsml: true,
                     txt: true, 
                     pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] },
-                    parsedRsML: { rsmlJSON: {}, simplifiedLines: [[{}, {}], [{}, {}]]},
+                    parsedRsML: { rsmlJson: {}, simplifiedLines: [[{}, {}], [{}, {}]]},
                     first_order: true,
                     second_order: true
                 },

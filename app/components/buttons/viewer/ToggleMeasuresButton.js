@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 
-class RemoveButton extends Component {
+export default class ToggleMeasuresButton extends Component {
 
     render() {    
         return (
@@ -14,5 +14,3 @@ class RemoveButton extends Component {
         )
     }
 }
-
-export default RemoveButton;

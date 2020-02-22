@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 
-class ClearButton extends Component {
+export default class ClearButton extends Component {
     render() {
         return (
             <StyledButton
@@ -12,5 +12,3 @@ class ClearButton extends Component {
         )
     }
 }
-
-export default ClearButton;

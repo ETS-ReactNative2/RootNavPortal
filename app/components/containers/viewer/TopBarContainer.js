@@ -8,8 +8,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    toggleArch: viewerID => dispatch(toggleArch(viewerID)),
-    toggleSegMasks: viewerID => dispatch(toggleSegMasks(viewerID))
+    toggleArch: () => dispatch(toggleArch(process.pid)),
+    toggleSegMasks: () => dispatch(toggleSegMasks(process.pid))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(TopBar)

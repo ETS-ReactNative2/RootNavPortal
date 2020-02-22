@@ -8,7 +8,7 @@ import { APPHOME, CONFIG } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 const dree = require('dree');  
 
-class AddButton extends Component {
+export default class AddButton extends Component {
     constructor(props)
     {
         super(props);
@@ -73,5 +73,3 @@ class AddButton extends Component {
         )
     }
 }
-
-export default AddButton;
