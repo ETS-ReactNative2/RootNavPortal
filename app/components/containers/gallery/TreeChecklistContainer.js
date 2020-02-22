@@ -5,7 +5,8 @@ import { updateChecked } from '../../../actions/galleryActions';
 const mapStateToProps = state => (
     { 
         tree: state.gallery.modalBody,
-        importedFolders: state.gallery.folders
+        importedFolders: state.gallery.folders,
+        checked: state.gallery.checked
     }
 );
 

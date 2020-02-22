@@ -96,10 +96,12 @@ export default (state = initialState, action) => {
                 }
             }
         }
-        case UPDATE_CHECKLIST_DROPDOWN: return {
+        case UPDATE_CHECKLIST_DROPDOWN: {
+            console.log(state.checked.map(folder => action.path == folder.path ? folder : {...folder, model: action.model}));
+            return {
             ...state,
-            checked: state.checked.map(folder => action.path == folder.path ? folder : {...folder, model: action.model})
-        }
+            checked: state.checked.map(folder => action.path != folder.path ? folder : {...folder, model: action.model})
+        }}
         case UPDATE_FOLDER_MODEL: return {
             ...state,
             folders: state.folders.map(it => it.path == action.path ? {...it, model: action.model} : it)

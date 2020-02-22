@@ -23,10 +23,10 @@ export default class TreeChecklist extends Component<Props> {
   // Pass in array of checked paths, get back the paths model in state (if there), otherwise null.
   // Needed because the treechecklist returns lists of strings, but we need lists of objects. 
   getUpdatedCheckedWithModels = checkedStringList => {
-    const { checked } = this.state;
+    const { checked } = this.props;
     return checkedStringList.map(checkedString => {
-      const model = checked.find(test => test.path == checkedString) || "";
-      return { path: checkedString, model };
+      const found = checked.find(test => test.path == checkedString);
+      return { path: checkedString, model: found ? found.model : "" };
     });
   }
 
@@ -39,22 +39,22 @@ export default class TreeChecklist extends Component<Props> {
       expanded: paths,
       nodes: this.getNodes(tree, paths, importedFolderNames)
     });
-    console.log(this.state);
     updateChecked(this.getUpdatedCheckedWithModels(paths));
   }
 
-  getNodes = (nodes, checked) => 
+  getNodes = (nodes, checked, importedFolderNames) => 
   {
     if (!nodes) return [];
     return nodes.map((item, i) => {
       const existingFolder = this.props.importedFolders.find(it => it.path==item.path);
+      const model = existingFolder ? existingFolder.model : null;
       return ({ 
         value: item.path, 
-        children: this.getNodes(item.children, checked),
-        label: this.getDropdown(item.name, item.path, checked, existingFolder ? existingFolder.model : ""),
+        children: this.getNodes(item.children, checked, importedFolderNames),
+        label: this.getDropdown(item.name, item.path, checked.concat(importedFolderNames), model),
         name: item.name,
         disabled: !!existingFolder,
-        existingFolder: existingFolder
+        model
       })}
     );
   }
@@ -66,19 +66,19 @@ export default class TreeChecklist extends Component<Props> {
     return nodes.map((item, i) => {
       return ({
         ...item,
-        label: this.getDropdown(item.name, item.value, checked, item.existingFolder),
+        label: this.getDropdown(item.name, item.value, checked, item.model),
         children: this.refreshNodeLabels(item.children, checked),
       })
     });
   }
 
   // Creates the dropdown, with props that determine whether the dropdown should show at all.
-  getDropdown = (name, value, checked, model) => <TreeChecklistDropdown name={name} checked={checked.includes(value)} model={model} />;
+  getDropdown = (name, value, checked, model) => <TreeChecklistDropdown name={name} path={value} checked={checked.includes(value)} model={model} />;
   
   render() 
   {
     let { nodes, checked, expanded } = this.state;
-    const { updateChecked } = this.props;
+    const { updateChecked, importedFolders } = this.props;
     return (
       <div>
         <style>
@@ -111,7 +111,7 @@ export default class TreeChecklist extends Component<Props> {
           expanded={expanded}
           noCascade={true}
           onCheck={checked => {
-            this.setState({ checked, nodes: this.refreshNodeLabels(nodes, checked) });
+            this.setState({ checked, nodes: this.refreshNodeLabels(nodes, checked.concat(importedFolders.map(it => it.path))) });
             updateChecked(this.getUpdatedCheckedWithModels(checked));
           }}
           checkModel={'all'}

@@ -31,7 +31,7 @@ export const addThumb      = (folder, fileName, thumb) => ({ type: ADD_THUMB, fo
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
 export const updateFilterAnalysed = checked => ({ type: UPDATE_FILTER_ANALYSED, checked });
 export const updateParsedRSML = (folder, fileName, rsml) => ({ type: UPDATE_PARSED_RSML, folder, fileName, rsml });
-export const updateChecklistDropdown = (folder, model) => ({ type: UPDATE_CHECKLIST_DROPDOWN, folder, model });
+export const updateChecklistDropdown = (path, model) => ({ type: UPDATE_CHECKLIST_DROPDOWN, path, model });
 export const updateFolderModel = (path, model) => ({ type: UPDATE_FOLDER_MODEL, path, model });
 export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, folder, fileName, newExts });
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions
