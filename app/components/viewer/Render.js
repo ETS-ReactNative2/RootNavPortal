@@ -79,7 +79,6 @@ export default class Render extends Component {
 
         this.fabricCanvas.on('mouse:down', e => {
             let opt = e.e;
-            console.log(opt)
             if (e.button === 3) //Right click = 3, middle 2, left 1
             {
                 this.isDragging = true;
