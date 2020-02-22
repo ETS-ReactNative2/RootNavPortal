@@ -21,26 +21,6 @@ export default class FolderView extends Component<Props> {
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
-	onClickFile = (folder, isActive) => {
-		this.props.toggleOpenFile(folder);
-		this.writeFolderToggled(isActive);
-	}
-
-	writeFolderToggled = isActive => {
-        const { folders, folder: path } = this.props;
-        if (!path) return;
-        const updatedFolders = folders.map(folder => folder.path === path ? {...folder, active: isActive } : folder);
-        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
-            writeFile(APPHOME + CONFIG , JSON.stringify(updatedFolders, null, 4), err => {
-                if (err) {
-                    console.err("Could not write updated folder toggle!");
-                    console.err("Folder: " + path + " Active: " + isActive);
-                    console.err(err);
-                }
-            });
-    }
-
-
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -82,7 +62,7 @@ export default class FolderView extends Component<Props> {
 		{
 			return (
 				<StyledFolderCard className="bg-light">
-					<StyledCardHeader onClick={() => this.onClickFile(folder, isActive)}>
+					<StyledCardHeader onClick={() => this.props.toggleOpenFile(folder)}>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
 							{folder}

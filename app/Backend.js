@@ -70,7 +70,9 @@ export default class Backend extends Component<Props> {
                     });
                 }
                 else newState[fileName][extension] = files[path][fileName][extension]; //Otherwise copy the value for that ext to our reset state
-                
+                console.log(files[path][fileName][extension]);
+                console.log(newState[fileName][extension]);
+
                 if (!queued)
                 {
                     let file = path + sep + fileName + "." + Object.keys(files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX));

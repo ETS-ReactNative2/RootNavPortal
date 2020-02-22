@@ -71,15 +71,16 @@ class SettingsButton extends Component {
 
     renderModalBody = () => {
         const { currentModel } = this.state;
-        return this.state.confirmText ?(<div><span dangerouslySetInnerHTML={{__html: this.state.confirmText}}/></div>)
+        return this.state.confirmText ? (<div><span dangerouslySetInnerHTML={{__html: this.state.confirmText}}/></div>)
         : (
             <Container>
                 <Row>
                     <Col>
                         <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
-                            { API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
-                                <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
-                                : "") 
+                            { 
+                                API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
+                                    <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
+                                    : "") 
                             }
                         </DropdownButton>
                     </Col>
@@ -87,7 +88,7 @@ class SettingsButton extends Component {
                         <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
                             e.stopPropagation(); 
                             this.setState({ actionFlag: this.ACTION_REANALYSE })
-                            this.refreshModal("Reanalysing " + this.deleteMessage) 
+                            this.refreshModal("Reanalysing " + this.DELETE_MESSAGE) 
                         }}>Reanalyse</Button>
                     </Col>
                 </Row>
