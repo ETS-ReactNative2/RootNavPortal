@@ -1,6 +1,6 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FILE, RESET_FOLDER } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER } from '../actions/galleryActions';
 
 const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "", filterAnalysed: false };
 
@@ -99,6 +99,10 @@ export default (state = initialState, action) => {
         case UPDATE_CHECKLIST_DROPDOWN: return {
             ...state,
             checked: state.checked.map(folder => action.path == folder.path ? folder : {...folder, model: action.model})
+        }
+        case UPDATE_FOLDER_MODEL: return {
+            ...state,
+            folders: state.folders.map(it => it.path == action.path ? {...it, model: action.model} : it)
         }
         case UPDATE_FILE: return {
             ...state,

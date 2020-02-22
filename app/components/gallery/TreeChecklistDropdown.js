@@ -4,10 +4,6 @@ import { API_MODELS } from '../../constants/globals'
 type Props = {};
 
 export default class TreeChecklistDropdown extends Component<Props> {
-
-    // Todo make another props function to update the model onChange.
-    // Note the value needs to be empty string to detect a non-selection, so might need to manipulate that in redux?
-
     render() 
     {
         console.log(this.props);

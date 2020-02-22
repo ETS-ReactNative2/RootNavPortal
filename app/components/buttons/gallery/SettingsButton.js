@@ -7,13 +7,24 @@ import { ipcRenderer } from 'electron';
 
 class SettingsButton extends Component {
 
-    REANALYSE = 0;
-    CHANGE_MODEL = 1;
+    ACTION_NONE         = 0
+    ACTION_REANALYSE    = 1;
+    ACTION_CHANGE_MODEL = 2;
 
-    currentModel = API_MODELS[0];
-    state = { modal: false };
-    deleteMessage = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
-    actionFlag;
+    DELETE_MESSAGE = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
+
+    constructor(props) {
+        super(props);
+        const { folders, path } = this.props;
+        const modelApiName = folders.find(it => it.path == path).model; // Get current modelApiName
+        this.state = {
+            modal: false,
+            confirmText: "",
+            actionFlag: this.ACTION_NONE,
+            // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
+            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : {displayName: "Please select a Model!"} 
+        }
+    }
 
     close = () => {
         this.setState({ modal: false, confirmText: "" });
@@ -29,42 +40,36 @@ class SettingsButton extends Component {
     }
 
     handleAction = () => {
-        ipcRenderer.send(API_DELETE, { path: this.props.path });
-        //if (this.actionFlag == this.CHANGE_MODEL) this.props.updateModel(path, this.currentModel.apiName); //Finish when model is in state
+        const { path, updateFolderModel } = this.props; 
+        ipcRenderer.send(API_DELETE, { path });
+        if (this.actionFlag == this.CHANGE_MODEL) updateFolderModel(path, this.state.currentModel.apiName); //Finish when model is in state
     }
 
     selectDropdown = model => {
-        this.currentModel = model; 
-        this.actionFlag = this.CHANGE_MODEL; 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.deleteMessage)
+        this.setState({ actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model }); 
+        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
     }
 
     renderModalBody = () => {
-        return this.state.confirmText ? 
-        (
-            <div>
-                <span dangerouslySetInnerHTML={{__html: this.state.confirmText}}/>
-            </div>
-        ) 
-        : 
-        (
+        const { currentModel } = this.state;
+        return this.state.confirmText ?(<div><span dangerouslySetInnerHTML={{__html: this.state.confirmText}}/></div>)
+        : (
             <Container>
                 <Row>
                     <Col>
-                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={this.currentModel.displayName} onClick={e => e.stopPropagation()}>
-                            { API_MODELS.map((model, i) => model.displayName != this.currentModel.displayName ? 
-                                <Dropdown.Item 
-                                    key={i} 
-                                    onSelect={() => { this.selectDropdown(model)}}
-                                >
-                                    {model.displayName} 
-                                </Dropdown.Item> 
+                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
+                            { API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
+                                <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
                                 : "") 
                             }
                         </DropdownButton>
                     </Col>
                     <Col> 
-                        <Button style={{'float': 'right'}}variant="danger" onClick={e => { e.stopPropagation(); this.actionFlag = this.REANALYSE; this.refreshModal("Reanalysing " + this.deleteMessage) }}>Reanalyse</Button>
+                        <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
+                            e.stopPropagation(); 
+                            this.setState({ actionFlag: this.ACTION_REANALYSE })
+                            this.refreshModal("Reanalysing " + this.deleteMessage) 
+                        }}>Reanalyse</Button>
                     </Col>
                 </Row>
             </Container>
