@@ -11,14 +11,7 @@ import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
 import { StyledRow } from './StyledComponents';
 import { matchPathName } from '../../constants/globals';
 
-export default class TopBar extends Component<Props> {
-  toggleArch = () => {
-      this.props.toggleArch();
-  }
-
-  toggleSegMasks = () => {
-      this.props.toggleSegMasks()
-  }
+export default class TopBar extends Component {
 
   render() {
     const { path, buttonHandler } = this.props;
@@ -40,11 +33,11 @@ export default class TopBar extends Component<Props> {
             <RightButton click={buttonHandler}/>
             <ToggleMeasuresButton />
             <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.toggleArch}/>
+                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.props.toggleArch}/>
                 <label className="custom-control-label" htmlFor="architecture">Architecture</label>
             </div>
             <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.toggleSegMasks}/>
+                <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.props.toggleSegMasks}/>
                 <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
             </div>
             <ResetChangesButton />

@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => (
         folder: ownProps.folder,
         fileName: ownProps.fileName,
         queue: state.backend.queue,
-        inFlight: state.backend.inFlight
+        inFlight: state.backend.inFlight,
+        labels: state.gallery.labels
     }
 );
 

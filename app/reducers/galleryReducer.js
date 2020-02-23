@@ -1,8 +1,8 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, TOGGLE_LABELS } from '../actions/galleryActions';
 
-const initialState = { folders: [], modal: false, modalBody: [], hasReadConfig: false, checked: [], files: {}, filterText: "", filterAnalysed: false };
+const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", filterAnalysed: false, labels: true };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -123,6 +123,10 @@ export default (state = initialState, action) => {
                 ...state.files,
                 [action.folder] : action.newState //Write over the folder's state with our object constructed in the backend
             }
+        }
+        case TOGGLE_LABELS: return {
+            ...state,
+            labels: !state.labels
         }
         default: return state;
     }

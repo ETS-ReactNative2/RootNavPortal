@@ -35,7 +35,6 @@ export const StyledGalleryViewDiv = styled.div` && {
 export const StyledImage = styled.img` && {
       display: block;
       width: 100%;
-      height: auto;
       max-height: 5%;
     }`
 
@@ -50,7 +49,6 @@ export const StyledFolderCard = styled(Card)` && {
 }`
 
 export const StyledImageCard = styled(Card)` && {
-      height: 100%;
       -webkit-transition: 0.2s;
       &:hover {
             background-color: #e2e5ea !important;
@@ -67,11 +65,9 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 export const StyledCardBody = styled(Card.Footer)` && {
       padding: 0.5em;
-      height: 100%
 }`
 
 export const StyledCardText = styled.div` && {
       display: flex;
-      height: 100%;
       align-items: flex-end;
 }`

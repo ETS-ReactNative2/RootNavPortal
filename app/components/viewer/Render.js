@@ -218,7 +218,6 @@ export default class Render extends Component {
                     }));
                     if (architecture) this.drawRSML(simplifiedLines); 
                 });
-                
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 

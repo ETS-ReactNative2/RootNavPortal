@@ -5,7 +5,7 @@ import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImage, StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
 import { IMAGE_EXTS, IMAGE_EXTS_REGEX } from '../../constants/globals'
-import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
+import { Spinner, Overlay, Tooltip, Collapse, Fade } from 'react-bootstrap';
 import styled from 'styled-components';
 
 export default class Thumbnail extends Component<Props> {
@@ -96,14 +96,20 @@ export default class Thumbnail extends Component<Props> {
                     <this.spinner/>
                     {image}
                 </div>
-                <StyledCardBody>
-                    <StyledCardText>
-                        <this.StyledTextOverflowContainer>
-                            {fileName}
-                        </this.StyledTextOverflowContainer>
-                    </StyledCardText>
-                </StyledCardBody>
-            </StyledImageCard>            
+                {
+                    <Collapse in={this.props.labels}>
+                        <div>
+                            <StyledCardBody>
+                                <StyledCardText>
+                                    <this.StyledTextOverflowContainer>
+                                        {fileName}
+                                    </this.StyledTextOverflowContainer>
+                                </StyledCardText>
+                            </StyledCardBody>
+                        </div>
+                    </Collapse>
+                }
+            </StyledImageCard> 
 		);
 	}
 }
