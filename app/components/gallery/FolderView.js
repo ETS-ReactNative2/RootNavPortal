@@ -6,14 +6,12 @@ import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD, APPHOME, CONFIG } from '../../constants/globals'
+import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
-import { existsSync, writeFile } from 'fs';
 import { sep } from 'path';
+import { Collapse } from 'react-bootstrap';
 
-type Props = {};
-
-export default class FolderView extends Component<Props> {
+export default class FolderView extends Component {
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
@@ -72,22 +70,22 @@ export default class FolderView extends Component<Props> {
 							</div>
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
-					{
-						(isActive && files && folder) ? 
-							<StyledFolderViewDiv>
-								<StyledRow> {filesList
-									.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
-									.map((file, index) => (
-										<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
-											<Thumbnail folder={folder} fileName={file}/>
-										</div>
-									))} 
-								</StyledRow>
-							</StyledFolderViewDiv> 
-						: ""							
-					}
+						<Collapse in={!!(isActive && files && folder)}>
+							<div>
+								<StyledFolderViewDiv>
+									<StyledRow> {filesList
+										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
+										.map((file, index) => (
+											<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
+												<Thumbnail folder={folder} fileName={file}/>
+											</div>
+										))} 
+									</StyledRow>
+								</StyledFolderViewDiv> 
+							</div>
+						</Collapse>
 				</StyledFolderCard>
-				);
+			);
 		}
 		else return "";
 	}

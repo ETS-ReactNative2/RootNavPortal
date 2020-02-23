@@ -35,8 +35,6 @@ export default class FilterBar extends Component<Props> {
     this.props.updateFilterAnalysed(e.target.checked);
   }
 
-
-
   clear = () => { 
     this.props.updateFilterText(""); 
     this.textref.current.value = ""; 
