@@ -46,9 +46,9 @@ export default class TreeChecklist extends Component<Props> {
   {
     if (!nodes) return [];
     return nodes.map((item, i) => {
-      const existingFolder = this.props.importedFolders.find(it => it.path==item.path);
+      const existingFolder = this.props.importedFolders.find(it => it.path == item.path);
       const model = existingFolder ? existingFolder.model : null;
-      return ({ 
+      return ({
         value: item.path, 
         children: this.getNodes(item.children, checked, importedFolderNames),
         label: this.getDropdown(item.name, item.path, checked.concat(importedFolderNames), model),
