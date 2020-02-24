@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import TopBar from '../containers/viewer/TopBarContainer';
-import RightBar from './RightBar'
+import PluginBar from './PluginBar'
 import { StyledContainer } from './StyledComponents';
 import Render from '../containers/viewer/RenderContainer';
 import { sep } from 'path';
@@ -69,8 +69,8 @@ export default class Viewer extends Component {
         return (
             <StyledContainer>
                 <TopBar path={this.state.path} buttonHandler={this.loadNextRSML}/>
-                <Render path={this.state.path} />
-                <RightBar/>
+                {/* <Render path={this.state.path} /> */}
+                <PluginBar/>
             </StyledContainer>
         );
     }

@@ -109,6 +109,12 @@ app.on('ready', async () => {
       });
   });
 
+  ipcMain.on('getExportDest', event => {
+      dialog.showOpenDialog(event.sender.getOwnerBrowserWindow(), { properties: ['openDirectory'] }).then(result => {
+        if (result.filePaths && !result.canceled) event.sender.send('exportDest', result.filePaths);
+      });
+  });
+
   ipcMain.on('openViewer', (event, path) => {
     let subWindow = new BrowserWindow({
       width: WINDOW_WIDTH,

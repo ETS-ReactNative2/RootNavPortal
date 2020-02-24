@@ -1,16 +1,19 @@
 // @flow
 import fs from 'fs';
 import React, { Component } from 'react';
-import { Button, Row, Collapse, Fade } from 'react-bootstrap'
+import { Button, Row, Modal, InputGroup } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
+import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
 import styled from 'styled-components';
+import { StyledModal } from '../buttons/StyledComponents'; 
+import { ipcRenderer } from 'electron';
 
-export default class RightBar extends Component {
+export default class PluginBar extends Component {
     constructor(props) 
     {
         super(props);
@@ -21,6 +24,7 @@ export default class RightBar extends Component {
             plugins: _plugins,
             modal: false
         };
+        this.exportDest = React.createRef();
         console.log(this.state);
     }
 
@@ -34,6 +38,7 @@ export default class RightBar extends Component {
     render() {
         let pluginActive = Object.keys(this.state.plugins).some(group => Object.values(this.state.plugins[group]).some(plugin => plugin.active));
         return (
+        <>
             <StyledCard>
                 <StyledCenterListGroupItem>
                     <RefreshButton/>
@@ -74,35 +79,65 @@ export default class RightBar extends Component {
                 <this.measureButton variant={pluginActive ? "primary" : "secondary"} onClick={this.measure} disabled={!pluginActive}>Measure</this.measureButton>
             </StyledCard>
 
-            <>
-                <StyledModal show={this.props.modal} onHide={this.closeModal}>
+            <StyledModal show={this.state.modal} onHide={this.closeModal}>
                 <Modal.Header closeButton>
                     <Modal.Title>Export Measurements</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <TreeChecklist/>
+                    <InputGroup>
+                        <InputGroup.Prepend>
+                            <InputGroup.Text><StyledIcon className={"fas fa-save fa-lg"}/></InputGroup.Text> 
+                        </InputGroup.Prepend>
+                        <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
+                    </InputGroup>
+                    <SelectDestinationButton inputRef={this.exportDest}/>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={this.closeModal}>
                         Cancel
                     </Button>
                     <Button variant="primary" onClick={this.export}>
-                        Select
+                        Measure
                     </Button>
                 </Modal.Footer>
-                </StyledModal> 
-            </>
+            </StyledModal> 
+        </>
         );
     }
-    
 
+    //Modal's measure button clicked
+    export = () => {
+        if (!this.exportDest.current.value) return;
+        let funcs = [];
+        let folders = ["C:\\Users\\Andrew\\Desktop\\hkj\\ouptput", "C:\\Users\\Andrew\\Desktop\\hkj\ouptput\\temp"]; //Get this from state when sidebar is done
 
-    closeModal = () => {
-        this.setState({...state, modal: false});
+        //Todo: Move RSML parsing from Render to (probably) the backend on importing the FolderView. This is because we need the parsedRSML for measuring
+        //Which currently is JiT parsed on inspecting in the viewer. Also sets up our transition to canvases on the gallery nicely too, since we won't get bogged by async parsing
+        //Also anything that needs it will get its props updated by the backend's redux action putting it back to state.
+        folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
+            Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
+                if (file.parsedRSML) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
+                    Object.values(group).forEach(plugin => plugin.active ? //for each active plugin
+                        funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines)) : null)); //pass the data to each plugin
+            });
+        });
+
+        //Plugins return a promise which they then resolve when they finish their processing.
+        Promise.all(funcs).then(results => {
+            console.log(results);
+        });
+
+        console.log(this.exportDest.current.value);
     };
 
+    closeModal = () => {
+        this.setState({...this.state, modal: false});
+        ipcRenderer.removeListener('exportDest');
+    };
+
+    //Plugin measure clicked, opens modal
     measure = e => {
-        this.setState({ ...state, modal: true });
+        this.setState({ ...this.state, modal: true });
     };
     
     loadPlugins = () => {

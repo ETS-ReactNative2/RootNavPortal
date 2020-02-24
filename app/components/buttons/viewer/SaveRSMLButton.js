@@ -14,7 +14,7 @@ export default class SaveRSMLButton extends Component {
         const { resetEditStack, updateFile, editStack, parsedRSML: { rsmlJson }, path } = this.props;
         if (!editStack.length) return;
 
-        //Deep clones the original RSML and diff checks it against the editStack's simplifiedLines array to see what is/isn't present and deletes accordingly
+        //Deep clones the original RSML and diff checks it against the editStack's polylines array to see what is/isn't present and deletes accordingly
         //It's important that the keys are iterated over the original and not the copy, else the splicing will mess up the indexing heavily, but the clone is the one changed
         //Once reconstructed, the file is rewritten to disk, updated in state, and the editStack is cleared.
         this.newRSML = cloneDeep(rsmlJson);
@@ -23,7 +23,7 @@ export default class SaveRSMLButton extends Component {
         let newXML = Parser.toXml(this.newRSML, jsonOptions); //Floats being truncated, and attributes not being de-prefixed
         let pathVars = matchPathName(path);
         writeFileSync(pathVars[1] + sep + pathVars[2] + ".rsml", newXML);
-        updateFile(pathVars[1], pathVars[2], { parsedRSML: { rsmlJson: this.newRSML, simplifiedLines: editStack[editStack.length - 1] }} );
+        updateFile(pathVars[1], pathVars[2], { parsedRSML: { rsmlJson: this.newRSML, polylines: editStack[editStack.length - 1] }} );
         resetEditStack();
     };
 
