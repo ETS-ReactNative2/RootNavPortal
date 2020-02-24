@@ -148,6 +148,8 @@ export default class Backend extends Component {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
                 addQueue([matchedPath[1] + sep + matchedPath[2] + inflightFiles[filePath].ext]);
                 this.queue.push(matchedPath[1] + sep + matchedPath[2] + inflightFiles[filePath].ext); //Readd to queue
+            }
+            
             else responses.forEach(res => {
                 //Need to handle 400s, 404s, errors and timeouts too.
                 let type = res.config.url.match(/.+\/(.+)/)[1]; //returns rsml or first_order or second_order
