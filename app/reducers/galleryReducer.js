@@ -138,6 +138,8 @@ export default (state = initialState, action) => {
 // hasReadConfig = ensures we only read the config at boot
 // checked:      = array of folder paths that represent what the user has ticked in the tree checklist
 // filterText:   = Persistence of what's in the filter bar
+// labels:       = bool that toggles if the filename text is displayed under each thumbnail
+// filteranalysed = bool that toggles if the filter bar only displays files with RSML present
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists
@@ -154,14 +156,19 @@ Full example of state:
 
 state: {
     gallery: {
-        folders: ["C:\Users\Andrew\Desktop\hkj"]
+        folders: [ 
+            { path: "C:\Users\Andrew\Desktop\hkj", model: "wheat_bluepaper"}, 
+            { path: "C:\Users\Andrew\Desktop\experiments", model: "arabidopsis_plate" }
+        ],
         modal: false,
         modalBody: [{
             name: hkg, path: "C:\Users\Andrew\Desktop", children: [{name: ".vs", path: "..."}, {name: "output", path: "..."}] 
-        }]
+        }],
         hasReadConfig: true,
         checked: [],
         filterText: "",
+        filterAnalysed: false,
+        labels: true,
         files: {
             C:\Users\Andrew\Desktop\hkj: {
                 arch: {

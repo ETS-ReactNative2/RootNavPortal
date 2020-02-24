@@ -5,7 +5,8 @@ import { addQueue, removeQueue, addInflight, removeInflight } from '../actions/b
 
 const mapStateToProps = (state, ownProps) => ({ 
     files: state.gallery.files,
-    inflightFiles: state.backend.inFlight
+    inflightFiles: state.backend.inFlight,
+    folders: state.gallery.folders
 });
 
 //Follows the form ("path/folder", "file_tag_flower", {rsml: true, seg_p: true, seg_l: true})

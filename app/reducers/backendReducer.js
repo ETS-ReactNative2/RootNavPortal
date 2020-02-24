@@ -32,15 +32,15 @@ export default (state = initialState, action) => {
 }
 
 /*
-//Queue: Array of absolute paths minus the extensions that signify what the bcakend is waiting to send to the API
+//Queue: Array of absolute paths that signify what the bcakend is waiting to send to the API
 //inFlight: Object of objects indexed by folder/file path that signify which files are currently being processed/waiting for responses
 //  - contains the model used as a check if it was changing while inflight, and the extension to store it for operations the backend uses later/anything else needing access to it
 
 state: {
     backend: {
         queue: [
-            "C:\Users\Andrew\blabla\testset_rn2",
-            "C:\Users\Andrew\blabal\anotherfile"
+            "C:\Users\Andrew\blabla\testset_rn2.jpg",
+            "C:\Users\Andrew\blabal\anotherfile.png"
         ],
         inFlight: {
             C:\Users\Andrew\blabla\image_rn2: {
