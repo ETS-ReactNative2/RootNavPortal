@@ -1,5 +1,11 @@
+let plugin = (rsmlJson, polylines) => {
+	return new Promise((resolve, reject) => {
+		resolve("PluginTest has finished");
+	});
+};
+
 module.exports = {
     name: "PluginTest",
     group: "PluginGroup1",
-    function: () => { console.log("Test123"); }
+    function: plugin
 };

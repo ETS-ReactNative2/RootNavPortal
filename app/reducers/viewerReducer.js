@@ -82,8 +82,8 @@ export default (state = initialState, action) => {
 //Viewers are indexed by their process.pid values, as multiple viewers cannot interact/share their own state variables
 //Architecture - value of the architecture checkbox which defines whether or not to draw the RSML over the image
 //editStack - stores a history of edits -> each time the user does something to the canvas, the new state is pushed to the editStack
-//This lets us pop the stack to undo an action. The editStack is the first place to look for simplifiedLines
-//If the stack is empty, gallery.files.[file].parsedRSML.simplifiedLines will be used, which is what the RSML on disk represents
+//This lets us pop the stack to undo an action. The editStack is the first place to look for polylines
+//If the stack is empty, gallery.files.[file].parsedRSML.polylines will be used, which is what the RSML on disk represents
 //Each viewer process maintains its own editStack, and it is reset on file move
 
 state: {

@@ -173,15 +173,15 @@ export default class Render extends Component {
                     this.fabricCanvas.remove(lateral);
                 });
             
-            const simplifiedLines = editStack.length ? editStack[editStack.length - 1] : parsedRSML.simplifiedLines;
-            let editedLines = simplifiedLines.filter(line => {
+            const polylines = editStack.length ? editStack[editStack.length - 1] : parsedRSML.polylines;
+            let editedLines = polylines.filter(line => {
                 if (selectedID.includes('.')) return selectedID != line.id;
                 else return !line.id.startsWith(selectedID + '.') && line.id != selectedID;
             });
 
             pushEditStack(editedLines);
             this.fabricCache.selectedID = null;
-            //We need a save changes button, which will write it back to simplifiedLines[id], send to Redux, and reconstruct RSML
+            //We need a save changes button, which will write it back to polylines[id], send to Redux, and reconstruct RSML
         }
     };
 
@@ -191,8 +191,8 @@ export default class Render extends Component {
         if (file.parsedRSML) //Ready to draw!
         {
             //If there's something on the edit stack, grab the last one, else we use the file state RSML
-            const simplifiedLines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.simplifiedLines;
-            if (!simplifiedLines) return;
+            const polylines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.polylines;
+            if (!polylines) return;
 
             let image = new Image();
             let matchedPath = matchPathName(path);
@@ -216,7 +216,7 @@ export default class Render extends Component {
                     this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
                         left: 0, top: 0, selectable: false
                     }));
-                    if (architecture) this.drawRSML(simplifiedLines); 
+                    if (architecture) this.drawRSML(polylines); 
                 });
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
@@ -225,13 +225,13 @@ export default class Render extends Component {
                 this.fabricCanvas.add(new fabric.Image(image, {
                     left: 0, top: 0, selectable: false
                 }));
-                if (architecture) this.drawRSML(simplifiedLines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };     
         }
     };
 
-    drawRSML = (simplifiedLines) => {
-        simplifiedLines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
+    drawRSML = (polylines) => {
+        polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
             let polyline = new fabric.Polyline(line.points, {
                 stroke: line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL,
                 fill: null,
@@ -250,7 +250,7 @@ export default class Render extends Component {
     formatPoints = (rsml, plantID) => {
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
-            // simplifiedLines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
+            // polylines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
             this.rsmlPoints.push({ //To test alts, change rootnavspline to polyline
                 type: rsml.label,
                 id: plantID + "-" + rsml.id, //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
@@ -284,7 +284,7 @@ export default class Render extends Component {
 
             let plant = rsmlJson.rsml[0].scene[0].plant; 
             plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id));
-            updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, simplifiedLines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+            updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
             this.rsmlPoints = [];
         }
 
