@@ -71,7 +71,7 @@ export default class Viewer extends Component {
             <StyledContainer>
                 <TopBar path={this.state.path} buttonHandler={this.loadNextRSML}/>
                 <Render path={this.state.path} />
-                <RightBar/>
+                <PluginBar/>
             </StyledContainer>
         );
     }
