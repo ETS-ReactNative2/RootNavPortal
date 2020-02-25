@@ -36,7 +36,7 @@ export default class Gallery extends Component {
                 readFile(APPHOME + CONFIG, "utf8", (err, data) => 
                 {
                     if (err) console.error(err); 
-                    else this.props.importConfig(JSON.parse(data));
+                    else this.props.importConfig(JSON.parse(data).sort((a, b) => a.path.localeCompare(b.path)));
                 }); 
             }
             else console.error("doesn't exist: " + APPHOME+CONFIG);     
