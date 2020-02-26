@@ -38,11 +38,10 @@ export default class FolderChecklist extends Component {
 
     addToChildren = (path, children) => {
         let nodeIndex = children.findIndex(childNode => path.includes(childNode.value));
-        if (nodeIndex != -1){
-            children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
-        } else {
+        if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
+        else {
             const name = matchPathName(path)[2];
-            children.push({value: path, children: [], label: name});
+            children.push({ value: path, children: [], label: name });
         }
         return children;
     }

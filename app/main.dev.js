@@ -17,7 +17,7 @@ import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import axios from 'axios';
-import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE } from './constants/globals';
+import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE, API_PARSE } from './constants/globals';
 
 global.API_STATUS = false;
 axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);
@@ -184,4 +184,8 @@ app.on('ready', async () => {
   ipcMain.on(API_DELETE, (event, path) => {
       backendWindow.webContents.send(API_DELETE, path);
   });
+
+  ipcMain.on(API_PARSE, (event, paths) => {
+    backendWindow.webContents.send(API_PARSE, paths);
+});
 });

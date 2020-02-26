@@ -1,12 +1,13 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_PATH, API_ADD, API_DELETE, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_PATH, API_ADD, API_DELETE, API_PARSE, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants } from 'fs';
 import mFormData from 'form-data';
 import { remote } from 'electron';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
+import parser from 'xml2json';
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
 //Clean everything up once models have been added to state and we're not in debugging
@@ -30,6 +31,10 @@ export default class Backend extends Component {
             this.handleDelete(data.path);
         });
 
+        ipcRenderer.on(API_PARSE, (event, data) => {
+            data.forEach(path => this.parseRSML(path));
+        });
+
         if (remote.getGlobal('API_STATUS')) process.env.API_STATUS = true;
         setInterval(this.sendFile, API_POLLTIME);
     }
@@ -41,8 +46,38 @@ export default class Backend extends Component {
         //This theory is in caution of updating stopping functions and resetting some component vars like the queue. Props still get updated
     }
 
-    
-    //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
+    parseRSML = path => {
+        console.log(path);
+        let polylines = [];
+        let matchedPath = matchPathName(path);
+        //Ingest the RSML here if it's not cached in state
+        let rsmlJson = parser.toJson(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
+
+        let plant = rsmlJson.rsml[0].scene[0].plant; 
+        plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
+        console.log(polylines);
+        this.props.updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+    };
+
+    formatPoints = (rsml, plantID, polylines) => {
+        if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
+        {
+            // polylines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
+            polylines.push({ //To test alts, change rootnavspline to polyline
+                type: rsml.label,
+                id: plantID + "-" + rsml.id, //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+                points: rsml.geometry[0].polyline[0].point.map(p => ({ 
+                    x: parseFloat(p.x), //Floats still need to be transformed so Fabric can draw them right => but only in the line array, these never end up in the RSML/JSON
+                    y: parseFloat(p.y)
+                })) //Can also add a * 0.5 to scale the image points down, rather than scaling the canvas
+            });
+        }
+        if (rsml.root)
+        {
+           rsml.root.forEach(root => this.formatPoints(root, plantID, polylines));
+        }
+    };
+        //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
         const { files, resetFolder, addQueue, inflightFiles } = this.props;

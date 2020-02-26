@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Backend from '../Backend';
-import { updateFile, resetFolder } from '../actions/galleryActions';
+import { updateFile, resetFolder, updateParsedRSML } from '../actions/galleryActions';
 import { addQueue, removeQueue, addInflight, removeInflight } from '../actions/backendActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
@@ -16,7 +16,8 @@ const mapDispatchToProps = dispatch => ({
     addQueue: path    => dispatch(addQueue(path)),
     removeQueue: path => dispatch(removeQueue(path)),
     addInflight: file => dispatch(addInflight(file)),
-    removeInflight: file => dispatch(removeInflight(file))
+    removeInflight: file => dispatch(removeInflight(file)),
+    updateParsedRSML: (folder, file, parsedRSML) => dispatch(updateParsedRSML(folder, file, parsedRSML))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Backend)

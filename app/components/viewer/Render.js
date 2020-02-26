@@ -1,7 +1,6 @@
 // @flow
 import React, { Component } from 'react';
 import { readFileSync } from 'fs';
-import parser from 'xml2json';
 import { sep } from 'path';
 import { IMAGE_EXTS_REGEX, matchPathName, xmlOptions } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
@@ -274,20 +273,8 @@ export default class Render extends Component {
     render() 
     {   
         if (this.fabricCanvas) this.fabricCanvas.dispose();
-        const { file, path, updateParsedRSML } = this.props;
-
-        if (!file.parsedRSML && file.rsml)
-        {
-            let matchedPath = matchPathName(path);
-            //Ingest the RSML here if it's not cached in state
-            let rsmlJson = parser.toJson(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
-
-            let plant = rsmlJson.rsml[0].scene[0].plant; 
-            plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id));
-            updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines: this.rsmlPoints }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
-            this.rsmlPoints = [];
-        }
-
+        //RSML parsing is now done in the backend upon importing
+        
         return (
             <div>
                 <this.FabricCanvas />
