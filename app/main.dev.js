@@ -125,8 +125,8 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('getExportDest', event => {
-      dialog.showOpenDialog(event.sender.getOwnerBrowserWindow(), { properties: ['openDirectory'] }).then(result => {
-        if (result.filePaths && !result.canceled) event.sender.send('exportDest', result.filePaths);
+      dialog.showSaveDialog(event.sender.getOwnerBrowserWindow(), { properties: ['showOverwriteConfirmation'], filters: [{ name: 'CSV (Comma delimited)', extensions: ['csv'] }] }).then(result => {
+        if (result.filePath && !result.canceled) event.sender.send('exportDest', result.filePath);
       });
   });
 

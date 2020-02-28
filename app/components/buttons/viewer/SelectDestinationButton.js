@@ -8,11 +8,14 @@ export default class SelectDestinationButton extends Component {
     {
         super(props);
         ipcRenderer.on('exportDest', (event, data) => {
-            console.log(data[0]);
-            console.log(this.props.inputRef.current)
-            this.props.inputRef.current.value = data[0];
+            this.setRefValue(data)
         });
     }
+
+    setRefValue = data => {
+        this.props.inputRef.current.value = data;
+        ipcRenderer.removeListener('exportDest', this.setRefValue);
+    };
 
     render() {    
         return (

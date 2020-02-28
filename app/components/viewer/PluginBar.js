@@ -109,7 +109,7 @@ export default class PluginBar extends Component {
     export = () => {
         if (!this.exportDest.current.value) return;
         let funcs = [];
-        let folders = ["C:\\Users\\Andrew\\Desktop\\hkj\\ouptput", "C:\\Users\\Andrew\\Desktop\\hkj\ouptput\\temp"]; //Get this from state when sidebar is done
+        let folders = ["C:\\Users\\Andrew\\Desktop\\hkj\\ouptput"]; //Get this from state when sidebar is done
 
         //Todo: Move RSML parsing from Render to (probably) the backend on importing the FolderView. This is because we need the parsedRSML for measuring
         //Which currently is JiT parsed on inspecting in the viewer. Also sets up our transition to canvases on the gallery nicely too, since we won't get bogged by async parsing
@@ -132,7 +132,6 @@ export default class PluginBar extends Component {
 
     closeModal = () => {
         this.setState({...this.state, modal: false});
-        ipcRenderer.removeListener('exportDest');
     };
 
     //Plugin measure clicked, opens modal

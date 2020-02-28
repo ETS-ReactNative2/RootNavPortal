@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { readFileSync } from 'fs';
 import { sep } from 'path';
-import { IMAGE_EXTS_REGEX, matchPathName, xmlOptions } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX, matchPathName, COLOURS } from '../../constants/globals'
 import imageThumb from 'image-thumbnail';
 import Tiff from 'tiff.js';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
