@@ -63,7 +63,7 @@ export default class Render extends Component {
         this.fabricCanvas.on('mouse:over', e => {
             if (e.target && e.target.selectable && e.target.get('name') != this.fabricCache.selectedID) 
             {
-                e.target.set('stroke', this.colours.HOVERED);
+                e.target.set('stroke', COLOURS.HOVERED);
                 this.fabricCanvas.renderAll();
             }
         });
@@ -71,7 +71,7 @@ export default class Render extends Component {
         this.fabricCanvas.on('mouse:out', e => {
             if (e.target && e.target.selectable && this.fabricCache.selectedID != e.target.get('name'))
             {
-                e.target.set('stroke', e.target.get('name').toString().includes(".") ? this.colours.LATERAL : this.colours.PRIMARY);
+                e.target.set('stroke', e.target.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
                 this.fabricCanvas.renderAll();
             }
         });
@@ -88,13 +88,13 @@ export default class Render extends Component {
             if (e.target && this.fabricCache.selectedID) 
             {
                 let line = this.getObjectByName(this.fabricCache.selectedID)
-                line.set('stroke', line.get('name').toString().includes(".") ? this.colours.LATERAL : this.colours.PRIMARY);
+                line.set('stroke', line.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
                 this.fabricCache.selectedID = null;
                 this.fabricCanvas.renderAll();
             }
             if (e.target && e.target.selectable) 
             {
-                e.target.set('stroke', this.colours.HOVERED);
+                e.target.set('stroke', COLOURS.HOVERED);
                 this.fabricCache.selectedID = e.target.name;
                 this.fabricCanvas.renderAll();
             }
@@ -229,10 +229,10 @@ export default class Render extends Component {
         }
     };
 
-    drawRSML = (polylines) => {
+    drawRSML = polylines => {
         polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
             let polyline = new fabric.Polyline(line.points, {
-                stroke: line.type == 'primary' ? this.colours.PRIMARY : this.colours.LATERAL,
+                stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
                 strokeWidth: 8,
                 perPixelTargetFind: true,
@@ -274,7 +274,7 @@ export default class Render extends Component {
     {   
         if (this.fabricCanvas) this.fabricCanvas.dispose();
         //RSML parsing is now done in the backend upon importing
-        
+
         return (
             <div>
                 <this.FabricCanvas />

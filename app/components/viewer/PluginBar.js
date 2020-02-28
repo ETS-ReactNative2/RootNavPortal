@@ -122,7 +122,7 @@ export default class PluginBar extends Component {
             });
         });
 
-        //Plugins return a promise which they then resolve when they finish their processing.
+        //Plugins return a promise which they then resolve when they finish their processing. This barrier will then callback upon all plugins completing.
         Promise.all(funcs).then(results => {
             console.log(results);
         });

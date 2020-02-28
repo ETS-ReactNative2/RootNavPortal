@@ -17,7 +17,7 @@ import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import axios from 'axios';
-import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE, API_PARSE } from './constants/globals';
+import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE, API_PARSE, API_THUMB } from './constants/globals';
 
 global.API_STATUS = false;
 axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);
@@ -29,7 +29,10 @@ export default class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
 const store = configureStore({}, 'main');
+let bBackendReady = false;
+let backendQueue = { add: [], parse: [], thumb: [] }; //Backend dead letter queue for late loading
 
 //Hot reload reducers in main process
 ipcMain.on('renderer-reload', (event, action) => {
@@ -82,6 +85,18 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
+
+  
+  //Open backend last
+  backendWindow = new BrowserWindow({
+    show: false,
+    width: 0,
+    height: 0,
+    webPreferences: { nodeIntegration: true },
+    frame: false
+  });
+  
+  backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
   mainWindow = new BrowserWindow({
     show: false,
@@ -166,26 +181,31 @@ app.on('ready', async () => {
   // eslint-disable-next-line
   new AppUpdater();
 
-  //Open backend last
-  backendWindow = new BrowserWindow({
-    show: false,
-    width: 0,
-    height: 0,
-    webPreferences: { nodeIntegration: true },
-    frame: false
+
+  backendWindow.on('ready-to-show', () => {
+    bBackendReady = true;
+    backendWindow.webContents.send(API_PARSE, backendQueue.parse);
+    backendWindow.webContents.send(API_ADD, backendQueue.add);
+    backendWindow.webContents.send(API_THUMB, backendQueue.thumb);
+
   });
-  
-  backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
   ipcMain.on(API_ADD, (event, paths) => {
-    backendWindow.webContents.send(API_ADD, paths)
+    if (!bBackendReady) backendQueue.add.push(...paths.paths); // paths = { paths: [] }
+    else backendWindow.webContents.send(API_ADD, paths.paths)
   });
 
-  ipcMain.on(API_DELETE, (event, path) => {
-      backendWindow.webContents.send(API_DELETE, path);
+  ipcMain.on(API_DELETE, (event, path) => { //path = { path: "C:\folder\stuff" }
+    backendWindow.webContents.send(API_DELETE, path);
   });
 
-  ipcMain.on(API_PARSE, (event, paths) => {
-    backendWindow.webContents.send(API_PARSE, paths);
-});
+  ipcMain.on(API_PARSE, (event, paths) => { // paths = [ "C:\folder\plant", "C:\folder\otherplant"] - a .rsml is appended in backend
+    if (!bBackendReady) backendQueue.parse.push(...paths); //Suddenly the backend starting opening slower (or gallery faster) causing early IPCs to miss.
+    else backendWindow.webContents.send(API_PARSE, paths); //Storing and sending a small dead letter queue until it's ready solves this potential issue.
+  });
+
+  ipcMain.on(API_THUMB, (event, data) => {  // data = { folder: "C:\blala", file: { rsml: true, png: true }, fileName: "plant" }
+    if (!bBackendReady) backendQueue.thumb.push(...data); 
+    else backendWindow.webContents.send(API_THUMB, data);
+  });
 });

@@ -1,13 +1,14 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_PATH, API_ADD, API_DELETE, API_PARSE, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_PATH, API_ADD, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants } from 'fs';
 import mFormData from 'form-data';
 import { remote } from 'electron';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import parser from 'xml2json';
+import imageThumbail from 'image-thumbnail';
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
 //Clean everything up once models have been added to state and we're not in debugging
@@ -20,12 +21,12 @@ export default class Backend extends Component {
     {
         super(props)
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
+        get(API_PATH + "/model").then(res => process.env.API_STATUS = true).catch(err => process.env.API_STATUS = false); //backend can determine API status for itself so it can start loading earlier than gallery
 
         ipcRenderer.on(API_ADD, (event, data) => {
-            this.queue.push(...data.paths); //data.paths must be an array
-            props.addQueue(data.paths);
+            this.queue.push(...data); //data.paths must be an array
+            props.addQueue(data);
         });
-
         //A single directory path {path: ""}
         ipcRenderer.on(API_DELETE, (event, data) => {
             this.handleDelete(data.path);
@@ -33,6 +34,10 @@ export default class Backend extends Component {
 
         ipcRenderer.on(API_PARSE, (event, data) => {
             data.forEach(path => this.parseRSML(path));
+        });
+
+        ipcRenderer.on(API_THUMB, (event, data) => {
+            data.forEach(args => this.genThumbnail(args.folder, args.file, args.fileName));
         });
 
         if (remote.getGlobal('API_STATUS')) process.env.API_STATUS = true;
@@ -46,8 +51,16 @@ export default class Backend extends Component {
         //This theory is in caution of updating stopping functions and resetting some component vars like the queue. Props still get updated
     }
 
+    genThumbnail = (folder, file, fileName) => {
+        const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+
+        imageThumbail.thumb(folder + sep + fileName + "." + ext, { percentage: THUMB_PERCENTAGE, pngOptions: { force: true } }).then(thumb => 
+        {
+            this.props.addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
+        }).catch(err => console.error(err));
+    };
+
     parseRSML = path => {
-        console.log(path);
         let polylines = [];
         let matchedPath = matchPathName(path);
         //Ingest the RSML here if it's not cached in state
@@ -55,7 +68,6 @@ export default class Backend extends Component {
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
         plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
-        console.log(polylines);
         this.props.updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
     };
 
@@ -77,7 +89,8 @@ export default class Backend extends Component {
            rsml.root.forEach(root => this.formatPoints(root, plantID, polylines));
         }
     };
-        //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
+    
+    //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
         const { files, resetFolder, addQueue, inflightFiles } = this.props;

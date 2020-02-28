@@ -10,6 +10,7 @@ export const API_PATH   = API_HOST + ":" + API_PORT;
 export const API_ADD    = 'api-add';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
+export const API_THUMB = 'api-thumb';
 
 export const WINDOW_HEIGHT = 728;
 export const WINDOW_WIDTH  = 1024;
@@ -30,6 +31,9 @@ export const API_MODELS = [
     { apiName: "osr_bluepaper",     displayName: "Oilseed Rape (Blue Paper)" }, 
     { apiName: "wheat_bluepaper",   displayName: "Wheat (Blue Paper)" } 
 ];
+
+export const THUMB_PERCENTAGE = 20
+export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
 export const matchPathName = path => path.match(/(.+)(?:\\|\/)(.+)/); //Matches the file's dir path and actual name. no trailing slash on the path
 
