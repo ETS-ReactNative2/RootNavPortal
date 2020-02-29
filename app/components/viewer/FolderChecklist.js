@@ -48,6 +48,7 @@ export default class FolderChecklist extends Component {
 
     render() {
         let { nodes, checked, expanded } = this.state;
+        let { updateChecked } = this.props;
         return (
             <CheckboxTree
                 nodes={nodes}
@@ -67,7 +68,10 @@ export default class FolderChecklist extends Component {
                     leaf: <i className="far fa-folder"/>,
                 }}
                 showExpandAll={true}
-                onCheck={checked => this.setState({ checked })}
+                onCheck={checked => { 
+                    this.setState({ checked })
+                    updateChecked(checked);
+                }} 
                 onExpand={expanded => this.setState({ expanded })}
         
             />
