@@ -11,7 +11,8 @@ import RefreshButton from '../buttons/viewer/RefreshButton';
 import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
 import styled from 'styled-components';
 import { StyledModal } from '../buttons/StyledComponents'; 
-import { ipcRenderer } from 'electron';
+import { createObjectCsvWriter } from 'csv-writer';
+const { log } = console;
 
 export default class PluginBar extends Component {
     constructor(props) 
@@ -64,11 +65,7 @@ export default class PluginBar extends Component {
                         {
                             this.state[groupName] ? Object.entries(pluginGroup[1]).map((plugin, i) => {
                                 return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
-                                    <Plugin 
-                                        key={i} 
-                                        name={plugin[0]} 
-                                        func={plugin[1].function} 
-                                        active={plugin[1].active}/>
+                                    <Plugin key={i} name={plugin[0]} active={plugin[1].active}/>
                                 </div>
                             }) : ""
                         }
@@ -108,12 +105,9 @@ export default class PluginBar extends Component {
     //Modal's measure button clicked
     export = () => {
         if (!this.exportDest.current.value) return;
-        let funcs = [];
-        let folders = ["C:\\Users\\Andrew\\Desktop\\hkj\\ouptput"]; //Get this from state when sidebar is done
+        let funcs = []; //Stores an array of processing promises
+        let folders = ["C:\\Users\\Andrew\\Desktop\\hkj\\ouptput\\temp"]; //Get this from state when sidebar is done
 
-        //Todo: Move RSML parsing from Render to (probably) the backend on importing the FolderView. This is because we need the parsedRSML for measuring
-        //Which currently is JiT parsed on inspecting in the viewer. Also sets up our transition to canvases on the gallery nicely too, since we won't get bogged by async parsing
-        //Also anything that needs it will get its props updated by the backend's redux action putting it back to state.
         folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
             Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
                 if (file.parsedRSML) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
@@ -124,11 +118,56 @@ export default class PluginBar extends Component {
 
         //Plugins return a promise which they then resolve when they finish their processing. This barrier will then callback upon all plugins completing.
         Promise.all(funcs).then(results => {
-            console.log(results);
-        });
+            let headers = { //These are the fields for the CSV
+                plant: [
+                    { id: 'tag', title: 'Tag'}
+                ],
+                root: [
+                    { id: 'tag', title: 'Tag'}
+                ]
+            };
 
-        console.log(this.exportDest.current.value);
+            let data = { //Where each plugin's set of results get totalled
+                plant: [],
+                root: []
+            };
+
+            results.forEach(result => {
+                let type = result.group.match(/([^\s]+)/)[1].toLowerCase(); //Use the plant/root group name to decide which section it goes in
+                headers[type] = headers[type].concat(result.header); //Dump all the headers in for now
+                data[type] = this.mergeResults(data[type], result.results); //Combine results with what exists, merging on the tag, so we get one big object per 'thing'. Won't apply for things that measure primaries and lats separately as the tag will differ
+            });
+            
+            Object.keys(headers).forEach(type => headers[type] = headers[type].reduce((filtered, item) => { //Once done, reduce and filter the list by object
+                if (!filtered.some(header => JSON.stringify(header) == JSON.stringify(item))) filtered.push(item); //Each plugin will return a header for every root. This can be optimised, else big lookups will happen in big sets.
+                return filtered;
+            }, []));
+            
+            let multiFile = data.plant.length && data.root.length;
+
+            Object.keys(data).forEach(type => {
+                if (data[type].length)
+                {   
+                    let path = multiFile ? this.exportDest.current.value.replace(/([^\\\/.]+)(\..+)?$/, `$1 - ${type}$2`) : this.exportDest.current.value; //If writing multiple files, append the type
+
+                    let csvWriter = createObjectCsvWriter({
+                        path,
+                        header: headers[type]
+                    });
+                    csvWriter.writeRecords(data[type]).then(() => console.log(`written to ${path}`));
+                }
+            });
+        });
     };
+
+    //Merges any number of arrays of objects into an array of objects by their tag. All result sets must have a tag property, being the same for all measurements that should be merged together
+    mergeResults = (...results) => Object.values(results.reduce((data, list) => {
+        list.forEach(record => {
+            if (data[record.tag]) data[record.tag] = Object.assign(data[record.tag], record);
+            else data[record.tag] = record;
+        });
+        return data;
+    }, {}));
 
     closeModal = () => {
         this.setState({...this.state, modal: false});
@@ -162,14 +201,11 @@ export default class PluginBar extends Component {
                 else console.log("Bad Plugin: " + JSON.stringify(plugin));
             });
         }
-        console.log("Loaded Plugins:");
-        console.log(plugins);
         return plugins;
     }
 
     togglePlugin = (groupName, pluginName) => {
         const { plugins } = this.state;
-        console.log(plugins[groupName]);
         if (!plugins.hasOwnProperty(groupName) || !plugins[groupName].hasOwnProperty(pluginName)) return;
         this.setState({
             ...this.state,
