@@ -64,13 +64,18 @@ export default class Backend extends Component {
         let polylines = [];
         let matchedPath = matchPathName(path);
         //Ingest the RSML here if it's not cached in state
-        let rsmlJson = parser.toJson(readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'), xmlOptions);
+        this.structurePolylines(matchedPath, readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'));
+    };
+
+    structurePolylines = (matchedPath, rsml) => {
+        //Ingest the RSML here if it's not cached in state
+        let rsmlJson = parser.toJson(rsml, xmlOptions);
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
         plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
         this.props.updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
     };
-
+    
     formatPoints = (rsml, plantID, polylines) => {
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
@@ -203,7 +208,11 @@ export default class Backend extends Component {
                 let type = res.config.url.match(/.+\/(.+)/)[1]; //returns rsml or first_order or second_order
 
                 if (type != 'rsml') res.data.pipe(createWriteStream(filePath + '.' + type + '.png')) //name.first_order.png
-                else writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary
+                else 
+                {
+                    writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary
+                    this.structurePolylines(matchedPath, res.data);
+                }
                 exts[type] = true; 
             });
 
