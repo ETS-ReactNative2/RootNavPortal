@@ -66,10 +66,11 @@ export default class Viewer extends Component {
 
     render() 
     {
+        const { path } = this.state;
         return (
             <StyledContainer>
-                <TopBar path={this.state.path} buttonHandler={this.loadNextRSML}/>
-                {/*<Render path={this.state.path} />*/}
+                <TopBar path={path} buttonHandler={this.loadNextRSML}/>
+                {/*<Render path={path} />*/}
                 <StyledSidebarContainer>
                     <StyledFolderChecklist/>
                     <PluginBar/>

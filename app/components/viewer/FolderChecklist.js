@@ -18,14 +18,14 @@ export default class FolderChecklist extends Component {
     }   
 
     reset = () => {
-        const tree = this.folderListToTree(this.props.folders.map(it => it.path));
-        const paths = tree.map(item => item.value);
+        const folderPaths = this.props.folders.map(it => it.path);
+        const tree = this.folderListToTree(folderPaths);
+        const { checked, expanded } = this.state;
         this.setState({
-          checked: paths,
-          expanded: paths,
+          checked: checked.filter(it => folderPaths.includes(it)),
+          expanded: expanded.length == 0 ? expanded.filter(it => folderPaths.includes(it)) : tree.map(item => item.value),
           nodes: tree
         });
-    
     }
 
     // Converts a flat list of foldername strings into a hierarchical object representing folder structure
@@ -45,6 +45,20 @@ export default class FolderChecklist extends Component {
             children.push({ value: path, children: [], label: name });
         }
         return children;
+    }
+
+    cascadeChecked = (checked, clicked) => {
+        return checked.includes(clicked.value) ? checked.concat(this.flattenChildren(clicked.children)) : checked;
+    }
+
+    flattenChildren = children => {
+        return children.map(child => this.flattenChildren(child.children).concat(child.value)).flat();
+    }
+
+    componentDidUpdate(prevProps) {
+        const folderPaths = this.props.folders.map(it => it.path);
+        const oldFolderPaths = prevProps.folders.map(it => it.path);
+        if (folderPaths.length != oldFolderPaths.length) this.reset();
     }
 
     render() {
@@ -71,7 +85,8 @@ export default class FolderChecklist extends Component {
                         leaf: <i className="far fa-folder"/>,
                     }}
                     showExpandAll={true}
-                    onCheck={checked => { 
+                    onCheck={(rawChecked, clicked) => { 
+                        const checked = this.cascadeChecked(rawChecked, clicked);
                         this.setState({ checked })
                         updateChecked(checked);
                     }} 
