@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 import { Button, Row, Modal, InputGroup } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
-import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron } from './StyledComponents'
+import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
@@ -31,13 +31,6 @@ export default class PluginBar extends Component {
         console.log(this.state);
     }
 
-    measureButton = styled(Button)`
-        position: absolute;
-        bottom: 0;
-        width: -webkit-fill-available;
-        transitionDuration: 0.4s;
-    `;
-
     render() {
         let pluginActive = Object.keys(this.state.plugins).some(group => Object.values(this.state.plugins[group]).some(plugin => plugin.active));
         return (
@@ -47,6 +40,7 @@ export default class PluginBar extends Component {
                     <RefreshButton/>
                     <ClearButton/>
                 </StyledCenterListGroupItem>
+                <StyledCardContents>
                 {
                     Object.entries(this.state.plugins).map((pluginGroup, i) => {
                         const groupName = pluginGroup[0];
@@ -58,9 +52,7 @@ export default class PluginBar extends Component {
                                         <StyledChevron className="col-3">
                                             <StyledIcon className={"fas fa-chevron-" + (this.state[groupName] ?  "down" : "right") + " fa-lg"}/>
                                         </StyledChevron>
-                                    <div className="col-9">
-                                        {groupName} Measurements
-                                    </div>
+                                        <div className="col-9">{groupName}</div>
                                     </Row>
                                 </div>
                             </StyledCardHeader>
@@ -75,7 +67,8 @@ export default class PluginBar extends Component {
                         );
                     })
                 }    
-                <this.measureButton variant={pluginActive ? "primary" : "secondary"} onClick={this.measure} disabled={!pluginActive}>Measure</this.measureButton>
+                </StyledCardContents>
+                <StyledMeasureButton variant={pluginActive ? "primary" : "secondary"} onClick={this.measure} disabled={!pluginActive}>Measure</StyledMeasureButton>
             </StyledCard>
 
             <StyledModal show={this.state.modal} onHide={this.closeModal}>

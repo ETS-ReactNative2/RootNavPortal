@@ -1,5 +1,6 @@
 import styled from 'styled-components';
-import { Card, ListGroupItem, Row } from 'react-bootstrap';
+import { Card, ListGroupItem, Row, Button } from 'react-bootstrap';
+import FolderChecklist from '../containers/viewer/FolderListContainer';
 
 
 export const StyledListGroupItem = styled(ListGroupItem)` && {
@@ -33,8 +34,11 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     width: 15em;
-    margin-bottom: 1em;
-    overflow-y:auto;
+    margin: 1em;
+}`
+
+export const StyledCardContents = styled.div` && {
+    overflow-y:overlay;
 }`
 
 export const StyledChevron = styled.div` && {
@@ -45,5 +49,14 @@ export const StyledChevron = styled.div` && {
 export const StyledSidebarContainer = styled.div` && {
     display: flex;
     justify-content: space-between;
-    height: 100%
+    height: 100%;
+    overflow: hidden;
+}`
+
+export const StyledFolderChecklist = styled(FolderChecklist).attrs({border:"dark"})` && {
+}`
+
+export const StyledMeasureButton = styled(Button)` && {
+    margin-top:auto;
+    transition: 0.2s ease-in-out;
 }`
