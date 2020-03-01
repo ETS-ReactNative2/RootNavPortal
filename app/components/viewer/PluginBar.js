@@ -130,6 +130,7 @@ export default class PluginBar extends Component {
             results.forEach(result => {
                 let type = result.group.match(/([^\s]+)/)[1].toLowerCase(); //Use the plant/root group name to decide which section it goes in
                 headers[type] = headers[type].concat(result.header); //Dump all the headers in for now
+                result.results.forEach(record => Object.keys(record).forEach(key => { if (/^\d+\.\d+$/.test(record[key])) record[key] = record[key].toFixed(3) })); //Round floats to 3 DP
                 data[type] = this.mergeResults(data[type], result.results); //Combine results with what exists, merging on the tag, so we get one big object per 'thing'. Won't apply for things that measure primaries and lats separately as the tag will differ
             });
             

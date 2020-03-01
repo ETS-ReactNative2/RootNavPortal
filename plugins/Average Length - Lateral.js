@@ -21,8 +21,8 @@ const plugin = (rsmlJson, polylines, utils) => {
                 let count = plantCounts[plantID];
 
                 let object = results.find(record => record.tag == `${tag}:${plantID}`); 
-                object ? object.plantAverageLengthLateral = utils.addToAverage(object.plantAverageLengthLateral, distance, ++count) 
-                       : results.push({ tag: `${tag}:${plantID}`, plantAverageLengthLateral: utils.addToAverage(0, distance, ++count) })
+                object ? object.plantAverageLengthLateral = utils.addToAverage(object.plantAverageLengthLateral, distance, ++plantCounts[plantID]) 
+                       : results.push({ tag: `${tag}:${plantID}`, plantAverageLengthLateral: utils.addToAverage(0, distance, ++plantCounts[plantID]) })
             }
         });
 
