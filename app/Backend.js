@@ -61,7 +61,6 @@ export default class Backend extends Component {
     };
 
     parseRSML = path => {
-        let polylines = [];
         let matchedPath = matchPathName(path);
         //Ingest the RSML here if it's not cached in state
         this.structurePolylines(matchedPath, readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'));
@@ -69,6 +68,7 @@ export default class Backend extends Component {
 
     structurePolylines = (matchedPath, rsml) => {
         //Ingest the RSML here if it's not cached in state
+        let polylines = [];
         let rsmlJson = parser.toJson(rsml, xmlOptions);
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 

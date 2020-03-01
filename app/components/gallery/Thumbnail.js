@@ -44,7 +44,7 @@ export default class Thumbnail extends Component {
     openViewer = e => 
     {
         const { folder, file, fileName } = this.props;
-        if (IMAGE_EXTS.some(ext => ext in file)) 
+        if (IMAGE_EXTS.some(ext => ext in file) && 'rsml' in file) 
         {
             ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).filter(string => !string.includes("Thumb")).join("|"), () => {}) //| is the delimeter for file extensions in the URL bar
         }
@@ -88,7 +88,7 @@ export default class Thumbnail extends Component {
             im.scaleToWidth(this.container.current.clientWidth); //Perhaps not great, but I can't think of a better way. The sizing issue is circular.
             this.fabricCanvas.add(im);
 
-            if (polylines) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
+            if (polylines && this.props.architecture) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
         };     
     };
 

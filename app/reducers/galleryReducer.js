@@ -1,8 +1,8 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, TOGGLE_LABELS } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH } from '../actions/galleryActions';
 
-const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", filterAnalysed: false, labels: true };
+const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", filterAnalysed: false, labels: true, architecture: true };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -127,6 +127,10 @@ export default (state = initialState, action) => {
         case TOGGLE_LABELS: return {
             ...state,
             labels: !state.labels
+        }
+        case TOGGLE_GALLERY_ARCH: return {
+            ...state,
+            architecture: !state.architecture
         }
         default: return state;
     }
