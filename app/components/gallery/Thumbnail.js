@@ -4,7 +4,7 @@ import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { StyledImageCard } from './StyledComponents'
 import { IMAGE_EXTS, API_THUMB, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
-import { Spinner, Overlay, Tooltip, Collapse } from 'react-bootstrap';
+import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 

@@ -1,11 +1,12 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, useState, useRef } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { ipcRenderer } from 'electron';
 import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
 import { existsSync, writeFile, mkdirSync } from 'fs';
 import { APPHOME, CONFIG } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
+import { Overlay, Tooltip } from 'react-bootstrap';
 const dree = require('dree');  
 
 export default class AddButton extends Component {
@@ -45,14 +46,33 @@ export default class AddButton extends Component {
         ipcRenderer.send('openFolder')
     }
 
+    overlayedButton = () => {
+        const [show, setShow] = useState(false);
+        const target = useRef(null);
+        
+         //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
+        let button = <StyledButton variant="success" onClick={this.openFileDialog} className={`btn btn-default fas fa-plus button`} 
+                ref={target}
+                onMouseEnter={() => setShow(true)} 
+                onMouseLeave={() => setShow(false)}
+            />
+
+        return (
+            <>
+                <Overlay target={target.current} show={show} placement="top">
+                {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
+                    <Tooltip placement={top} {...props}> Import Folders </Tooltip>
+                )}
+                </Overlay>
+                {button}
+            </>
+        )
+    }
+
     render() {
         return (
             <React.Fragment>
-                <StyledButton
-                    variant="success" 
-                    onClick={this.openFileDialog} 
-                    className={`btn btn-default fas fa-plus button`} 
-                />
+                <this.overlayedButton />
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Select plant image folders</Modal.Title>
