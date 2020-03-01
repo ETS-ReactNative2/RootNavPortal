@@ -12,6 +12,8 @@ import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
 import styled from 'styled-components';
 import { StyledModal } from '../buttons/StyledComponents'; 
 import { createObjectCsvWriter } from 'csv-writer';
+import utils from '../../constants/pluginUtils';
+
 const { log } = console;
 
 export default class PluginBar extends Component {
@@ -112,7 +114,7 @@ export default class PluginBar extends Component {
             Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
                 if (file.parsedRSML) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
                     Object.values(group).forEach(plugin => plugin.active ? //for each active plugin
-                        funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines)) : null)); //pass the data to each plugin
+                        funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines, utils)) : null)); //pass the data to each plugin
             });
         });
 

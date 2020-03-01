@@ -7,19 +7,23 @@ const name = "Primary Root Count";
 //rsmlJson - A JSON representation of RSML
 //Polylines - an array of objects representing all the parsed points. Contains an ID formatted plantID-primaryID.lateralID, a type: 'primary' or 'lateral'
 //and points: an array of objects: { x: ..., y: ... } representing the polyline.
-const plugin = (rsmlJson, polylines) => {
+//utils - an object containing an API of potentially common, useful functions for plugin writing
+//Convention for plant measurements is to label each row as `tag` or `tag:plantID` if there are multiple
+//Each plugin must be able to handle the possibility of having multiple plants in an image's dataset.
+
+const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
         let tag = rsmlJson.rsml[0].metadata[0]['file-key'][0]["$t"]; //Location of the tag
         let multiplePlants = rsmlJson.rsml[0].scene[0].plant.length > 1 //Having multiple plants effects our naming conventions - tag:id or just tag
         let results = [];
-        if (!multiplePlants) results.push({ tag, primaries: 0 }); //If there aren't, we can initialise easily
+        if (!multiplePlants) results.push({ tag, primaries: 0 }); //If there aren't, we can initialise easily. Result rows must always include `tag`, and then their returned field
 
         polylines.forEach(line => {
             if (!multiplePlants && line.type == 'primary') return results[0].primaries++;
 
             if (line.type == 'primary') 
             {
-                let plantID = line.id.match(/([0-9]+)/); //Get plant ID
+                let plantID = utils.getPlantID(line); //Get plant ID
                 let object = results.find(record => record.tag == `${tag}:${plantID}`); //Does a record exist
                 object ? object.primaries++ : results.push({ tag: `${tag}:${plantID}`, primaries: 1 }); //If so, increment, else add a record for it
             }
