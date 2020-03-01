@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
 import { FormGroup, FormControl, Row } from 'react-bootstrap';
 import { API_MODELS } from '../../constants/globals'
-type Props = {};
 
-export default class TreeChecklistDropdown extends Component<Props> {
+export default class TreeChecklistDropdown extends Component {
     render() 
     {
         const { name, path, checked, updateChecklistDropdown, model } = this.props;
