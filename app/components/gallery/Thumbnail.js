@@ -2,7 +2,7 @@
 import React, { Component, useState, useRef } from 'react';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
-import { StyledCardBody, StyledImageCard, StyledCardText } from './StyledComponents'
+import { StyledImageCard } from './StyledComponents'
 import { IMAGE_EXTS, API_THUMB, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip, Collapse } from 'react-bootstrap';
 import styled from 'styled-components';
@@ -29,12 +29,6 @@ export default class Thumbnail extends Component {
         top: 0.1em;
     }`;
 
-    StyledTextOverflowContainer = styled.div` && {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-    }`;
-
     StyledImage = styled.canvas` && {
         display: block;
         width: 100%;
@@ -48,6 +42,12 @@ export default class Thumbnail extends Component {
         {
             ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).filter(string => !string.includes("Thumb")).join("|"), () => {}) //| is the delimeter for file extensions in the URL bar
         }
+    }
+
+    shouldComponentUpdate(nextProps, nextState) 
+    {
+        if (nextProps.labels != this.props.labels) return false; //If the label changes, we don't want to update with the rest of the container
+        return true; //so the label collapse animation is still smooth as the canvas won't redraw unnecessarily
     }
 
     componentDidUpdate(prevProps)
@@ -69,7 +69,7 @@ export default class Thumbnail extends Component {
     };
 
     draw = () => {
-        const { file } = this.props;
+        const { file, architecture } = this.props;
         const polylines = file.parsedRSML ? file.parsedRSML.polylines : null;
         let image = new Image();
         let ext;
@@ -88,7 +88,7 @@ export default class Thumbnail extends Component {
             im.scaleToWidth(this.container.current.clientWidth); //Perhaps not great, but I can't think of a better way. The sizing issue is circular.
             this.fabricCanvas.add(im);
 
-            if (polylines && this.props.architecture) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
+            if (polylines && architecture) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
         };     
     };
 
@@ -149,6 +149,7 @@ export default class Thumbnail extends Component {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
+        console.log("Rerendering thumb");
         const { folder, file, fileName } = this.props;
 
         if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
@@ -163,19 +164,6 @@ export default class Thumbnail extends Component {
                     <this.spinner/>
                     <this.FabricCanvas />
                 </div>
-                {
-                    <Collapse in={this.props.labels}>
-                        <div>
-                            <StyledCardBody>
-                                <StyledCardText>
-                                    <this.StyledTextOverflowContainer>
-                                        {fileName}
-                                    </this.StyledTextOverflowContainer>
-                                </StyledCardText>
-                            </StyledCardBody>
-                        </div>
-                    </Collapse>
-                }
             </StyledImageCard> 
 		);
 	}

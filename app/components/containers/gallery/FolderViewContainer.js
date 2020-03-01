@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => ({
         folder: ownProps.folder,
         isActive: ownProps.isActive,
         filterText: state.gallery.filterText,
-        filterAnalysed: state.gallery.filterAnalysed        
+        filterAnalysed: state.gallery.filterAnalysed,
+        labels: state.gallery.labels        
     }
 );
 
