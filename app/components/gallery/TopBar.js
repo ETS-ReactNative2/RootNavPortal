@@ -22,6 +22,10 @@ export default class TopBar extends Component {
               <input type="checkbox" className="custom-control-input" id="labels" defaultChecked={true} onClick={this.props.toggleLabels}/>
               <label className="custom-control-label" htmlFor="labels">Display Names</label>
           </this.labelDiv>
+          <this.labelDiv className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em'}}>
+              <input type="checkbox" className="custom-control-input" id="drawRsml" defaultChecked={true} onClick={this.props.toggleArch}/>
+              <label className="custom-control-label" htmlFor="drawRsml">Draw Architecture</label>
+          </this.labelDiv>
         </StyledTopBarDiv>
         <StyledTopBarHR/>
       </div>

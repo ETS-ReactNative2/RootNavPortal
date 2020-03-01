@@ -17,6 +17,7 @@ export const UPDATE_FOLDER_MODEL = 'UPDATE_FOLDER_MODEL';
 export const UPDATE_FILE = 'UPDATE_FILE';
 export const RESET_FOLDER = 'RESET_FOLDER';
 export const TOGGLE_LABELS = 'TOGGLE_LABELS';
+export const TOGGLE_GALLERY_ARCH = 'TOGGLE_GALLERY_ARCH';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -37,3 +38,4 @@ export const updateFolderModel = (path, model) => ({ type: UPDATE_FOLDER_MODEL, 
 export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, folder, fileName, newExts });
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions
 export const toggleLabels = () => ({ type: TOGGLE_LABELS });
+export const toggleArch = () => ({ type: TOGGLE_GALLERY_ARCH });
