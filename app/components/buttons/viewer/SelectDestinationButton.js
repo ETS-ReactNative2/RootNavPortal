@@ -22,7 +22,8 @@ export default class SelectDestinationButton extends Component {
             <StyledButton
                 variant="secondary" 
                 onClick={() => ipcRenderer.send('getExportDest')} 
-                className={`btn btn-default fa fa-folder-open button`} 
+                className={`btn btn-default fa fa-folder-open button`}
+                style={{height: 'auto', margin: '0px', minHeight: 'auto'}}
             />    
         )
     }

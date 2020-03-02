@@ -81,8 +81,10 @@ export default class PluginBar extends Component {
                             <InputGroup.Text><StyledIcon className={"fas fa-save fa-lg"}/></InputGroup.Text> 
                         </InputGroup.Prepend>
                         <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
+                        <InputGroup.Append>
+                            <SelectDestinationButton inputRef={this.exportDest}/>
+                        </InputGroup.Append>
                     </InputGroup>
-                    <SelectDestinationButton inputRef={this.exportDest}/>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="danger" onClick={this.closeModal}>
