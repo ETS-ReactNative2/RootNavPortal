@@ -77,7 +77,13 @@ export default (state = initialState, action) => {
         }
         case UPDATE_CHECKED: return {
             ...state,
-            checked: action.checked
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    checked: action.checked
+                }
+            }
         }
         default: return state;
     }
@@ -100,12 +106,14 @@ state: {
                 editStack: [
                     [{}, {}, {}],
                     [{}, {}, {}]
-                ]
+                ],
+                checked: ["C:\plants\wheat"]
             },
             1853: {
                 architecture: false
                 segMasks: true,
-                editStack: []
+                editStack: [],
+                checked: []
             }
         }
     }   

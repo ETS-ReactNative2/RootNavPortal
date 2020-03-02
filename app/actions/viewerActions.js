@@ -16,4 +16,4 @@ export const pushEditStack  = (viewerID, lines) => ({ type: PUSH_EDITSTACK, view
 export const popEditStack = viewerID => ({ type: POP_EDITSTACK, viewerID });
 export const resetEditStack = viewerID => ({ type: RESET_EDITSTACK, viewerID });
 export const saveRSML = (viewerID, newRSML) => ({ type: SAVE_RSML, viewerID, newRSML });
-export const updateChecked = checked => ({ type: UPDATE_CHECKED, checked })
+export const updateChecked = (viewerID, checked) => ({ type: UPDATE_CHECKED, viewerID, checked })

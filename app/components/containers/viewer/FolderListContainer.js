@@ -7,7 +7,7 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    updateChecked: checked => dispatch(updateChecked(checked))
+    updateChecked: checked => dispatch(updateChecked(process.pid, checked))
 });
 
 
