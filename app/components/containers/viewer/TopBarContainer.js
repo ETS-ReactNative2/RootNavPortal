@@ -4,7 +4,8 @@ import { toggleArch, toggleSegMasks } from '../../../actions/viewerActions';
 
 const mapStateToProps = (state, ownProps) => ({
     buttonHandler: ownProps.buttonHandler,
-    path: ownProps.path
+    path: ownProps.path,
+    plants: ownProps.plants
 });
 
 const mapDispatchToProps = dispatch => ({

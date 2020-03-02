@@ -41,10 +41,11 @@ export default class Viewer extends Component {
     }
 
     loadNextRSML = direction => {
-        if (this.props.editStack.length) this.props.resetEditStack();
+        const { editStack, resetEditStack, files } = this.props;
+        if (editStack.length) resetEditStack();
         let split = matchPathName(this.state.path); 
-        let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?)
-        let keys = Object.keys(this.props.files[folder]);
+        let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
+        let keys = Object.keys(files[folder]);
         let index = keys.indexOf(split[2]); //I'm thinking make a global func for splitting/getting dir path and file name given how much this regex pops up now
         let file;
         let initialIndex = index;
@@ -54,7 +55,7 @@ export default class Viewer extends Component {
             index += direction;
             if (index < 0) index = keys.length - 1; //Wrap left or right around the array if out of bounds
             if (index == keys.length) index = 0;
-            file = this.props.files[folder][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
+            file = files[folder][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
         }
         while (!file.rsml && initialIndex != index) //Only loop through the folder once
 
@@ -64,12 +65,19 @@ export default class Viewer extends Component {
         }
     }
 
+    getNumberOfPlants = () => {
+        let [, folder, fileName] = matchPathName(this.state.path); 
+        folder.replace(/\\\\/g, '\\');
+        console.log(folder, fileName)
+        return this.props.files[folder][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
+    };
+
     render() 
     {
         const { path } = this.state;
         return (
             <StyledContainer>
-                <TopBar path={path} buttonHandler={this.loadNextRSML}/>
+                <TopBar path={path} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 {/*<Render path={path} />*/}
                 <StyledSidebarContainer>
                     <StyledFolderChecklist/>

@@ -81,7 +81,7 @@ export default class FolderView extends Component {
 				<StyledFolderCard className="bg-light">
 					<StyledCardHeader onClick={() => this.props.toggleOpenFile(folder)}>
 						<StyledFolderViewDiv>
-							<StyledIcon className={"fas fa-chevron-" + (isActive ?  "down" : "right") + " fa-lg"}/>
+							<StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${isActive ? '90' : '0'}deg)`}}/>
 							{folder}
 							<div style={{marginLeft: "auto", marginRight: "0"}}>
 								<SettingsButton path={folder}/>

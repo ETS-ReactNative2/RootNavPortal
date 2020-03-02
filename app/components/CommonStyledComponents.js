@@ -14,5 +14,5 @@ export const StyledTopBarDiv = styled.div` && {
   }`;
 
 export const StyledIcon = styled.i` && {
-    width: 1.3em;
+    margin: 0 0.3em;
 }`

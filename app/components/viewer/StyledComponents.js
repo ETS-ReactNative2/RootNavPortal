@@ -7,6 +7,7 @@ export const StyledListGroupItem = styled(ListGroupItem)` && {
     padding: 0.5em;
     color: black;
     border-radius: 0;
+    transition: 0.2s ease-in-out
 }`
 
 export const StyledCenterListGroupItem = styled(StyledListGroupItem)` && {

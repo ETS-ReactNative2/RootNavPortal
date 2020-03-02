@@ -1,7 +1,7 @@
 // @flow
-import fs from 'fs';
+import { existsSync, readdirSync, mkdirSync } from 'fs';
 import React, { Component } from 'react';
-import { Button, Row, Modal, InputGroup } from 'react-bootstrap'
+import { Button, Row, Modal, InputGroup, Collapse } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
@@ -9,13 +9,9 @@ import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
 import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
-import styled from 'styled-components';
 import { StyledModal } from '../buttons/StyledComponents'; 
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
-
-const { log } = console;
-
 export default class PluginBar extends Component {
     constructor(props) 
     {
@@ -23,7 +19,7 @@ export default class PluginBar extends Component {
         // Todo do this in redux
         const _plugins = this.loadPlugins();
         this.state = {
-            ...Object.fromEntries(Object.keys(_plugins).map(group => [group,true])),
+            ...Object.fromEntries(Object.keys(_plugins).map(group => [group, true])),
             plugins: _plugins,
             modal: false
         };
@@ -50,19 +46,23 @@ export default class PluginBar extends Component {
                                 <div className="container">
                                     <Row>
                                         <StyledChevron className="col-3">
-                                            <StyledIcon className={"fas fa-chevron-" + (this.state[groupName] ?  "down" : "right") + " fa-lg"}/>
+                                            <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
                                         </StyledChevron>
                                         <div className="col-9">{groupName}</div>
                                     </Row>
                                 </div>
                             </StyledCardHeader>
-                        {
-                            this.state[groupName] ? Object.entries(pluginGroup[1]).map((plugin, i) => {
-                                return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
-                                    <Plugin key={i} name={plugin[0]} active={plugin[1].active}/>
+                            <Collapse in={!!this.state[groupName]}>
+                                <div>
+                                {
+                                    Object.entries(pluginGroup[1]).map((plugin, i) => {
+                                        return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
+                                            <Plugin key={i} name={plugin[0]} active={plugin[1].active}/>
+                                        </div>
+                                    })
+                                }
                                 </div>
-                            }) : ""
-                        }
+                            </Collapse>
                         </React.Fragment>
                         );
                     })
@@ -178,14 +178,14 @@ export default class PluginBar extends Component {
         let plugins = {};
 
         // If there are no plugins, then make the plugin directory.
-        if (!fs.existsSync(PLUGINDIR)) { 
+        if (!existsSync(PLUGINDIR)) { 
             console.log("No plugin directory found at '" + PLUGINDIR + "', creating!");
-            fs.mkdirSync(PLUGINDIR);
+            mkdirSync(PLUGINDIR);
         }
         else 
         {
             console.log("Plugin directory found at '" + PLUGINDIR + "', reading plugins!");
-            const pluginFilenames = fs.readdirSync(PLUGINDIR); // Get all plugin filenames
+            const pluginFilenames = readdirSync(PLUGINDIR); // Get all plugin filenames
             pluginFilenames.forEach(filename => {
                 const plugin = _require(`${PLUGINDIR}${filename.replace('.js', '')}`); // For each filename, import the plugin
                 

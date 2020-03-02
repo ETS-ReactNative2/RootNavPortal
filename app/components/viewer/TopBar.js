@@ -14,16 +14,16 @@ import { matchPathName } from '../../constants/globals';
 export default class TopBar extends Component {
 
   render() {
-    const { path, buttonHandler } = this.props;
+    const { path, buttonHandler, plants } = this.props;
     let tag = path ? matchPathName(path)[2] : ""; //Matches the file path into the absolute directory path and file name
     return (
       <div>
         <StyledTopBarDiv className="d-inline-flex" data-tid="container">
             <StyledRow>
-                <div className="col-sm-3">Tag: {tag}</div>
-                <div className="col-sm-3">Date:</div>
-                <div className="col-sm-3">Number of Plants:</div>
-                <div className="col-sm-3">Captured On:</div>
+                <div className="col-sm-3"><b>Tag:</b> {tag}</div>
+                <div className="col-sm-3"><b>Date:</b></div>
+                <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>
+                <div className="col-sm-3"><b>Captured On:</b></div>
             </StyledRow>
         </StyledTopBarDiv>
         <StyledTopBarHR/>
