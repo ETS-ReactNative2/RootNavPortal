@@ -13,6 +13,7 @@ export default class Render extends Component {
     {
         super(props);
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
+        this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
     }
     
     //Objects are named by their RSML ID => laterals are parentID.latID
@@ -53,8 +54,22 @@ export default class Render extends Component {
         this.draw();    
     }
 
+    setCanvasStyle = () => {
+        var container = document.getElementsByClassName("canvas-container")[0];
+        container.style.width = "100%";
+        container.style.height = "auto";
+        container.style.border = "1px solid";
+        container.style.borderRadius = ".25rem .25rem 0 0";
+        for (var i = 0; i < container.children.length; ++i){
+            container.children[i].style.width = "100%";
+            container.children[i].style.height = "auto";
+        }
+    }
+
     setupCanvas = () => {
-        this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: 1000, height: 1000 }); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.initialize(document.getElementById(this.canvasID)); //This is the element size, these may need tweaking, maybe on the fly later
+        this.setCanvasStyle();
+        
         this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //These really need evening. They both change the canvas.
         //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
@@ -266,20 +281,20 @@ export default class Render extends Component {
     };
 
     FabricCanvas = () => {
-        this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
-        return <canvas id={this.canvasID}></canvas>;
+        //this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
+        return <canvas id={this.canvasID}>test</canvas>;
     };
 
     render() 
     {   
-        if (this.fabricCanvas) this.fabricCanvas.dispose();
+        if (this.fabricCanvas) {
+            this.fabricCanvas.dispose();
+            var canvas = document.getElementsByClassName("canvas-container");
+            console.log(canvas.length);
+        }
         //RSML parsing is now done in the backend upon importing
 
-        return (
-            <div>
-                <this.FabricCanvas />
-            </div>
-        );
+        return <this.FabricCanvas style={{margin: "30em"}}/>;
     }
 }
 

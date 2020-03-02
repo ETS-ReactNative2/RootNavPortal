@@ -34,7 +34,7 @@ export default class PluginBar extends Component {
         let pluginActive = Object.keys(this.state.plugins).some(group => Object.values(this.state.plugins[group]).some(plugin => plugin.active));
         return (
         <>
-            <StyledCard>
+            <StyledCard style={{borderRadius: '.25rem 0 0 0', marginLeft: '0.5em'}}>
                 <StyledCenterListGroupItem>
                     <RefreshButton/>
                     <ClearButton/>

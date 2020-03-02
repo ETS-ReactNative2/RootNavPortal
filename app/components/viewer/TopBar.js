@@ -20,18 +20,16 @@ export default class TopBar extends Component {
       <div>
         <StyledTopBarDiv className="d-inline-flex" data-tid="container">
             <StyledRow>
-                <div className="col-sm-3"><b>Tag:</b> {tag}</div>
-                <div className="col-sm-3"><b>Date:</b></div>
+                <div className="col-sm-4"><b>Tag:</b> {tag}</div>
+                <div className="col-sm-2"><b>Date:</b></div>
                 <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>
                 <div className="col-sm-3"><b>Captured On:</b></div>
             </StyledRow>
         </StyledTopBarDiv>
         <StyledTopBarHR/>
         <StyledTopBarDiv className="d-inline-flex container" data-tid="container">
-            <ToggleFolderButton />
             <LeftButton click={buttonHandler}/>
             <RightButton click={buttonHandler}/>
-            <ToggleMeasuresButton />
             <div className="custom-control custom-checkbox">
                 <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.props.toggleArch}/>
                 <label className="custom-control-label" htmlFor="architecture">Architecture</label>

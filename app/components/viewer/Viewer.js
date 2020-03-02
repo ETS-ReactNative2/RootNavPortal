@@ -1,9 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import TopBar from '../containers/viewer/TopBarContainer';
-import { StyledContainer, StyledSidebarContainer, StyledFolderChecklist } from './StyledComponents';
+import { StyledContainer, StyledSidebarContainer, StyledFolderChecklist, StyledRender } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
-import Render from '../containers/viewer/RenderContainer';
 import { sep } from 'path';
 import { matchPathName } from '../../constants/globals';
 import { remote } from 'electron';
@@ -78,9 +77,9 @@ export default class Viewer extends Component {
         return (
             <StyledContainer>
                 <TopBar path={path} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
-                {/*<Render path={path} />*/}
                 <StyledSidebarContainer>
                     <StyledFolderChecklist/>
+                    <StyledRender path={path}/>
                     <PluginBar/>
                 </StyledSidebarContainer>
             </StyledContainer>

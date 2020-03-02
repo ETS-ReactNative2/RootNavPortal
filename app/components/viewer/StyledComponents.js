@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 import { Card, ListGroupItem, Row, Button } from 'react-bootstrap';
 import FolderChecklist from '../containers/viewer/FolderListContainer';
+import Render from '../containers/viewer/RenderContainer';
 
 
 export const StyledListGroupItem = styled(ListGroupItem)` && {
@@ -35,7 +36,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     width: 15em;
-    margin: 1em;
+    min-width: 15em;
 }`
 
 export const StyledCardContents = styled.div` && {
@@ -52,6 +53,7 @@ export const StyledSidebarContainer = styled.div` && {
     justify-content: space-between;
     height: 100%;
     overflow: hidden;
+    margin-top: 1em;
 }`
 
 export const StyledFolderChecklist = styled(FolderChecklist).attrs({border:"dark"})` && {
@@ -60,4 +62,8 @@ export const StyledFolderChecklist = styled(FolderChecklist).attrs({border:"dark
 export const StyledMeasureButton = styled(Button)` && {
     margin-top:auto;
     transition: 0.2s ease-in-out;
+}`
+
+export const StyledRender = styled(Render)` && {
+    margin: 2em;
 }`
