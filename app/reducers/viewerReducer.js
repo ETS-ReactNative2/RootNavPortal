@@ -1,7 +1,7 @@
 import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, 
     SAVE_RSML, UPDATE_CHECKED } from '../actions/viewerActions';
 
-const initialState = {viewers: {}, checked: []};
+const initialState =  {viewers: {} };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -13,7 +13,8 @@ export default (state = initialState, action) => {
                 [action.viewerID]: { 
                     architecture: true, 
                     segMasks: false ,
-                    editStack: []
+                    editStack: [],
+                    checked: []
                 }
             }
         }

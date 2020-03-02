@@ -1,7 +1,7 @@
 // @flow
 import { existsSync, readdirSync, mkdirSync } from 'fs';
-import React, { Component } from 'react';
-import { Button, Row, Modal, InputGroup, Collapse } from 'react-bootstrap'
+import React, { Component, useState } from 'react';
+import { Button, Row, Modal, InputGroup, Collapse, Toast } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
@@ -13,6 +13,7 @@ import { StyledModal } from '../buttons/StyledComponents';
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
 export default class PluginBar extends Component {
+    
     constructor(props) 
     {
         super(props);
@@ -22,7 +23,8 @@ export default class PluginBar extends Component {
             ...Object.fromEntries(Object.keys(_plugins).map(group => [group, true])),
             plugins: _plugins,
             modal: false,
-            exportable: true
+            exportable: true,
+            toast: false
         };
         this.exportDest = React.createRef();
         console.log(this.state);
@@ -98,14 +100,30 @@ export default class PluginBar extends Component {
                     </Button>
                 </Modal.Footer>
             </StyledModal> 
+
+            <this.measureToast />
         </>
         );
     }
 
+    measureToast = () => {
+        return (
+                <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+                    style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '13vw' }} >
+                    <Toast.Header>
+                        <StyledIcon className={"fas fa-arrow-left fa-lg"} />
+                        <strong className="mr-auto">Measure Error</strong>
+                    </Toast.Header>
+                    <Toast.Body>You have no folders selected for measuring</Toast.Body>
+                </Toast>
+        );
+    };
+
     setExportDest = value => {
         this.exportDest.current.value = value;
         this.setState({ ...this.state, exportable: true });
-    }
+    };
+
     //Modal's measure button clicked
     export = () => {
         if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
@@ -179,6 +197,7 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = e => {
+        if (!this.props.folders.length) return this.setState({ ...this.state, toast: true });
         this.setState({ ...this.state, modal: true });
     };
     
