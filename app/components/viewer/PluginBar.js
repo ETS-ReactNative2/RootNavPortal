@@ -21,7 +21,8 @@ export default class PluginBar extends Component {
         this.state = {
             ...Object.fromEntries(Object.keys(_plugins).map(group => [group, true])),
             plugins: _plugins,
-            modal: false
+            modal: false,
+            exportable: true
         };
         this.exportDest = React.createRef();
         console.log(this.state);
@@ -76,13 +77,15 @@ export default class PluginBar extends Component {
                     <Modal.Title>Export Measurements</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <InputGroup>
+                    <InputGroup style={!this.state.exportable ? {boxShadow: '0 0 10px red', borderRadius: '7px 20px 20px 7px'} : {}}>
                         <InputGroup.Prepend>
-                            <InputGroup.Text><StyledIcon className={"fas fa-save fa-lg"}/></InputGroup.Text> 
+                            <InputGroup.Text>
+                                <StyledIcon className={"fas fa-save fa-lg"}/>
+                            </InputGroup.Text> 
                         </InputGroup.Prepend>
                         <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
                         <InputGroup.Append>
-                            <SelectDestinationButton inputRef={this.exportDest}/>
+                            <SelectDestinationButton setExportDest={this.setExportDest}/>
                         </InputGroup.Append>
                     </InputGroup>
                 </Modal.Body>
@@ -99,9 +102,13 @@ export default class PluginBar extends Component {
         );
     }
 
+    setExportDest = value => {
+        this.exportDest.current.value = value;
+        this.setState({ ...this.state, exportable: true });
+    }
     //Modal's measure button clicked
     export = () => {
-        if (!this.exportDest.current.value) return;
+        if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux

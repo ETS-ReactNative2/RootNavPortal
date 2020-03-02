@@ -13,7 +13,7 @@ export default class SelectDestinationButton extends Component {
     }
 
     setRefValue = data => {
-        this.props.inputRef.current.value = data;
+        this.props.setExportDest(data);
         ipcRenderer.removeListener('exportDest', this.setRefValue);
     };
 
