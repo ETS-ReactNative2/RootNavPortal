@@ -1,8 +1,6 @@
 import styled from 'styled-components';
 import { Card, ListGroupItem, Row, Button } from 'react-bootstrap';
 import FolderChecklist from '../containers/viewer/FolderListContainer';
-import Render from '../containers/viewer/RenderContainer';
-
 
 export const StyledListGroupItem = styled(ListGroupItem)` && {
     padding: 0.5em;
@@ -62,8 +60,4 @@ export const StyledFolderChecklist = styled(FolderChecklist).attrs({border:"dark
 export const StyledMeasureButton = styled(Button)` && {
     margin-top:auto;
     transition: 0.2s ease-in-out;
-}`
-
-export const StyledRender = styled(Render)` && {
-    margin: 2em;
 }`

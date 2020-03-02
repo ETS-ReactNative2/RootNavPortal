@@ -6,6 +6,7 @@ import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
 import { matchPathName } from '../../constants/globals';
 import { remote } from 'electron';
+import Render from '../containers/viewer/RenderContainer';
 
 export default class Viewer extends Component {
     LEFT_KEY  = "ArrowLeft";
@@ -79,7 +80,7 @@ export default class Viewer extends Component {
                 <TopBar path={path} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
                     <StyledFolderChecklist/>
-                    <StyledRender path={path}/>
+                    <Render path={path}/>
                     <PluginBar/>
                 </StyledSidebarContainer>
             </StyledContainer>

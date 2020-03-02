@@ -287,14 +287,11 @@ export default class Render extends Component {
 
     render() 
     {   
-        if (this.fabricCanvas) {
+        if (this.fabricCanvas)
             this.fabricCanvas.dispose();
-            var canvas = document.getElementsByClassName("canvas-container");
-            console.log(canvas.length);
-        }
+        
         //RSML parsing is now done in the backend upon importing
-
-        return <this.FabricCanvas style={{margin: "30em"}}/>;
+        return <this.FabricCanvas/>;
     }
 }
 
