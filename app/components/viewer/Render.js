@@ -225,7 +225,7 @@ export default class Render extends Component {
             {
                 sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => { //Get size of tiff
                     let canvas = new OffscreenCanvas(dimensions.width, dimensions.height); //Create offscreen canvas with its resolution
-                    let image = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
+                    let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
                     canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
                     this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
                         left: 0, top: 0, selectable: false

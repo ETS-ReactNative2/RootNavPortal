@@ -82,7 +82,7 @@ export default class FolderView extends Component {
 					<StyledCardHeader onClick={() => this.props.toggleOpenFile(folder)}>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${isActive ? '90' : '0'}deg)`}}/>
-							{folder}
+							{folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1]}
 							<div style={{marginLeft: "auto", marginRight: "0"}}>
 								<SettingsButton path={folder}/>
 								<RemoveButton path={folder}/>

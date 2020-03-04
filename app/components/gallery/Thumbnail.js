@@ -30,6 +30,15 @@ export default class Thumbnail extends Component {
         top: 0.1em;
     }`;
 
+    LoadingSpinner = styled(Spinner)` && {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }`;
+
     StyledImage = styled.canvas` && {
         display: block;
         width: 100%;
@@ -75,7 +84,7 @@ export default class Thumbnail extends Component {
         const polylines = file.parsedRSML ? file.parsedRSML.polylines : null;
         let image = new Image();
         let ext;
-        
+
         Object.keys(file).forEach(key => { if (key.includes("Thumb")) ext = key });
         if (!ext) return;
 
@@ -163,6 +172,7 @@ export default class Thumbnail extends Component {
                 <div style={{minHeight: '30vh'}} ref={this.container}> 
                     <this.spinner/>
                     <this.FabricCanvas />
+                    { !file.parsedRSML ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
                 </div>
             </StyledImageCard> 
 		);
