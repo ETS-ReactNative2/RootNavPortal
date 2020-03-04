@@ -13,7 +13,7 @@ export default class Render extends Component {
     {
         super(props);
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
-        this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
+        this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15, selection: false }); //Extra pixels around an object the canvas includes in hitbox
     }
     
     //Objects are named by their RSML ID => laterals are parentID.latID
@@ -254,7 +254,8 @@ export default class Render extends Component {
                 name: line.id,
                 lockMovementX: true,
                 lockMovementY: true,
-                strokeLineCap: "round"
+                strokeLineCap: "round",
+                hasControls: false
             });
             this.fabricCanvas.add(polyline);
         });

@@ -1,6 +1,5 @@
 import { connect } from 'react-redux';
 import Thumbnail from '../../gallery/Thumbnail';
-import { addThumb } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
@@ -10,7 +9,8 @@ const mapStateToProps = (state, ownProps) => (
         queue: state.backend.queue,
         inFlight: state.backend.inFlight,
         labels: state.gallery.labels,
-        architecture: state.gallery.architecture
+        architecture: state.gallery.architecture,
+        active: state.gallery.folders.find(folder => folder.path == ownProps.folder).active
     }
 );
 
@@ -18,4 +18,4 @@ const mapDispatchToProps = dispatch => (
     { }
 );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Thumbnail)
+export default connect(mapStateToProps, mapDispatchToProps)(Thumbnail);

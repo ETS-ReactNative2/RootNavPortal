@@ -15,6 +15,7 @@ export default class Thumbnail extends Component {
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
         this.container = React.createRef();
         this.timer = null;
+        this.fabricCanvas = new fabric.Canvas(this.canvasID, { selection: false }); 
 
         //On resize, force a refresh so our canvas can update its image to fit the containing div.
         window.addEventListener('resize', e => {
@@ -46,6 +47,7 @@ export default class Thumbnail extends Component {
 
     shouldComponentUpdate(nextProps, nextState) 
     {
+        if (!nextProps.active) return false; //Don't rerender if the parent folder is closed
         if (nextProps.labels != this.props.labels) return false; //If the label changes, we don't want to update with the rest of the container
         return true; //so the label collapse animation is still smooth as the canvas won't redraw unnecessarily
     }
@@ -79,7 +81,6 @@ export default class Thumbnail extends Component {
 
         image.src = 'data:image/png;base64,' + Buffer.from(file[ext]).toString('base64'); //Otherwise we can just ref the file path normally
         image.onload = () => {
-            console.log("image loaded");
             let im = new fabric.Image(image, {
                 left: 0, top: 0, selectable: false
             });
@@ -93,7 +94,7 @@ export default class Thumbnail extends Component {
     };
 
     drawRSML = (polylines, scaling) => {
-        console.log("Scaling for: " + this.props.fileName + " " + scaling)
+
         polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
             let polyline = new fabric.Polyline(line.points.map(point => ({ x: point.x * THUMB_PERCENTAGE * scaling.scaleX / 100, y: point.y * THUMB_PERCENTAGE * scaling.scaleY/ 100 }) ), {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
@@ -103,7 +104,9 @@ export default class Thumbnail extends Component {
                 name: line.id,
                 lockMovementX: true,
                 lockMovementY: true,
-                strokeLineCap: "round"
+                strokeLineCap: "round",
+                hasControls: false,
+                selectable: false
             });
             this.fabricCanvas.add(polyline);
         });
@@ -141,7 +144,6 @@ export default class Thumbnail extends Component {
     }
     
     FabricCanvas = () => {
-        this.fabricCanvas = new fabric.Canvas(this.canvasID); 
         return <canvas id={this.canvasID}></canvas>
     };
 
@@ -149,9 +151,7 @@ export default class Thumbnail extends Component {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
-        console.log("Rerendering thumb");
         const { folder, file, fileName } = this.props;
-
         if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
         {
             ipcRenderer.send(API_THUMB, [{folder, file, fileName }]); //Array so it's easier for DLQ

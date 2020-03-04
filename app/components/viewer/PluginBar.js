@@ -108,14 +108,14 @@ export default class PluginBar extends Component {
 
     measureToast = () => {
         return (
-                <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
-                    style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '13vw' }} >
-                    <Toast.Header>
-                        <StyledIcon className={"fas fa-arrow-left fa-lg"} />
-                        <strong className="mr-auto">Measure Error</strong>
-                    </Toast.Header>
-                    <Toast.Body>You have no folders selected for measuring</Toast.Body>
-                </Toast>
+            <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '13vw' }} >
+                <Toast.Header>
+                    <StyledIcon className={"fas fa-arrow-left fa-lg"} />
+                    <strong className="mr-auto">Measure Error</strong>
+                </Toast.Header>
+                <Toast.Body>You have no folders selected for measuring</Toast.Body>
+            </Toast>
         );
     };
 
