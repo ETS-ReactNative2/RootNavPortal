@@ -14,6 +14,7 @@ export default class Render extends Component {
         super(props);
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15, selection: false }); //Extra pixels around an object the canvas includes in hitbox
+        this.imageSize = {};
     }
     
     //Objects are named by their RSML ID => laterals are parentID.latID
@@ -55,23 +56,26 @@ export default class Render extends Component {
     }
 
     setCanvasStyle = () => {
+        // Because fabric does DOM manipulation, we need to do it *as well* to style it the way we want!
         var container = document.getElementsByClassName("canvas-container")[0];
         container.style.width = "100%";
         container.style.height = "auto";
         container.style.border = "1px solid";
+        container.style.overflow = "hidden";
         container.style.borderRadius = ".25rem .25rem 0 0";
         for (var i = 0; i < container.children.length; ++i){
-            container.children[i].style.width = "100%";
-            container.children[i].style.height = "auto";
+            container.children[i].style.width = "auto";
+            container.children[i].style.height = "100%";
+            container.children[i].style.right = "0";
+            container.children[i].style.bottom = "0";
+            container.children[i].style.margin = "auto";
         }
     }
 
     setupCanvas = () => {
-        this.fabricCanvas.initialize(document.getElementById(this.canvasID)); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.initialize(document.getElementById(this.canvasID)); 
         this.setCanvasStyle();
         
-        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //These really need evening. They both change the canvas.
-        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
         this.fabricCanvas.setZoom(this.zoom);
 
@@ -128,12 +132,14 @@ export default class Render extends Component {
         });
 
         this.fabricCanvas.on('mouse:wheel', opt => {
-            let delta = opt.e.deltaY;
+            let delta = -opt.e.deltaY;
             let zoom = this.fabricCanvas.getZoom() + delta / 200;
             if (zoom > 20) zoom = 20;
             if (zoom < 1) zoom = 1;
             this.zoom = zoom;
+            
             this.fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+            this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
             opt.e.preventDefault();
             opt.e.stopPropagation();
 
@@ -212,6 +218,11 @@ export default class Render extends Component {
             let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+
+            // Save image size, for scaling usage!;
+            this.imageSize = sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext);
+
+
             if (segMasks && file.first_order && file.second_order) //Composite the segmasks together
                 if (!file.seg_mask) 
                     imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
@@ -223,15 +234,13 @@ export default class Render extends Component {
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
-                sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => { //Get size of tiff
-                    let canvas = new OffscreenCanvas(dimensions.width, dimensions.height); //Create offscreen canvas with its resolution
-                    let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
-                    canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
-                    this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
-                        left: 0, top: 0, selectable: false
-                    }));
-                    if (architecture) this.drawRSML(polylines); 
-                });
+                let canvas = new OffscreenCanvas(this.imageSize.width, this.imageSize.height); //Create offscreen canvas with its resolution
+                let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
+                canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
+                this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
+                    left: 0, top: 0, selectable: false
+                }));
+                if (architecture) this.drawRSML(polylines); 
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
@@ -240,8 +249,11 @@ export default class Render extends Component {
                     left: 0, top: 0, selectable: false
                 }));
                 if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
-            };     
+            };
+            
+            this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
         }
+        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
     };
 
     drawRSML = polylines => {
