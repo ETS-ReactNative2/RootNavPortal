@@ -56,6 +56,7 @@ export default class Render extends Component {
     }
 
     setCanvasStyle = () => {
+        // Because fabric does DOM manipulation, we need to do it *as well* to style it the way we want!
         var container = document.getElementsByClassName("canvas-container")[0];
         container.style.width = "100%";
         container.style.height = "auto";
@@ -72,7 +73,7 @@ export default class Render extends Component {
     }
 
     setupCanvas = () => {
-        this.fabricCanvas.initialize(document.getElementById(this.canvasID)); //This is the element size, these may need tweaking, maybe on the fly later
+        this.fabricCanvas.initialize(document.getElementById(this.canvasID)); 
         this.setCanvasStyle();
         
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
@@ -250,7 +251,7 @@ export default class Render extends Component {
                 if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };
             
-            this.fabricCanvas.setDimensions(this.imageSize, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
+            this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
         }
         //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
     };
