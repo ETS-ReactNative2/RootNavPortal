@@ -60,6 +60,7 @@ export default class Render extends Component {
         container.style.width = "100%";
         container.style.height = "auto";
         container.style.border = "1px solid";
+        container.style.overflow = "hidden";
         container.style.borderRadius = ".25rem .25rem 0 0";
         for (var i = 0; i < container.children.length; ++i){
             container.children[i].style.width = "auto";
