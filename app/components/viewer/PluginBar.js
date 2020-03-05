@@ -12,7 +12,7 @@ import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
 import { StyledModal } from '../buttons/StyledComponents'; 
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
-
+import cloneDeep from 'lodash.clonedeep';
 export default class PluginBar extends Component {
     
     constructor(props) 
@@ -31,6 +31,15 @@ export default class PluginBar extends Component {
         this.exportDest = React.createRef();
     }
 
+    resetPlugins = () => {
+        let plugins = cloneDeep(this.state.plugins);
+        Object.values(plugins).forEach(group => Object.values(group).forEach(plugin => plugin.active = false));
+
+        this.setState({ ...this.state,
+            plugins
+        });
+    };
+
     render() {
         let pluginActive = Object.keys(this.state.plugins).some(group => Object.values(this.state.plugins[group]).some(plugin => plugin.active));
         return (
@@ -38,7 +47,7 @@ export default class PluginBar extends Component {
             <StyledCard style={{borderRadius: '.25rem 0 0 0', marginLeft: '0.5em'}}>
                 <StyledCenterListGroupItem>
                     <RefreshButton/>
-                    <ClearButton/>
+                    <ClearButton resetPlugins={this.resetPlugins}/>
                 </StyledCenterListGroupItem>
                 <StyledCardContents>
                 {

@@ -7,7 +7,8 @@ export default class ClearButton extends Component {
         return (
             <StyledButton
                 variant="danger" 
-                className={`btn btn-default fas fa-times button`} 
+                className={`btn btn-default fas fa-times button`}
+                onClick={this.props.resetPlugins}
             />    
         )
     }
