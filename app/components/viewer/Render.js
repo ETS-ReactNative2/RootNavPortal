@@ -14,6 +14,7 @@ export default class Render extends Component {
         super(props);
         this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15, selection: false }); //Extra pixels around an object the canvas includes in hitbox
+        this.imageSize = {};
     }
     
     //Objects are named by their RSML ID => laterals are parentID.latID
@@ -134,7 +135,9 @@ export default class Render extends Component {
             if (zoom > 20) zoom = 20;
             if (zoom < 1) zoom = 1;
             this.zoom = zoom;
+            
             this.fabricCanvas.zoomToPoint({ x: opt.e.offsetX, y: opt.e.offsetY }, zoom);
+            this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
             opt.e.preventDefault();
             opt.e.stopPropagation();
 
@@ -209,13 +212,15 @@ export default class Render extends Component {
             const polylines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.polylines;
             if (!polylines) return;
 
-            let width;
-            let height;
-
             let image = new Image();
             let matchedPath = matchPathName(path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+
+            // Save image size, for scaling usage!;
+            this.imageSize = sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext);
+
+
             if (segMasks && file.first_order && file.second_order) //Composite the segmasks together
                 if (!file.seg_mask) 
                     imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
@@ -227,15 +232,13 @@ export default class Render extends Component {
             
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
-                sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => { //Get size of tiff
-                    let canvas = new OffscreenCanvas(dimensions.width, dimensions.height); //Create offscreen canvas with its resolution
-                    let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
-                    canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
-                    this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
-                        left: 0, top: 0, selectable: false
-                    }));
-                    if (architecture) this.drawRSML(polylines); 
-                });
+                let canvas = new OffscreenCanvas(this.imageSize.width, this.imageSize.height); //Create offscreen canvas with its resolution
+                let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
+                canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
+                this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
+                    left: 0, top: 0, selectable: false
+                }));
+                if (architecture) this.drawRSML(polylines); 
             }
             else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
 
@@ -246,10 +249,7 @@ export default class Render extends Component {
                 if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
             };
             
-            sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => {
-                this.fabricCanvas.setDimensions(dimensions, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
-            });
-
+            this.fabricCanvas.setDimensions(this.imageSize, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
         }
         //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
     };
