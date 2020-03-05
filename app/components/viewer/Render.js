@@ -130,7 +130,7 @@ export default class Render extends Component {
         });
 
         this.fabricCanvas.on('mouse:wheel', opt => {
-            let delta = opt.e.deltaY;
+            let delta = -opt.e.deltaY;
             let zoom = this.fabricCanvas.getZoom() + delta / 200;
             if (zoom > 20) zoom = 20;
             if (zoom < 1) zoom = 1;
