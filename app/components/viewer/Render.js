@@ -61,8 +61,11 @@ export default class Render extends Component {
         container.style.border = "1px solid";
         container.style.borderRadius = ".25rem .25rem 0 0";
         for (var i = 0; i < container.children.length; ++i){
-            container.children[i].style.width = "100%";
-            container.children[i].style.height = "auto";
+            container.children[i].style.width = "auto";
+            container.children[i].style.height = "100%";
+            container.children[i].style.right = "0";
+            container.children[i].style.bottom = "0";
+            container.children[i].style.margin = "auto";
         }
     }
 
@@ -70,8 +73,6 @@ export default class Render extends Component {
         this.fabricCanvas.initialize(document.getElementById(this.canvasID)); //This is the element size, these may need tweaking, maybe on the fly later
         this.setCanvasStyle();
         
-        this.fabricCanvas.setDimensions({ width: 3000, height: 3000 }, { backstoreOnly: true }); //These really need evening. They both change the canvas.
-        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
         this.fabricCanvas.setZoom(this.zoom);
 
@@ -208,6 +209,9 @@ export default class Render extends Component {
             const polylines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.polylines;
             if (!polylines) return;
 
+            let width;
+            let height;
+
             let image = new Image();
             let matchedPath = matchPathName(path);
 
@@ -240,8 +244,14 @@ export default class Render extends Component {
                     left: 0, top: 0, selectable: false
                 }));
                 if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
-            };     
+            };
+            
+            sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext, (err, dimensions) => {
+                this.fabricCanvas.setDimensions(dimensions, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
+            });
+
         }
+        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
     };
 
     drawRSML = polylines => {
