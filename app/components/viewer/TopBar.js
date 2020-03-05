@@ -3,8 +3,6 @@ import React, { Component } from 'react';
 import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
 import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
-import ToggleFolderButton from '../buttons/viewer/ToggleFolderButton';
-import ToggleMeasuresButton from '../buttons/viewer/ToggleMeasuresButton';
 import ResetChangesButton from '../containers/viewer/ResetButtonContainer';
 import SaveRSMLButton from '../containers/viewer/SaveButtonContainer';
 import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
@@ -27,14 +25,14 @@ export default class TopBar extends Component {
             </StyledRow>
         </StyledTopBarDiv>
         <StyledTopBarHR/>
-        <StyledTopBarDiv className="d-inline-flex container" data-tid="container">
+        <StyledTopBarDiv className="d-inline-flex container" data-tid="container" style={{paddingTop: '0'}}>
             <LeftButton click={buttonHandler}/>
             <RightButton click={buttonHandler}/>
-            <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.props.toggleArch}/>
+            <div className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em'}}>
+                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.props.toggleArch} />
                 <label className="custom-control-label" htmlFor="architecture">Architecture</label>
             </div>
-            <div className="custom-control custom-checkbox">
+            <div className="custom-control custom-checkbox" style={{margin: 'auto 1em auto 1em'}}>
                 <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.props.toggleSegMasks}/>
                 <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
             </div>
