@@ -4,7 +4,7 @@ import { AppContainer } from 'react-hot-loader';
 import Root from './containers/Root';
 import Store from './store/configureStore';
 import './bootstrap.global.css';
-import './app.global.css';
+import './app.global.scss';
 import './fontawesome.global.css';
 
 

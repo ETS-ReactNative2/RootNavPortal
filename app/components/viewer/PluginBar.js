@@ -1,6 +1,6 @@
 // @flow
 import { existsSync, readdirSync, mkdirSync } from 'fs';
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { Button, Row, Modal, InputGroup, Collapse, Toast } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
@@ -12,22 +12,23 @@ import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
 import { StyledModal } from '../buttons/StyledComponents'; 
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
+
 export default class PluginBar extends Component {
     
     constructor(props) 
     {
         super(props);
-        // Todo do this in redux
         const _plugins = this.loadPlugins();
         this.state = {
             ...Object.fromEntries(Object.keys(_plugins).map(group => [group, true])),
             plugins: _plugins,
             modal: false,
             exportable: true,
-            toast: false
+            toast: false,
+            measuresComplete: false, //Toggles checkmark's animation state
+            measuring: false //Toggles the collapse within the export modal
         };
         this.exportDest = React.createRef();
-        console.log(this.state);
     }
 
     render() {
@@ -79,7 +80,7 @@ export default class PluginBar extends Component {
                     <Modal.Title>Export Measurements</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <InputGroup style={!this.state.exportable ? {boxShadow: '0 0 10px red', borderRadius: '7px 20px 20px 7px'} : {}}>
+                    <InputGroup style={!this.state.exportable ? { boxShadow: '0 0 10px red', borderRadius: '7px 20px 20px 7px' } : {}}>
                         <InputGroup.Prepend>
                             <InputGroup.Text>
                                 <StyledIcon className={"fas fa-save fa-lg"}/>
@@ -90,10 +91,17 @@ export default class PluginBar extends Component {
                             <SelectDestinationButton setExportDest={this.setExportDest}/>
                         </InputGroup.Append>
                     </InputGroup>
+                    <Collapse in={this.state.measuring}>
+                        <div>
+                            <div style={{ display: 'flex' }} className={"circle-loader" + (this.state.measuresComplete ? " load-complete" : "")}>
+                                <div style={this.state.measuresComplete ? {display: 'block'} : {display: 'none'}} className={(this.state.measuresComplete ? "checkmark " : "") + "draw"}></div>
+                            </div>
+                        </div>
+                    </Collapse>
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger" onClick={this.closeModal}>
-                        Cancel
+                    <Button variant={this.state.measuresComplete ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
+                        {this.state.measuresComplete ? "Close" : "Cancel"}
                     </Button>
                     <Button variant="primary" onClick={this.export}>
                         Measure
@@ -104,12 +112,12 @@ export default class PluginBar extends Component {
             <this.measureToast />
         </>
         );
-    }
+    };
 
     measureToast = () => {
         return (
             <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
-                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '13vw' }} >
+                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '15vw' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
                     <strong className="mr-auto">Measure Error</strong>
@@ -127,6 +135,7 @@ export default class PluginBar extends Component {
     //Modal's measure button clicked
     export = () => {
         if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
+        this.setState({ ...this.state, measuring: true });
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
@@ -139,7 +148,7 @@ export default class PluginBar extends Component {
 
         //Plugins return a promise which they then resolve when they finish their processing. This barrier will then callback upon all plugins completing.
         Promise.all(funcs).then(results => {
-            let headers = { //These are the fields for the CSV
+            let headers = { //These are the fields for the CSV. If it's not in the headers, it won't get pulled and written as data.
                 plant: [
                     { id: 'tag', title: 'Tag'}
                 ],
@@ -154,8 +163,8 @@ export default class PluginBar extends Component {
             };
 
             results.forEach(result => {
-                let type = result.group.match(/([^\s]+)/)[1].toLowerCase(); //Use the plant/root group name to decide which section it goes in
-                headers[type] = headers[type].concat(result.header); //Dump all the headers in for now
+                let type = result.group.match(/([^\s]+)/)[1].toLowerCase(); //Use the plant/root group name to decide which section it goes in.
+                headers[type] = headers[type] ? headers[type].concat(result.header) : [{ id: 'tag', title: 'Tag'}, ...result.header]; //Dump all the headers in for now. If it doesn't exist in plant/root group, assign it a new array with default tag.
                 result.results.forEach(record => Object.keys(record).forEach(key => { if (/^\d+\.\d+$/.test(record[key])) record[key] = record[key].toFixed(3) })); //Round floats to 3 DP
                 data[type] = this.mergeResults(data[type], result.results); //Combine results with what exists, merging on the tag, so we get one big object per 'thing'. Won't apply for things that measure primaries and lats separately as the tag will differ
             });
@@ -179,6 +188,7 @@ export default class PluginBar extends Component {
                     csvWriter.writeRecords(data[type]).then(() => console.log(`written to ${path}`));
                 }
             });
+            setTimeout(() => this.setState({ ...this.state, measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
         });
     };
 
@@ -192,11 +202,11 @@ export default class PluginBar extends Component {
     }, {}));
 
     closeModal = () => {
-        this.setState({...this.state, modal: false});
+        this.setState({...this.state, modal: false, measuresComplete: false, measuring: false });
     };
 
     //Plugin measure clicked, opens modal
-    measure = e => {
+    measure = () => {
         if (!this.props.folders.length) return this.setState({ ...this.state, toast: true });
         this.setState({ ...this.state, modal: true });
     };
