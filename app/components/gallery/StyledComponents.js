@@ -12,6 +12,7 @@ export const StyledFolderViewDiv = styled.div` && {
       align-items: center;
       margin: 0 2em;
       padding: 0.5em 0;
+      overflow: hidden;
     }`;
     
 export const StyledFilterBarSpan = styled.span` && {
