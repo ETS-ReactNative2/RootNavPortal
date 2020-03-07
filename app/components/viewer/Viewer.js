@@ -68,7 +68,6 @@ export default class Viewer extends Component {
     getNumberOfPlants = () => {
         let [, folder, fileName] = matchPathName(this.state.path); 
         folder.replace(/\\\\/g, '\\');
-        console.log(folder, fileName)
         return this.props.files[folder][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
     };
 

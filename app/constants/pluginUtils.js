@@ -12,5 +12,7 @@ module.exports = {
     getPlantID: line => line.id.match(/([0-9]+)/)[1],
     getPlantPrimaryID: line => line.id.match(/([0-9]+)-([0-9]+)/),
     getAllIDs: line => line.id.match(/([0-9]+)-([0-9]+).?([0-9]+)?/),
-    addToAverage: (total, newVal, frame) => (total + newVal) / frame
+    addToAverage: (total, newVal, frame) => (total + newVal) / frame,
+    getParentOfLateral: (lateral, polylines) => polylines.find(line => line.id == lateral.id.match(/(\d+\-\d+)/)[1]),
+    getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"] 
 }

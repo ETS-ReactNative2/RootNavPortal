@@ -6,6 +6,8 @@ const mapStateToProps = (state, ownProps) => (
     { 
         path: ownProps.path,
         folders: state.gallery.folders,
+        apiAddress: state.gallery.apiAddress,
+        apiKey: state.gallery.apiKey
     }
 );
 

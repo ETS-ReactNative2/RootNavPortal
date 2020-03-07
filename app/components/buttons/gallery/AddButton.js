@@ -1,12 +1,10 @@
 // @flow
 import React, { Component, useState, useRef } from 'react';
-import { Button, Modal } from 'react-bootstrap';
+import { Button, Modal, Overlay, Tooltip } from 'react-bootstrap';
 import { ipcRenderer } from 'electron';
 import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
-import { existsSync, writeFile, mkdirSync } from 'fs';
-import { APPHOME, CONFIG } from '../../../constants/globals';
+import { writeConfig } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
-import { Overlay, Tooltip } from 'react-bootstrap';
 const dree = require('dree');  
 
 export default class AddButton extends Component {
@@ -27,19 +25,12 @@ export default class AddButton extends Component {
     }
 
     importFolders = () => {
-        const { imports, addFolders, closeModal, folders } = this.props;
+        const { imports, addFolders, closeModal, folders, apiAddress, apiKey } = this.props;
         const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}))
             .filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
         addFolders(config);
         closeModal();
-
-        if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-            mkdirSync(APPHOME, '0777', true, err => { //0777 HMMMM change later
-                if (err) console.error(err);
-            });
-        writeFile(APPHOME + CONFIG , JSON.stringify(folders.concat(config), null, 4), err => {
-            if (err) console.error(err); //idk do some handling here
-        });
+        writeConfig(JSON.stringify({ apiAddress, apiKey, folders: folders.concat(config) }, null, 4));
     }
 
     openFileDialog = () => {
@@ -71,7 +62,7 @@ export default class AddButton extends Component {
 
     render() {
         return (
-            <React.Fragment>
+            <>
                 <this.overlayedButton />
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
@@ -89,7 +80,7 @@ export default class AddButton extends Component {
                         </Button>
                     </Modal.Footer>
                 </StyledModal> 
-            </React.Fragment>
+            </>
         )
     }
 }

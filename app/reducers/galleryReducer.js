@@ -1,8 +1,10 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
+    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS } from '../actions/galleryActions';
 
-const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", filterAnalysed: false, labels: true, architecture: true };
+const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
+    filterAnalysed: false, labels: true, architecture: true, apiAddress: '', apiKey: '', apiStatus: false };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -46,7 +48,9 @@ export default (state = initialState, action) => {
         case IMPORT_CONFIG: return {
             ...state,
             hasReadConfig: true,
-            folders: action.data
+            folders: action.folders,
+            apiAddress: action.apiAddress,
+            apiKey: action.apiKey
         };
         case UPDATE_CHECKED: return {
             ...state,
@@ -132,6 +136,15 @@ export default (state = initialState, action) => {
             ...state,
             architecture: !state.architecture
         }
+        case SAVE_API_SETTINGS: return {
+            ...state,
+            apiAddress: action.address,
+            apiKey: action.key
+        }
+        case UPDATE_API_STATUS: return {
+            ...state,
+            apiStatus: action.status
+        }
         default: return state;
     }
 }
@@ -143,7 +156,10 @@ export default (state = initialState, action) => {
 // checked:      = array of folder paths that represent what the user has ticked in the tree checklist
 // filterText:   = Persistence of what's in the filter bar
 // labels:       = bool that toggles if the filename text is displayed under each thumbnail
+// architecture  = bool that toggles drawing RSML on the thumbnails
 // filteranalysed = bool that toggles if the filter bar only displays files with RSML present
+// apiAddress/Key = Address/port and key used for the API connection
+// apiStatus      = is the API up or not
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists
@@ -173,6 +189,9 @@ state: {
         filterText: "",
         filterAnalysed: false,
         labels: true,
+        apiAddress: "https://xavier.cs.nott.ac.uk:8841",
+        apiKey: "dkfskisfg;lleslfds/fesf",
+        architecture: true,
         files: {
             C:\Users\Andrew\Desktop\hkj: {
                 arch: {

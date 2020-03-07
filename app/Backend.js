@@ -1,10 +1,9 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_PATH, API_ADD, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants } from 'fs';
 import mFormData from 'form-data';
-import { remote } from 'electron';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import parser from 'xml2json';
@@ -15,18 +14,14 @@ import imageThumbail from 'image-thumbnail';
 export default class Backend extends Component {
     queue = [];
     inflightReqs = INFLIGHT_REQS; //Concurrency limit
+    
     //this.props.inflightfiles : Tracks requests with some data in case we need to ignore the response. { C:\path\file: {model: 'wheat_bluepaper', ext: '.png' }, ... }
 
     constructor(props)
     {
         super(props)
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
-        get(API_PATH + "/model").then(res => process.env.API_STATUS = true).catch(err => process.env.API_STATUS = false); //backend can determine API status for itself so it can start loading earlier than gallery
 
-        ipcRenderer.on(API_ADD, (event, data) => {
-            this.queue.push(...data); //data.paths must be an array
-            props.addQueue(data);
-        });
         //A single directory path {path: ""}
         ipcRenderer.on(API_DELETE, (event, data) => {
             this.handleDelete(data.path);
@@ -40,12 +35,51 @@ export default class Backend extends Component {
             data.forEach(args => this.genThumbnail(args.folder, args.file, args.fileName));
         });
 
-        if (remote.getGlobal('API_STATUS')) process.env.API_STATUS = true;
         setInterval(this.sendFile, API_POLLTIME);
     }
 
-    shouldComponentUpdate()
+    //This is called on any file addition, or API update. No IPC is used anymore for queueing files. Even if backend late loads, we should still just pick up all the missed ones
+    //On any next iteration. There is a minor risk that if all files are added, and no more get added, and no API settings change, it won't add them to the queue. Very small edge case
+    //And the user can always reanalyse anyway. We could make the refresh button also trigger a full scan manually too.
+    scanFiles = () => {
+        let apiFiles = []; //search through the file structure for anything imported without RSML
+        const { files, addQueue, inflightFiles } = this.props;
+
+        Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
+            if (!files[folder][file].rsml)
+            {
+                let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
+                let filePath = folder + sep + file + "." + imageExt;
+
+                let [, path, fileName] = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
+                if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
+            }
+        }));
+        if (apiFiles.length)
+        {
+            this.queue.push(...apiFiles);
+            addQueue(apiFiles);
+        }
+    };
+
+
+    shouldComponentUpdate(nextProps)
     {
+        //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
+        if ((nextProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != nextProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
+        {
+            const { apiAddress, apiKey, files, addQueue, updateAPIStatus } = nextProps;
+            defaults.headers.common['key'] = apiKey; //Set the default header for every request.
+
+            get(apiAddress + "/model").then(res => { 
+                updateAPIStatus(true);
+                this.scanFiles();
+            }).catch(err => { updateAPIStatus(false) });
+        }
+
+        //If the number of files in the new files array is larger than the amount of files we have, scan through and check for new ones lacking RSML
+        if (Object.values(nextProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
+            this.scanFiles(); //If files changes, scan it for queueing.
         return false; //In theory, backend never needs to update, since it receives everything via IPC, and sends back to Redux when done. 
         //Some collision checking will need to be done in reducer so it doesn't try write over a folder:file that may have been removed
         //This theory is in caution of updating stopping functions and resetting some component vars like the queue. Props still get updated
@@ -108,6 +142,7 @@ export default class Backend extends Component {
             let queued = false; //Only allow file to be requeued once - else each seg mask/rsml will trigger it
             Object.keys(files[path][fileName]).forEach(extension => { //For each extension in the state object
                 
+                if (extension == 'parsedRSML') return; //Get rid of the existing parsed polylines and JSON RSML
                 if (extension.match(/first_order|second_order|rsml/)) //If it's an API file
                 {
                     access(path + sep + fileName + "." + (extension != 'rsml' ? extension + ".png" : extension), constants.F_OK, err => { //Does it exist?
@@ -138,11 +173,11 @@ export default class Backend extends Component {
 
     //Send the job off to the server
     sendFile = () => {
-        if (!process.env.API_STATUS || !this.queue.length || !this.inflightReqs) return;
-        const { removeQueue, folders, addInflight } = this.props;
+        if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs) return;
+        const { removeQueue, folders, addInflight, apiKey, apiAddress } = this.props;
 
         let file = this.queue.shift();
-        let matchedFile = file.match(/(.+\\|\/)(.+)(\..+)/); //Matches the file path into the absolute directory path/, file name and .ext
+        let matchedFile = this.matchFileParts(file);
 
         let model = folders.find(folder => (folder.path + sep) == matchedFile[1]).model;
         if (!model || !API_MODELS.some(apiModel => apiModel.apiName == model)) return;
@@ -155,6 +190,7 @@ export default class Backend extends Component {
 
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
+        formData.append('key', apiKey);
         formData.append('io_id', matchedFile[2]);
         formData.append('io_model', model);
         const config = { headers: formData.getHeaders() };
@@ -166,7 +202,7 @@ export default class Backend extends Component {
             ext: matchedFile[3]
         });
 
-        post(API_PATH + "/job", formData, config).then(res => 
+        post(apiAddress + "/job", formData, config).then(res => 
         {
             if (res.data) setTimeout(() => this.pollJob(res.data[0], matchedFile[1] + matchedFile[2]), API_POLLTIME); //absolute path to file, with no ext
         })
@@ -176,7 +212,7 @@ export default class Backend extends Component {
     }
 
     pollJob = (jobID, filePath) => {
-        get(API_PATH + "/job/" + jobID).then(res => {
+        get(this.props.apiAddress + "/job/" + jobID).then(res => {
             if (res.data == 'COMPLETED') this.getOutput(jobID, filePath); 
             else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME); 
         })
@@ -186,16 +222,15 @@ export default class Backend extends Component {
     getOutput = (jobID, filePath) => {
 
         let requests = [
-            get(API_PATH + "/job/" + jobID + "/output/rsml"),
-            get(API_PATH + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
-            get(API_PATH + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
+            get(this.props.apiAddress + "/job/" + jobID + "/output/rsml"),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
         ]
 
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
             let exts = {};
             const { updateFile, removeInflight, inflightFiles, folders, addQueue } = this.props;
             let matchedPath = matchPathName(filePath); //folder path and filename, no trailing / on the folder
-
             if (inflightFiles[filePath].model != folders.find(folder => folder.path == matchedPath[1]).model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
@@ -219,7 +254,7 @@ export default class Backend extends Component {
             removeInflight(filePath);
             updateFile(matchedPath[1], matchedPath[2], exts); //there isn't really any proof checking here :think:
         })
-        .catch(err => console.error(err));
+        .catch(err => { removeInflight(filePath); console.error(err) });
 
         this.inflightReqs++;
     }
@@ -228,4 +263,6 @@ export default class Backend extends Component {
     {
         return ""
     }
+
+    matchFileParts = file => file.match(/(.+\\|\/)(.+)(\..+)/); //Matches the file path into the absolute directory path/, file name and .ext
 }

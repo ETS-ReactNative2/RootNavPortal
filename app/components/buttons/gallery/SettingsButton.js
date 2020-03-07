@@ -2,8 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
-import { API_MODELS, matchPathName, API_DELETE, APPHOME, CONFIG } from '../../../constants/globals';
-import { existsSync, writeFile } from 'fs';
+import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
 
 export default class SettingsButton extends Component {
@@ -23,26 +22,24 @@ export default class SettingsButton extends Component {
             confirmText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
-            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : {displayName: "Please select a Model!"} 
+            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : { displayName: "Please select a Model!" } 
         }
     }
 
     writeUpdatedModel = apiName => {
-        const { folders, path } = this.props;
+        const { folders, path, apiAddress, apiKey } = this.props;
         if (!path) return;
         const updatedFolders = folders.map(folder => folder.path === path ? {...folder, model: apiName } : folder);
-        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
-            writeFile(APPHOME + CONFIG , JSON.stringify(updatedFolders, null, 4), err => {
-                if (err) {
-                    console.err("Could not write updated model!");
-                    console.err("Folder: " + path + " Model: " + apiName);
-                    console.err(err);
-                }
-            });
+        writeConfig(JSON.stringify({ apiAddress, apiKey, folders: updatedFolders }, null, 4));
     }
 
     close = () => {
-        this.setState({ modal: false, confirmText: "" });
+        let reduxModel = this.props.folders.find(it => it.path == this.props.path).model
+        this.setState({ 
+            modal: false, 
+            confirmText: "", 
+            currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel)
+        });
     }
 
     openModal = () => {
@@ -65,8 +62,10 @@ export default class SettingsButton extends Component {
     }
 
     selectDropdown = model => {
+        let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName).displayName;
         this.setState({ actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model }); 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
+
+        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>"+oldModel+"</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
     }
 
     renderModalBody = () => {
@@ -99,7 +98,7 @@ export default class SettingsButton extends Component {
     render() {    
     
         return (
-        <React.Fragment>
+        <>
             <StyledButton
                 variant="secondary" 
                 onClick={e => {
@@ -133,7 +132,7 @@ export default class SettingsButton extends Component {
 
                 </Modal.Footer>
             </StyledModal>
-        </React.Fragment> 
+        </> 
         )
     }
 }

@@ -1,13 +1,10 @@
 import os from 'os'
 import path from 'path'
+import { writeFile, existsSync, mkdirSync } from 'fs';
 
 export const APPHOME    = `${os.homedir()}${path.sep}.rootnav${path.sep}`;
 export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.cwd()}${path.sep}plugins${path.sep}`;
 export const CONFIG     = 'config.json';
-export const API_HOST   = 'http://127.0.0.1';
-export const API_PORT   = 8841;
-export const API_PATH   = API_HOST + ":" + API_PORT;
-export const API_ADD    = 'api-add';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
 export const API_THUMB = 'api-thumb';
@@ -36,6 +33,16 @@ export const THUMB_PERCENTAGE = 20
 export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
 export const matchPathName = path => path.match(/(.+)(?:\\|\/)(.+)/); //Matches the file's dir path and actual name. no trailing slash on the path
+
+export const writeConfig = config => {
+    if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
+        mkdirSync(APPHOME, '0777', true, err => { //0777 HMMMM change later
+            if (err) console.error(err);
+        });
+    writeFile(APPHOME + CONFIG , config, err => { //Perhaps we add a callback as an argument if needed
+        if (err) console.error(err); //idk do some handling here
+    });;
+};
 
 export const xmlOptions = {
     object: true,

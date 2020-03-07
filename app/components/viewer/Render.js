@@ -75,7 +75,7 @@ export default class Render extends Component {
     setupCanvas = () => {
         this.fabricCanvas.initialize(document.getElementById(this.canvasID)); 
         this.setCanvasStyle();
-        
+        this.fabricCanvas.hoverCursor = 'default';
         //Arabidopsis are square, and not that big. So we have images with like 1000px of difference in height. Some thinking needs doing here.
         this.fabricCanvas.setZoom(this.zoom);
 
@@ -83,6 +83,7 @@ export default class Render extends Component {
             if (e.target && e.target.selectable && e.target.get('name') != this.fabricCache.selectedID) 
             {
                 e.target.set('stroke', COLOURS.HOVERED);
+                this.fabricCanvas.hoverCursor = 'pointer';
                 this.fabricCanvas.renderAll();
             }
         });
@@ -90,6 +91,7 @@ export default class Render extends Component {
         this.fabricCanvas.on('mouse:out', e => {
             if (e.target && e.target.selectable && this.fabricCache.selectedID != e.target.get('name'))
             {
+                this.fabricCanvas.hoverCursor = 'default';
                 e.target.set('stroke', e.target.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
                 this.fabricCanvas.renderAll();
             }
@@ -122,6 +124,7 @@ export default class Render extends Component {
         this.fabricCanvas.on('mouse:move', opt => {
             let e = opt.e;
             if (this.isDragging) {
+                this.fabricCanvas.setCursor('grabbing');
                 this.fabricCanvas.viewportTransform[4] += (e.clientX - this.lastPosX) * 3;
                 this.fabricCanvas.viewportTransform[5] += (e.clientY - this.lastPosY) * 3;
                 this.fabricCanvas.renderAll();
