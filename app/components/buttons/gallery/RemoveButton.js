@@ -1,23 +1,16 @@
 // @flow
 import React, { Component, useState, useRef } from 'react';
-import { APPHOME, CONFIG } from '../../../constants/globals';
-import { existsSync, writeFile } from 'fs';
+import { writeConfig } from '../../../constants/globals';
 import { StyledButton } from '../StyledComponents'; 
 import { Overlay, Tooltip } from 'react-bootstrap';
 
 export default class RemoveButton extends Component {
 
     deleteFolder = () => {
-        const { folders, path } = this.props;
+        const { folders, path, apiAddress, apiKey } = this.props;
         if (!path) return;
         const filteredPaths = folders.filter(folder => folder.path !== path);
-        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
-            writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
-                if (err) {
-                    console.err("Could not delete folder '" + path + "'!");
-                    console.err(err);
-                }
-            });
+        writeConfig(JSON.stringify({ apiAddress, apiKey, folders: filteredPaths }, null, 4));
         this.props.remove(path);
     }
     

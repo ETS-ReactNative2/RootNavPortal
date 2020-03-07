@@ -166,13 +166,15 @@ export default class Thumbnail extends Component {
             ipcRenderer.send(API_THUMB, [{folder, file, fileName }]); //Array so it's easier for DLQ
         }
 
+        let ext = Object.keys(file).find(key => key.match(/^.{0,4}Thumb$/));
+
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
             <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
-                <div style={{minHeight: '30vh'}} ref={this.container}> 
-                    <this.spinner/>
+                <div style={{minHeight: '30vh'}} ref={this.container}>
                     <this.FabricCanvas />
-                    { !file.parsedRSML ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
+                    <this.spinner/>
+                    { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
                 </div>
             </StyledImageCard> 
 		);

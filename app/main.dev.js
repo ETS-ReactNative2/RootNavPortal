@@ -16,11 +16,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import axios from 'axios';
-import { API_PATH, WINDOW_HEIGHT, WINDOW_WIDTH, API_ADD, API_DELETE, API_PARSE, API_THUMB } from './constants/globals';
-
-global.API_STATUS = false;
-axios.get(API_PATH + "/model").then(res => { console.log("API is up"); global.API_STATUS = true}).catch(err => global.API_STATUS = false);
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, API_THUMB } from './constants/globals';
 
 export default class AppUpdater {
   constructor() {
@@ -174,25 +170,14 @@ app.on('ready', async () => {
     app.quit();
   });
 
-  const menuBuilder = new MenuBuilder(mainWindow);
-  menuBuilder.buildMenu();
-
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line
   new AppUpdater();
 
-
   backendWindow.on('ready-to-show', () => {
     bBackendReady = true;
     backendWindow.webContents.send(API_PARSE, backendQueue.parse);
-    backendWindow.webContents.send(API_ADD, backendQueue.add);
     backendWindow.webContents.send(API_THUMB, backendQueue.thumb);
-
-  });
-
-  ipcMain.on(API_ADD, (event, paths) => {
-    if (!bBackendReady) backendQueue.add.push(...paths.paths); // paths = { paths: [] }
-    else backendWindow.webContents.send(API_ADD, paths.paths)
   });
 
   ipcMain.on(API_DELETE, (event, path) => { //path = { path: "C:\folder\stuff" }

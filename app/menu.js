@@ -195,6 +195,11 @@ export default class MenuBuilder {
             click: () => {
               this.mainWindow.close();
             }
+          },
+          {
+            label: "id " + this.mainWindow.webContents.getProcessId(),
+            accelerator: 'Ctrl+P',
+            click: () => this.mainWindow.webContents.send('api-settings')
           }
         ]
       },

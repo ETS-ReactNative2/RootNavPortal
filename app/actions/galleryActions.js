@@ -18,6 +18,8 @@ export const UPDATE_FILE = 'UPDATE_FILE';
 export const RESET_FOLDER = 'RESET_FOLDER';
 export const TOGGLE_LABELS = 'TOGGLE_LABELS';
 export const TOGGLE_GALLERY_ARCH = 'TOGGLE_GALLERY_ARCH';
+export const SAVE_API_SETTINGS = 'SAVE_API_SETTINGS';
+export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -26,7 +28,7 @@ export const refreshFiles  = files => ({ type: REFRESH_DIRS, files});
 export const showModal     = ()    => ({ type: SHOW_MODAL });
 export const closeModal    = ()    => ({ type: CLOSE_MODAL });
 export const updateModal   = tree  => ({ type: UPDATE_MODAL, tree });
-export const importConfig  = data  => ({ type: IMPORT_CONFIG, data });
+export const importConfig  = (folders, apiAddress, apiKey)  => ({ type: IMPORT_CONFIG, folders, apiAddress, apiKey });
 export const updateChecked = checked => ({ type: UPDATE_CHECKED, checked });
 export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
 export const addThumb      = (folder, fileName, thumb) => ({ type: ADD_THUMB, folder, fileName, thumb }) //folder: full folder path string, fileName: file string, no ext
@@ -39,3 +41,5 @@ export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, f
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions
 export const toggleLabels = () => ({ type: TOGGLE_LABELS });
 export const toggleArch = () => ({ type: TOGGLE_GALLERY_ARCH });
+export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, address, key });
+export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });  

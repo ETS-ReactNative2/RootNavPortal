@@ -7,7 +7,8 @@ const mapStateToProps = (state, ownProps) => (
         folders: state.gallery.folders,
         modal: state.gallery.modal,
         imports: state.gallery.checked,
-        
+        apiAddress: state.gallery.apiAddress,
+        apiKey: state.gallery.apiKey
     }
 );
 

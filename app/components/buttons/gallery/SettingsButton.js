@@ -2,8 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
-import { API_MODELS, matchPathName, API_DELETE, APPHOME, CONFIG } from '../../../constants/globals';
-import { existsSync, writeFile } from 'fs';
+import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
 
 export default class SettingsButton extends Component {
@@ -28,17 +27,10 @@ export default class SettingsButton extends Component {
     }
 
     writeUpdatedModel = apiName => {
-        const { folders, path } = this.props;
+        const { folders, path, apiAddress, apiKey } = this.props;
         if (!path) return;
         const updatedFolders = folders.map(folder => folder.path === path ? {...folder, model: apiName } : folder);
-        if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
-            writeFile(APPHOME + CONFIG , JSON.stringify(updatedFolders, null, 4), err => {
-                if (err) {
-                    console.err("Could not write updated model!");
-                    console.err("Folder: " + path + " Model: " + apiName);
-                    console.err(err);
-                }
-            });
+        writeConfig(JSON.stringify({ apiAddress, apiKey, folders: updatedFolders }, null, 4));
     }
 
     close = () => {

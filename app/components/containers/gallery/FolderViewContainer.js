@@ -9,7 +9,8 @@ const mapStateToProps = (state, ownProps) => ({
         isActive: ownProps.isActive,
         filterText: state.gallery.filterText,
         filterAnalysed: state.gallery.filterAnalysed,
-        labels: state.gallery.labels        
+        labels: state.gallery.labels,
+        apiStatus: state.gallery.apiStatus   
     }
 );
 

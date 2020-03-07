@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { ConnectedRouter } from 'connected-react-router';
-import Routes from '../Routes';
+import Routes from './RoutesContainer';
 
 type Props = {
   history: {}

@@ -6,7 +6,7 @@ import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader, StyledCardBody, StyledCardText  } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, IMAGE_EXTS_REGEX, API_ADD, API_PARSE } from '../../constants/globals'
+import { ALL_EXTS_REGEX, API_PARSE } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import { Collapse } from 'react-bootstrap';
@@ -47,19 +47,6 @@ export default class FolderView extends Component {
 				});
 				if (Object.keys(structuredFiles).length) 
 				{
-					if (process.env.API_STATUS)
-					{
-						let apiFiles = [];
-						Object.keys(structuredFiles).forEach(file => {
-							if (!structuredFiles[file].rsml)
-							{
-								let imageExt = Object.keys(structuredFiles[file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
-								if (imageExt) apiFiles.push(folder + sep + file + "." + imageExt);
-							}
-						})
-						if (apiFiles.length) ipcRenderer.send(API_ADD, { paths: apiFiles });
-					}
-
 					//Evaluates all files with rsml and sends them to parse in the backend. This is so all the data is available at all times, and not on demand
 					//Else exporting measurements won't have any data unless the user has looked at them all in Render, where it gets JiT parsed
 					//"Parse on demand upon exporting" - we need the polylines available on gallery for the thumbnails to render RSML when that gets written
