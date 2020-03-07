@@ -22,7 +22,7 @@ export default class SettingsButton extends Component {
             confirmText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
-            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : {displayName: "Please select a Model!"} 
+            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : { displayName: "Please select a Model!" } 
         }
     }
 
@@ -34,7 +34,12 @@ export default class SettingsButton extends Component {
     }
 
     close = () => {
-        this.setState({ modal: false, confirmText: "" });
+        let reduxModel = this.props.folders.find(it => it.path == this.props.path).model
+        this.setState({ 
+            modal: false, 
+            confirmText: "", 
+            currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel)
+        });
     }
 
     openModal = () => {
@@ -57,8 +62,10 @@ export default class SettingsButton extends Component {
     }
 
     selectDropdown = model => {
+        let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName).displayName;
         this.setState({ actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model }); 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>GetThisFromState</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
+
+        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>"+oldModel+"</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
     }
 
     renderModalBody = () => {
