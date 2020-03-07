@@ -13,8 +13,6 @@ export default class TopBar extends Component {
 
   render() {
     const { path, buttonHandler, plants, segMasks } = this.props;
-    console.log(this.props);
-    console.log(segMasks);
     let tag = path ? matchPathName(path)[2] : ""; //Matches the file path into the absolute directory path and file name
     return (
       <div>

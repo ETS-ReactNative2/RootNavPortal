@@ -59,7 +59,6 @@ export default class Routes extends Component {
         let apiAddress = this.address.current.value;
         let port       = this.port.current.value;
         let apiKey     = this.apiKey.current.value;
-        console.log(apiAddress, port, apiKey);
         if (!apiAddress || !port || !apiKey) return; //Maybe do some form validation here later 
 
         this.setState({ ...this.state, openCollapse: true });
@@ -67,7 +66,7 @@ export default class Routes extends Component {
 
         writeConfig(JSON.stringify({ apiAddress: apiAddress + ":" + port, apiKey, folders: this.props.folders }, null, 4));
         setTimeout(() => this.setState({ ...this.state, changeSaveAnimation: true }), 225); //checkmark animation delay
-    }
+    };
 
     render() {
         const { address, apiKey} = this.props;
@@ -99,7 +98,7 @@ export default class Routes extends Component {
                         </Collapse>
                     </Modal.Body>
                     <Modal.Footer>
-                    { this.props.apiStatus ? <span>Server is available <i className="fas fa-check-circle -fa-lg" style={{color: '#5cb85c', marginRight: '0.25em'}}/></span> : ""}
+                    { this.props.apiStatus ? <span>Server is available <i className="fas fa-check-circle" style={{color: '#5cb85c', marginRight: '0.25em', fontSize: '1.2em'}}/></span> : ""}
                     <Button variant={this.state.changeSaveAnimation ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
                         {this.state.changeSaveAnimation ? "Close" : "Cancel"}
                     </Button>
