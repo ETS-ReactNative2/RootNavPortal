@@ -62,7 +62,7 @@ export default class AddButton extends Component {
 
     render() {
         return (
-            <React.Fragment>
+            <>
                 <this.overlayedButton />
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
@@ -80,7 +80,7 @@ export default class AddButton extends Component {
                         </Button>
                     </Modal.Footer>
                 </StyledModal> 
-            </React.Fragment>
+            </>
         )
     }
 }

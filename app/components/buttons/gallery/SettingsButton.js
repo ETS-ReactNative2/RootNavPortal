@@ -98,7 +98,7 @@ export default class SettingsButton extends Component {
     render() {    
     
         return (
-        <React.Fragment>
+        <>
             <StyledButton
                 variant="secondary" 
                 onClick={e => {
@@ -132,7 +132,7 @@ export default class SettingsButton extends Component {
 
                 </Modal.Footer>
             </StyledModal>
-        </React.Fragment> 
+        </> 
         )
     }
 }
