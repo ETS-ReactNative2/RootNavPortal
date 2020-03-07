@@ -76,6 +76,7 @@ export default class Thumbnail extends Component {
     setupCanvas = () => {
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: this.container.current.clientWidth, height: this.container.current.clientHeight });
         this.fabricCanvas.setDimensions({ width: this.container.current.clientWidth, height: this.container.current.clientHeight }, { backstoreOnly: true });
+        this.fabricCanvas.hoverCursor = 'pointer';
         //this.fabricCanvas.setDimensions({ width: '100%', height: '100%' }, { cssOnly: true }); 
     };
 
