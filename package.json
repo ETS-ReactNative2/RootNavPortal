@@ -59,12 +59,12 @@
     "productName": "RootNav",
     "appId": "org.uon.RootNav",
     "files": [
-      "dist/",
+      "app/dist/",
       "node_modules/",
-      "app.html",
-      "main.prod.js",
-      "main.prod.js.map",
-      "package.json"
+      "app/app.html",
+      "app/main.prod.js",
+      "app/main.prod.js.map",
+      "app/package.json"
     ],
     "dmg": {
       "contents": [

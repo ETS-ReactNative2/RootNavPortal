@@ -13,7 +13,6 @@
 import { app, BrowserWindow, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
 import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, API_THUMB } from './constants/globals';
@@ -29,7 +28,6 @@ export default class AppUpdater {
 const store = configureStore({}, 'main');
 let bBackendReady = false;
 let backendQueue = { add: [], parse: [], thumb: [] }; //Backend dead letter queue for late loading
-
 //Hot reload reducers in main process
 ipcMain.on('renderer-reload', (event, action) => {
   delete require.cache[require.resolve('./reducers')];
@@ -81,7 +79,6 @@ app.on('ready', async () => {
   ) {
     await installExtensions();
   }
-
   
   //Open backend last
   backendWindow = new BrowserWindow({
@@ -106,11 +103,6 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html?gallery`);
-  mainWindow.webContents.on("did-frame-finish-load", () => {
-    mainWindow.webContents.once("devtools-opened", () => {
-      });
-    mainWindow.webContents.openDevTools();
-  });
 
   ipcMain.on('openFolder', (event, path) => {
     dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
