@@ -12,6 +12,7 @@ export default class SettingsButton extends Component {
     ACTION_CHANGE_MODEL = 2;
 
     DELETE_MESSAGE = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
+    defaultModel = { displayName: "Please select a model", apiName: "" };
 
     constructor(props) {
         super(props);
@@ -22,7 +23,7 @@ export default class SettingsButton extends Component {
             confirmText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
-            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : { displayName: "Please select a Model!" } 
+            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : this.defaultModel
         }
     }
 
@@ -34,21 +35,23 @@ export default class SettingsButton extends Component {
     }
 
     close = () => {
-        let reduxModel = this.props.folders.find(it => it.path == this.props.path).model
+        let reduxModel = this.props.folders.find(it => it.path == this.props.path).model;
+
         this.setState({ 
+            ...this.state,
             modal: false, 
             confirmText: "", 
-            currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel)
+            currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
         });
     }
 
     openModal = () => {
-        this.setState({ modal: true, confirmText: "" });
+        this.setState({ ...this.state, modal: true, confirmText: "" });
     }
 
     refreshModal = confirmText => {
-        this.setState({modal: false});
-        setTimeout(() => this.setState({modal: true, confirmText}), 250)
+        this.setState({ ...this.state, modal: false });
+        setTimeout(() => this.setState({ ...this.state, modal: true, confirmText }), 250);
     }
 
     handleAction = () => {
@@ -62,10 +65,11 @@ export default class SettingsButton extends Component {
     }
 
     selectDropdown = model => {
-        let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName).displayName;
-        this.setState({ actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model }); 
+        let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName);
+        this.setState({  ...this.state, actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model });
+        let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b> from <b>"+oldModel+"</b> to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
+        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
     }
 
     renderModalBody = () => {
@@ -86,7 +90,7 @@ export default class SettingsButton extends Component {
                     <Col> 
                         <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
                             e.stopPropagation(); 
-                            this.setState({ actionFlag: this.ACTION_REANALYSE })
+                            this.setState({  ...this.state, actionFlag: this.ACTION_REANALYSE })
                             this.refreshModal("Reanalysing " + this.DELETE_MESSAGE) 
                         }}>Reanalyse</Button>
                     </Col>

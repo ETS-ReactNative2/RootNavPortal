@@ -68,7 +68,7 @@ export default class Backend extends Component {
         //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
         if ((nextProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != nextProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
         {
-            const { apiAddress, apiKey, files, addQueue, updateAPIStatus } = nextProps;
+            const { apiAddress, apiKey, updateAPIStatus } = nextProps;
             defaults.headers.common['key'] = apiKey; //Set the default header for every request.
 
             get(apiAddress + "/model").then(res => { 
