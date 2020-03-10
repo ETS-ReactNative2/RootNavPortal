@@ -53,6 +53,7 @@ export const StyledImageCard = styled(Card)` && {
       -webkit-transition: 0.2s;
       &:hover {
             background-color: #e2e5ea !important;
+            filter: drop-shadow(6px 4px 4px #b4b7bb);
       } 
 }`
 export const StyledCardHeader = styled(Card.Header)` && {

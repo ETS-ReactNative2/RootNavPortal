@@ -1,8 +1,9 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, useState, useRef } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
+import TextPopup from '../common/TextPopup';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader, StyledCardBody, StyledCardText  } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
@@ -13,13 +14,14 @@ import { Collapse } from 'react-bootstrap';
 
 
 export default class FolderView extends Component {
+
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.labels != this.props.labels) return true;
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
-	}
+	}	  
 		
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
@@ -58,12 +60,13 @@ export default class FolderView extends Component {
 		&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1]
+			const formattedFolder = (folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder;
 			return (
 				<StyledFolderCard className="bg-light">
 					<StyledCardHeader onClick={() => this.props.toggleOpenFile(folder)}>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${isActive ? '90' : '0'}deg)`}}/>
-							{(folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder}
+							<TextPopup displayText={formattedFolder} popupText={folder} placement="top"/>
 							<div style={{marginLeft: "auto", marginRight: "0"}}>
 								<SettingsButton path={folder}/>
 								<RemoveButton path={folder}/>

@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { StyledCardBody, StyledCardText  } from './StyledComponents'
 import { Collapse } from 'react-bootstrap';
+import TextPopup from '../common/TextPopup';
 import styled from 'styled-components';
 
 export default class CollapsableLabel extends Component{
@@ -20,7 +21,8 @@ export default class CollapsableLabel extends Component{
                 <StyledCardBody>
                     <StyledCardText>
                         <this.StyledTextOverflowContainer>
-                            {file}
+                            {/* Inherit all styling so we can style the inside of the popup using a styled component*/}
+                            <TextPopup displayText={file} popupText={file} placement="top"/>
                         </this.StyledTextOverflowContainer>
                     </StyledCardText>
                 </StyledCardBody>

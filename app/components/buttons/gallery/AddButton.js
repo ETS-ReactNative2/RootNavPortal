@@ -41,7 +41,6 @@ export default class AddButton extends Component {
         const [show, setShow] = useState(false);
         const target = useRef(null);
         
-         //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
         let button = <StyledButton variant="success" onClick={this.openFileDialog} className={`btn btn-default fas fa-plus button`} 
                 ref={target}
                 onMouseEnter={() => setShow(true)} 
@@ -50,8 +49,8 @@ export default class AddButton extends Component {
 
         return (
             <>
-                <Overlay target={target.current} show={show} placement="top">
-                {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
+                <Overlay target={target.current} show={show} placement="bottom">
+                {({ show, ...props }) => (
                     <Tooltip placement={top} {...props}> Import Folders </Tooltip>
                 )}
                 </Overlay>

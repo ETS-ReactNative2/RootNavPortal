@@ -31,7 +31,7 @@ export default class RemoveButton extends Component {
 
         return (
             <>
-                <Overlay target={target.current} show={show} placement="top">
+                <Overlay target={target.current} show={show} placement="top" containerPadding={-100}>
                 {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
                     <Tooltip placement={"top-start"} {...props}> Remove Folder </Tooltip>
                 )}

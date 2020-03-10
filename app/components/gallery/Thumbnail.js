@@ -40,11 +40,9 @@ export default class Thumbnail extends Component {
         margin: auto;
     }`;
 
-    StyledImage = styled.canvas` && {
-        display: block;
-        width: 100%;
-        max-height: 30vh;
-    }`
+    StyledShadowDiv = styled.div` && {
+        min-height: 30vh;
+    }`;
 
     openViewer = e => 
     {
@@ -176,13 +174,13 @@ export default class Thumbnail extends Component {
 
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
-                <div style={{minHeight: '30vh'}} ref={this.container}>
+            <StyledImageCard className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
+                <this.StyledShadowDiv ref={this.container}>
                     <this.FabricCanvas />
                     <CollapsableLabel file={fileName}/>
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
-                </div>
+                </this.StyledShadowDiv>
             </StyledImageCard> 
 		);
 	}
