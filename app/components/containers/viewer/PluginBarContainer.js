@@ -6,7 +6,9 @@ const mapStateToProps = (state, ownProps) => {
 
     return {
         files: state.gallery.files,
-        folders: viewer ? viewer.checked : []
+        folders: viewer ? viewer.checked : [],
+        apiInflight: state.backend.inFlight,
+        apiQueue: state.backend.queue
     }
 };
 

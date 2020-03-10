@@ -1,7 +1,7 @@
 // @flow
 import { existsSync, readdirSync, mkdirSync } from 'fs';
 import React, { Component } from 'react';
-import { Button, Row, Modal, InputGroup, Collapse, Toast } from 'react-bootstrap'
+import { Button, Row, Modal, InputGroup, Collapse, Toast, Spinner } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
@@ -13,6 +13,7 @@ import { StyledModal } from '../buttons/StyledComponents';
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
 import cloneDeep from 'lodash.clonedeep';
+
 export default class PluginBar extends Component {
     
     constructor(props) 
@@ -84,7 +85,7 @@ export default class PluginBar extends Component {
                 <StyledMeasureButton variant={pluginActive ? "primary" : "secondary"} onClick={this.measure} disabled={!pluginActive}>Measure</StyledMeasureButton>
             </StyledCard>
 
-            <StyledModal show={this.state.modal} onHide={this.closeModal}>
+            <StyledModal show={this.state.modal} onHide={this.closeModal} style={{minWidth: 'max-content !important'}}>
                 <Modal.Header closeButton>
                     <Modal.Title>Export Measurements</Modal.Title>
                 </Modal.Header>
@@ -109,6 +110,7 @@ export default class PluginBar extends Component {
                     </Collapse>
                 </Modal.Body>
                 <Modal.Footer>
+                    { this.checkAPIQueues() ? <span> <Spinner animation="border" variant="warning" style={{height: '1.5rem', width: '1.5rem', border: '0.2em solid currentColor', borderRightColor: 'transparent'}}/> Images in selected folders are still processing </span> : ""}
                     <Button variant={this.state.measuresComplete ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
                         {this.state.measuresComplete ? "Close" : "Cancel"}
                     </Button>
@@ -121,6 +123,19 @@ export default class PluginBar extends Component {
             <this.measureToast />
         </>
         );
+    };
+
+    //Returns true if any folder checked in this viewer window is queued or inflight
+    checkAPIQueues = () => {
+        let inflightQueue = Object.keys(this.props.apiInflight);
+        for (let i = 0; i < this.props.folders.length; i++)
+        {
+            let folder = this.props.folders[i];
+             //Using strings in regexes fucks up since the escaped \s need escaping for regex
+            if (inflightQueue.findIndex(file => file.match(new RegExp(`${folder.replace(/\\/g, '\\\\')}\\\\[^\\\\]+`))) != -1 || this.props.apiQueue.indexOf(folder) != -1) 
+                return true;
+        }
+        return false;
     };
 
     measureToast = () => {
