@@ -8,7 +8,6 @@ const mapStateToProps = (state, ownProps) => (
         fileName: ownProps.fileName,
         queue: state.backend.queue,
         inFlight: state.backend.inFlight,
-        labels: state.gallery.labels,
         architecture: state.gallery.architecture,
         active: state.gallery.folders.find(folder => folder.path == ownProps.folder).active
     }

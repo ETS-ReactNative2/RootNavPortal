@@ -6,6 +6,7 @@ import { StyledImageCard } from './StyledComponents'
 import { IMAGE_EXTS, API_THUMB, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
+import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 
 export default class Thumbnail extends Component {
@@ -167,6 +168,10 @@ export default class Thumbnail extends Component {
             ipcRenderer.send(API_THUMB, [{folder, file, fileName }]); //Array so it's easier for DLQ
         }
 
+        // Dispose of the canvas and redraw
+        if (this.fabricCanvas)
+            this.fabricCanvas.dispose();
+
         let ext = Object.keys(file).find(key => key.match(/^.{0,4}Thumb$/));
 
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
@@ -174,6 +179,7 @@ export default class Thumbnail extends Component {
             <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
                 <div style={{minHeight: '30vh'}} ref={this.container}>
                     <this.FabricCanvas />
+                    <CollapsableLabel file={fileName}/>
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
                 </div>
