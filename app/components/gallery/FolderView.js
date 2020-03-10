@@ -10,7 +10,6 @@ import { ALL_EXTS_REGEX, API_PARSE } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import { Collapse } from 'react-bootstrap';
-import styled from 'styled-components';
 
 
 export default class FolderView extends Component {
@@ -21,13 +20,7 @@ export default class FolderView extends Component {
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
-	
-	StyledTextOverflowContainer = styled.div` && {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        overflow: hidden;
-	}`;
-	
+		
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -84,18 +77,6 @@ export default class FolderView extends Component {
 										.map((file, index) => (
 											<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
 												<Thumbnail folder={folder} fileName={file}/>
-												{/* this is here as labels and thumbs have different rendering/update conditions */}
-												<Collapse in={this.props.labels}> 
-													<div>
-														<StyledCardBody>
-															<StyledCardText>
-																<this.StyledTextOverflowContainer>
-																	{file}
-																</this.StyledTextOverflowContainer>
-															</StyledCardText>
-														</StyledCardBody>
-													</div>
-												</Collapse>
 											</div>
 										))} 
 									</StyledRow>

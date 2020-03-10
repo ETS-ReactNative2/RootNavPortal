@@ -6,6 +6,7 @@ import { StyledImageCard } from './StyledComponents'
 import { IMAGE_EXTS, API_THUMB, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
+import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 
 export default class Thumbnail extends Component {
@@ -174,6 +175,7 @@ export default class Thumbnail extends Component {
             <StyledImageCard className="bg-light" onClick={e => e.stopPropagation()} onDoubleClick={this.openViewer}>
                 <div style={{minHeight: '30vh'}} ref={this.container}>
                     <this.FabricCanvas />
+                    <CollapsableLabel file={fileName}/>
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
                 </div>
