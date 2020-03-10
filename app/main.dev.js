@@ -80,17 +80,6 @@ app.on('ready', async () => {
     await installExtensions();
   }
   
-  //Open backend last
-  backendWindow = new BrowserWindow({
-    show: false,
-    width: 0,
-    height: 0,
-    webPreferences: { nodeIntegration: true },
-    frame: false
-  });
-  
-  backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
-
   mainWindow = new BrowserWindow({
     show: false,
     width: WINDOW_WIDTH,
@@ -103,6 +92,17 @@ app.on('ready', async () => {
   });
 
   mainWindow.loadURL(`file://${__dirname}/app.html?gallery`);
+
+  //Open backend last
+  backendWindow = new BrowserWindow({
+    show: false,
+    width: 0,
+    height: 0,
+    webPreferences: { nodeIntegration: true },
+    frame: false
+  });
+  
+  backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
   ipcMain.on('openFolder', (event, path) => {
     dialog.showOpenDialog(mainWindow, { properties: ['openDirectory', 'multiSelections'] }).then(result => 
