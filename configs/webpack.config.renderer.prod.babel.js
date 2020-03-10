@@ -17,7 +17,7 @@ CheckNodeEnv('production');
 DeleteSourceMaps();
 
 export default merge.smart(baseConfig, {
-  devtool: process.env.DEBUG_PROD === 'true' ? 'source-map' : 'none',
+  devtool: process.env.DEBUG_PROD === 'true' ? 'eval-source-map' : 'none',
 
   mode: 'production',
 
