@@ -13,11 +13,11 @@ export default props => {
 			</div>
 			<Overlay target={target.current} containerPadding={-100} show={show} placement={placement}>
 				{({ show, ...props }) => (
-				<Tooltip id="overlay-example" {...props}>
-					{popupText}
-				</Tooltip> 
+					<Tooltip id="overlay-example" {...props}>
+						{popupText}
+					</Tooltip> 
 				)}
 			</Overlay>
 		</>
 	);
-	}
+};

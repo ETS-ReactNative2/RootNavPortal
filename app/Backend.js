@@ -55,7 +55,7 @@ export default class Backend extends Component {
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
         }));
-        if (apiFiles.length)
+        if (apiFiles.length && this.props.apiStatus) //cautiously adding this here so queue doesn't get updated if there's no connection. Any API config change will rescan
         {
             this.queue.push(...apiFiles);
             addQueue(apiFiles);
