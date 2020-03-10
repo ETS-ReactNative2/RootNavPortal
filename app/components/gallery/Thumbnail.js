@@ -168,6 +168,10 @@ export default class Thumbnail extends Component {
             ipcRenderer.send(API_THUMB, [{folder, file, fileName }]); //Array so it's easier for DLQ
         }
 
+        // Dispose of the canvas and redraw
+        if (this.fabricCanvas)
+            this.fabricCanvas.dispose();
+
         let ext = Object.keys(file).find(key => key.match(/^.{0,4}Thumb$/));
 
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
