@@ -1,15 +1,19 @@
 // @flow
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
+import TooltipOverlay from '../TooltipOverlay';
 
 export default class ClearButton extends Component {
     render() {
         return (
-            <StyledButton
-                variant="danger" 
-                className={`btn btn-default fas fa-times button`}
-                onClick={this.props.resetPlugins}
-            />    
+            <TooltipOverlay  component={ props => <StyledButton
+                    variant="danger" 
+                    className={`btn btn-default fas fa-times button`}
+                    onClick={this.props.resetPlugins} 
+                    {...props}
+                />} 
+                text={"Clear Selected Plugins"}
+            />     
         )
     }
 }

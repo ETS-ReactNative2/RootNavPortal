@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
+import TooltipOverlay from '../TooltipOverlay';
 
 export default class SelectDestinationButton extends Component {
     constructor(props)
@@ -19,12 +20,15 @@ export default class SelectDestinationButton extends Component {
 
     render() {    
         return (
-            <StyledButton
-                variant="secondary" 
-                onClick={() => ipcRenderer.send('getExportDest')} 
-                className={`btn btn-default fa fa-folder-open button`}
-                style={{height: 'auto', margin: '0px', minHeight: 'auto'}}
-            />    
+            <TooltipOverlay  component={ props => <StyledButton
+                    variant="secondary" 
+                    onClick={() => ipcRenderer.send('getExportDest')} 
+                    className={`btn btn-default fa fa-folder-open button`}
+                    style={{height: 'auto', margin: '0px', minHeight: 'auto'}}
+                    {...props}
+                />} 
+                text={"Select Export Location"}
+            /> 
         )
     }
 }

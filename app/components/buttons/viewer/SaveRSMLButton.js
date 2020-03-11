@@ -6,6 +6,7 @@ import { jsonOptions, matchPathName } from '../../../constants/globals';
 import Parser from 'xml2json';
 import { writeFileSync } from 'fs';
 import { sep } from 'path';
+import TooltipOverlay from '../TooltipOverlay';
 
 export default class SaveRSMLButton extends Component {
 
@@ -71,11 +72,14 @@ export default class SaveRSMLButton extends Component {
 
     render() {    
         return (
-            <StyledButton
-                variant="primary" 
-                onClick={this.saveRSML} 
-                className={`btn btn-default fa fa-save button`} 
-            />    
+            <TooltipOverlay  component={ props => <StyledButton
+                    variant="primary" 
+                    onClick={this.saveRSML} 
+                    className={`btn btn-default fa fa-save button`}
+                    {...props}
+                />} 
+                text={"Save RSML Changes"}
+            />  
         )
     }
 }
