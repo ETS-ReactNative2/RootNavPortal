@@ -4,7 +4,7 @@ import { Overlay, Tooltip } from 'react-bootstrap';
 
 export default class TooltipOverlay extends Component {
 
-    overlayedButton = () => { //Overlays a tooltip around whatever component is passed
+    overlayedComponent = () => { //Overlays a tooltip around whatever component is passed
         const [show, setShow] = useState(false);
         const target = useRef(null);
         
@@ -27,6 +27,6 @@ export default class TooltipOverlay extends Component {
     }
 
     render() {    
-        return <this.overlayedButton/>    
+        return <this.overlayedComponent/>    
     }
 }
