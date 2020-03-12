@@ -12,7 +12,7 @@ import { matchPathName } from '../../constants/globals';
 export default class TopBar extends Component {
 
     render() {
-        const { path, buttonHandler, plants, segMasks, date } = this.props;
+        const { path, buttonHandler, plants, date, hasSegMasks } = this.props;
         let tag = path ? matchPathName(path).fileName : ""; //Matches the file path into the absolute directory path and file name
         return (
             <div>
@@ -33,7 +33,7 @@ export default class TopBar extends Component {
                         <label className="custom-control-label" htmlFor="architecture">Architecture</label>
                     </div>
                     <div className="custom-control custom-checkbox" style={{margin: 'auto 1em auto 1em'}}>
-                        <input type="checkbox" className="custom-control-input" id="segMasks" onClick={this.props.toggleSegMasks}/>
+                        <input type="checkbox" className="custom-control-input" disabled={!hasSegMasks} id="segMasks" onClick={this.props.toggleSegMasks}/>
                         <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
                     </div>
                     <ResetChangesButton />
