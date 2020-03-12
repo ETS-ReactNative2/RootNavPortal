@@ -44,12 +44,11 @@ export default class Routes extends Component {
     }
 
     static View(props) {
-        let args = props.location.search.match(/(\?[^?]+)\??([^|]+)?\|?(.+)?/) //This matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and |rsml|png|etc. The negated sets are to delimit the capture groups
-        let name = args[1] ? args[1] : "";
-        let path = args[2] ? args[2].replace(/%20/g, " ") : ""; //Replace any encoded spaces in the file path with a space.
-        let exts = args[3] ? args[3].split('|') : "";
+        let { page = "", path = "", exts = "" } = props.location.search.match(/(?<page>\?[^?]+)\??(?<path>[^|]+)?\|?(?<exts>.+)?/).groups //This matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and |rsml|png|etc. The negated sets are to delimit the capture groups
+        path = path.replace(/%20/g, " "); //Replace any encoded spaces in the file path with a space.
+        exts = exts.split('|');
 
-        let view = Routes.Views(path, exts)[name];
+        let view = Routes.Views(path, exts)[page];
         if (view == null) 
             view = Routes.Views()[routes.HOME];
         return view;
@@ -70,7 +69,7 @@ export default class Routes extends Component {
 
     render() {
         const { address, apiKey} = this.props;
-
+        const { serverIP = "", serverPort = "" } = address ? address.match(/(?<serverIP>.+):(?<serverPort>.+)/).groups : {}
         return (
             <Router>
             <div>
@@ -81,11 +80,11 @@ export default class Routes extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <InputGroup>
-                            <input key={0} type="text" defaultValue={address ? address.match(/(.+):.+/)[1] : ''} className="form-control" placeholder="https://server.location" ref={this.address}/>
+                            <input key={0} type="text" defaultValue={serverIP} className="form-control" placeholder="https://server.location" ref={this.address}/>
                             <InputGroup.Append><InputGroup.Text><b>:</b></InputGroup.Text></InputGroup.Append> 
                             <InputGroup.Append>
                                 {/* Considering putting minWidth 7em on this input, so the URL is bigger and port is shorter, but I also like the symmetry as it is currently. */}
-                                <input key={1} type="text" defaultValue={address ? address.match(/.+:(.+)/)[1] : ''} className="form-control" placeholder="port" ref={this.port} style={{ borderBottomLeftRadius: '0', borderTopLeftRadius: '0' }}/> 
+                                <input key={1} type="text" defaultValue={serverPort} className="form-control" placeholder="port" ref={this.port} style={{ borderBottomLeftRadius: '0', borderTopLeftRadius: '0' }}/> 
                             </InputGroup.Append>
                         </InputGroup>
                         <input key={0} type="text" defaultValue={apiKey} className="form-control" placeholder="Server Key" ref={this.apiKey} style={{marginTop: '1em'}}/>      

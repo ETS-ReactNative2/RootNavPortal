@@ -5,11 +5,11 @@ import { matchPathName } from '../../../constants/globals';
 import { pushEditStack } from '../../../actions/viewerActions';
 
 const mapStateToProps = (state, ownProps) => {
-    let match  = matchPathName(ownProps.path);
+    const { path, fileName }  = matchPathName(ownProps.path);
     let viewer =  state.viewer.viewers[process.pid];
     return { 
         path: ownProps.path,
-        file: state.gallery.files[match[1]][match[2]],
+        file: state.gallery.files[path][fileName],
         architecture:  viewer ? viewer.architecture : false, //These prevent errors when unloading the viewer, since the action updates children before the process actually ends
         segMasks: viewer ? viewer.segMasks : false,
         editStack: viewer ? viewer.editStack : false

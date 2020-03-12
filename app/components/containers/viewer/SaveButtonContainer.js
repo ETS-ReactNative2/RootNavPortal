@@ -6,9 +6,9 @@ import { matchPathName } from '../../../constants/globals';
 
 const mapStateToProps = (state, ownProps) => {
     let viewer =  state.viewer.viewers[process.pid];
-    let match  = matchPathName(ownProps.path);
+    const { path, fileName }  = matchPathName(ownProps.path);
     return {
-        parsedRSML: state.gallery.files[match[1]][match[2]].parsedRSML,
+        parsedRSML: state.gallery.files[path][fileName].parsedRSML,
         editStack: viewer ? viewer.editStack : false,
         path: ownProps.path
     }

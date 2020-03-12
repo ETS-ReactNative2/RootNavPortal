@@ -12,7 +12,7 @@ export default class SaveRSMLButton extends Component {
 
     newRSML = {};
     saveRSML = () => {
-        const { resetEditStack, updateFile, editStack, parsedRSML: { rsmlJson }, path } = this.props;
+        const { resetEditStack, updateFile, editStack, parsedRSML: { rsmlJson } } = this.props;
         if (!editStack.length) return;
 
         //Deep clones the original RSML and diff checks it against the editStack's polylines array to see what is/isn't present and deletes accordingly
@@ -22,9 +22,9 @@ export default class SaveRSMLButton extends Component {
         rsmlJson.rsml[0].scene[0].plant.forEach((plantItem, index) => this.deletePlants(plantItem, index));
         
         let newXML = Parser.toXml(this.newRSML, jsonOptions); //Floats being truncated, and attributes not being de-prefixed
-        let pathVars = matchPathName(path);
-        writeFileSync(pathVars[1] + sep + pathVars[2] + ".rsml", newXML);
-        updateFile(pathVars[1], pathVars[2], { parsedRSML: { rsmlJson: this.newRSML, polylines: editStack[editStack.length - 1] }} );
+        const { path, fileName } = matchPathName(this.props.path);
+        writeFileSync(path + sep + fileName + ".rsml", newXML);
+        updateFile(path, fileName, { parsedRSML: { rsmlJson: this.newRSML, polylines: editStack[editStack.length - 1] }} );
         resetEditStack();
     };
 

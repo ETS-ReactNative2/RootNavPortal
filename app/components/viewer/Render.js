@@ -218,19 +218,19 @@ export default class Render extends Component {
             if (!polylines) return;
 
             let image = new Image();
-            let matchedPath = matchPathName(path);
+            const { path, fileName }  = matchPathName(this.props.path);
 
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
             // Save image size, for scaling usage!;
-            this.imageSize = sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext);
+            this.imageSize = sizeOf(path + sep + fileName + "." + ext);
 
 
             if (segMasks && file._C1 && file._C2) //Composite the segmasks together
                 if (!file.seg_mask) 
-                    imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + "_C1.png", matchedPath[1] + sep + matchedPath[2] + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                    imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
                         .then(output => {
-                            updateFile(matchedPath[1], matchedPath[2], { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
+                            updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
                             image.src = 'data:image/png;base64,' + output.toString('base64');
                         });
                 else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
@@ -238,14 +238,14 @@ export default class Render extends Component {
             else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
             {
                 let canvas = new OffscreenCanvas(this.imageSize.width, this.imageSize.height); //Create offscreen canvas with its resolution
-                let image  = new Tiff({ buffer: readFileSync(matchedPath[1] + sep + matchedPath[2] + "." + ext) }); //convert tiff
+                let image  = new Tiff({ buffer: readFileSync(path + sep + fileName + "." + ext) }); //convert tiff
                 canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
                 this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
                     left: 0, top: 0, selectable: false
                 }));
                 if (architecture) this.drawRSML(polylines); 
             }
-            else image.src = matchedPath[1] + sep + matchedPath[2] + "." + ext; //Otherwise we can just ref the file path normally
+            else image.src = path + sep + fileName + "." + ext; //Otherwise we can just ref the file path normally
 
             image.onload = () => {
                 this.fabricCanvas.add(new fabric.Image(image, {

@@ -11,9 +11,9 @@ const plugin = (rsmlJson, polylines, utils) => {
 
             if (line.type == 'lateral') 
             {
-                let ids = line.id.match(/([0-9]+)-([0-9]+)/);
-                let object = results.find(record => record.tag == `${tag}:${ids[1]}-${ids[2]}`); 
-                object ? object.lateralRootCount++ : results.push({ tag: `${tag}:${ids[1]}-${ids[2]}`, lateralRootCount: 1 });
+                let { plantID, primaryID } = utils.getPlantPrimaryID(line);
+                let object = results.find(record => record.tag == `${tag}:${plantID}-${primaryID}`); 
+                object ? object.lateralRootCount++ : results.push({ tag: `${tag}:${plantID}-${primaryID}`, lateralRootCount: 1 });
             }
         });
 

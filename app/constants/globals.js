@@ -34,7 +34,7 @@ export const API_MODELS = [
 export const THUMB_PERCENTAGE = 20
 export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
-export const matchPathName = path => path.match(/(.+)(?:\\|\/)(.+)/); //Matches the file's dir path and actual name. no trailing slash on the path
+export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups; //Matches the file's dir path and actual name. no trailing slash on the path
 
 export const writeConfig = config => {
     if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.

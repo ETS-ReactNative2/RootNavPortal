@@ -38,7 +38,7 @@ export default class Viewer extends Component {
     {
         if (e.key != this.LEFT_KEY && e.key != this.RIGHT_KEY) return;
         this.loadNextRSML(e.key == this.LEFT_KEY ? -1 : 1);
-    }
+    };
 
     loadNextRSML = direction => {
         const { editStack, resetEditStack, files } = this.props;
@@ -46,7 +46,7 @@ export default class Viewer extends Component {
         let split = matchPathName(this.state.path); 
         let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
         let keys = Object.keys(files[folder]);
-        let index = keys.indexOf(split[2]); //I'm thinking make a global func for splitting/getting dir path and file name given how much this regex pops up now
+        let index = keys.indexOf(split[2]);
         let file;
         let initialIndex = index;
 
@@ -63,12 +63,12 @@ export default class Viewer extends Component {
         {
             this.setState({path: folder + sep + keys[index]});
         }
-    }
+    };
 
     getNumberOfPlants = () => {
-        let [, folder, fileName] = matchPathName(this.state.path); 
-        folder.replace(/\\\\/g, '\\');
-        return this.props.files[folder][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
+        let { path, fileName } = matchPathName(this.state.path);
+        path.replace(/\\\\/g, '\\');
+        return this.props.files[path][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
     };
 
     render() 
