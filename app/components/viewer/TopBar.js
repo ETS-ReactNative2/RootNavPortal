@@ -13,7 +13,7 @@ export default class TopBar extends Component {
 
     render() {
         const { path, buttonHandler, plants, segMasks } = this.props;
-        let tag = path ? matchPathName(path)[2] : ""; //Matches the file path into the absolute directory path and file name
+        let tag = path ? matchPathName(path).fileName : ""; //Matches the file path into the absolute directory path and file name
         return (
             <div>
                 <StyledTopBarDiv className="d-inline-flex" data-tid="container">
