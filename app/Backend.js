@@ -51,7 +51,7 @@ export default class Backend extends Component {
                 let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                 let filePath = folder + sep + file + "." + imageExt;
 
-                let { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
+                const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
         }));
@@ -177,7 +177,7 @@ export default class Backend extends Component {
         const { removeQueue, folders, addInflight, apiKey, apiAddress } = this.props;
 
         let file = this.queue.shift();
-        let { path, fileName, ext } = this.matchFileParts(file);
+        const { path, fileName, ext } = this.matchFileParts(file);
 
         let model = folders.find(folder => (folder.path + sep) == path).model;
         if (!model || !API_MODELS.some(apiModel => apiModel.apiName == model)) return;

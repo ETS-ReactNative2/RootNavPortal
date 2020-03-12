@@ -14,12 +14,12 @@ export default class RefreshButton extends Component {
             readdir(folder.path, (err, files) => {
                 if (!this.structuredFiles[folder]) this.structuredFiles[folder] = {};
 
-                let matched = files.map(file => file.match(ALL_EXTS_REGEX)) //Scan for file types we use
+                let matched = files.map(file => file.match(ALL_EXTS_REGEX).groups) //Scan for file types we use
                 matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
-                    if (regex) 
+                    if (!Object.keys(regex).length === 0) 
                     {
-                        let name = regex[1]; //Each file has an object with the key as the file name
-                        let ext  = regex[2] ? regex[2].toLowerCase() : regex[3].toLowerCase();  //that key's value is an object that holds the extensions we found as bools
+                        let name = regex.fileName; //Each file has an object with the key as the file name
+                        let ext  = regex.segMask ? regex.segMask.toUpperCase() : regex.ext.toLowerCase();  //that key's value is an object that holds the extensions we found as bools
                         if (!this.structuredFiles[folder][name]) this.structuredFiles[folder][name] = {} // if there is rsml and the png you'll get filename: {rsml: true, png: true}
 
                         this.structuredFiles[folder][name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.

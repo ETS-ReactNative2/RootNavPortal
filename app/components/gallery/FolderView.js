@@ -14,7 +14,11 @@ import { Collapse } from 'react-bootstrap';
 
 
 export default class FolderView extends Component {
-
+	constructor(props)
+	{
+		super(props);
+		this.state = { read: false };
+	}
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.labels != this.props.labels) return true;
@@ -27,15 +31,15 @@ export default class FolderView extends Component {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
 		const { isActive, folder, filterText, filterAnalysed, files, addFiles } = this.props; 
-		if (!files) {
+		if (!files && !this.state.read) {
 			let structuredFiles = {};
 			readdir(folder, (err, folderFiles) => {
-				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX)) //Scan for file types we use
+				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX).groups) //Scan for file types we use
 				matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
-					if (regex) 
+					if (Object.keys(regex).length) 
 					{
-						let name = regex[1]; //Each file has an object with the key as the file name
-						let ext  = regex[2] ? regex[2].toUpperCase() : regex[3].toLowerCase(); //if it's a seg mask like file_C1.png we'll get _C1, else we use the actual ext
+						let name = regex.fileName; //Each file has an object with the key as the file name
+						let ext  = regex.segMask ? regex.segMask.toUpperCase() : regex.ext.toLowerCase(); //if it's a seg mask like file_C1.png we'll get _C1, else we use the actual ext
 						if (!structuredFiles[name]) structuredFiles[name] = {} // if there is rsml and the png you'll get filename: {rsml: true, png: true}
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}
@@ -51,13 +55,14 @@ export default class FolderView extends Component {
 					});
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
 					if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);
-
 				}
+				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
+				//Refresh button can still manually rescan.
 			});		
 		}
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
-		if ((!filterText || (files && filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase())))) //Only display folder if there's no filterText, or any of the files includes the filter text
-		&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
+		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text
+			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1]
 			const formattedFolder = (folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder;
