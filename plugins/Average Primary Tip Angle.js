@@ -4,7 +4,7 @@ const name = "Average Primary Tip Angle";
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
         let tag = utils.getTag(rsmlJson); 
-        let multiplePlants = rsmlJson.rsml[0].scene[0].plant.length > 1 
+        let multiplePlants = utils.isMultiplePlants(rsmlJson); 
         let results = [];
         
 		resolve({

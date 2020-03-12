@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
 import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
-import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants } from 'fs';
+import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
@@ -184,9 +184,10 @@ export default class Backend extends Component {
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
         removeQueue(matchedFile[1] + matchedFile[2] + matchedFile[3]);
-
+        
         const formData = new mFormData();
         const filePath = matchedFile[1] + matchedFile[2] + matchedFile[3];
+        if (!existsSync(filePath)) return;
 
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
