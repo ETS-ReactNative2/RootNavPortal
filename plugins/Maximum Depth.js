@@ -13,7 +13,7 @@ const plugin = (rsmlJson, polylines, utils) => {
             results.push({ tag, maxDepth: extremes.max - extremes.min });
         }
         else {
-            const plantsLines = utils.splitLinesAsPlants(polylines);
+            const plantsLines = utils.groupLinesByPlantID(polylines);
             Object.entries(plantsLines)
                 .map(([plantID, lines]) => [plantID, utils.getExtremesY(lines)])
                 .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, maxDepth: extremes.max - extremes.min }))
