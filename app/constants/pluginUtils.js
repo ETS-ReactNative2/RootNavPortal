@@ -54,5 +54,5 @@ module.exports = {
         const ys = lines.map(line => line.points).flat().map(point => point.y);
         return {min: Math.min(...ys), max: Math.max(...ys)}
     },
-    pointDistance = (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
+    pointDistance: (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
 }
