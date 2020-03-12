@@ -10,13 +10,13 @@ const plugin = (rsmlJson, polylines, utils) => {
         if (!multiplePlants) results.push({ tag, laterals: 0 });
 
         polylines.forEach(line => {
-            if (!multiplePlants && line.type == 'lateral') return results[0].laterals++;
-
-            if (line.type == 'lateral') 
-            {
-                let plantID = line.id.match(/([0-9]+)/)[1];
-                let object = results.find(record => record.tag == `${tag}:${plantID}`); 
-                object ? object.laterals++ : results.push({ tag: `${tag}:${plantID}`, laterals: 1 });
+            if (line.type == 'lateral') {
+                if (!multiplePlants) return results[0].laterals++;
+                else {
+                    let plantID = line.id.match(/([0-9]+)/)[1];
+                    let object = results.find(record => record.tag == `${tag}:${plantID}`); 
+                    object ? object.laterals++ : results.push({ tag: `${tag}:${plantID}`, laterals: 1 });    
+                }
             }
         });
 
