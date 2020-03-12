@@ -43,7 +43,8 @@ module.exports = {
     },
     groupLinesByPlantID: lines => lines.reduce((acc, line) => {
         const id = module.exports.getPlantID(line);
-       (acc[id] = acc[id] || []).push(line);
+        if (!acc[id]) acc[id] = [line];
+        else acc[id].push(line);
         return acc;
     }, {}),
     getExtremesX: lines => {
@@ -54,5 +55,6 @@ module.exports = {
         const ys = lines.map(line => line.points).flat().map(point => point.y);
         return {min: Math.min(...ys), max: Math.max(...ys)}
     },
-    pointDistance: (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2)
+    pointDistance: (p1, p2) => Math.sqrt((p1.x - p2.x) ** 2 + (p1.y - p2.y) ** 2),
+    flatten: lines => lines.map(it => it.points).flat(),
 }
