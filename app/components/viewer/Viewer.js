@@ -65,6 +65,15 @@ export default class Viewer extends Component {
         }
     };
 
+    getDate = () => {
+        let { path, fileName } = matchPathName(this.state.path);
+        path.replace(/\\\\/g, '\\');
+        const date = this.props.files[path][fileName].parsedRSML.rsmlJson.rsml[0].metadata[0]["last-modified"][0]["$t"];
+        const isValidDate = date.match(/^\d{4}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/i); // Todo ensure this is valid
+        console.log(date);
+        return isValidDate ? new Date(date).toDateString() : "Unknown";
+    }
+
     getNumberOfPlants = () => {
         let { path, fileName } = matchPathName(this.state.path);
         path.replace(/\\\\/g, '\\');
@@ -76,7 +85,7 @@ export default class Viewer extends Component {
         const { path } = this.state;
         return (
             <StyledContainer>
-                <TopBar path={path} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
+                <TopBar path={path} date={this.getDate()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
                     <StyledFolderChecklist/>
                     <Render path={path}/>
