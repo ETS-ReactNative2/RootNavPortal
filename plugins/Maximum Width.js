@@ -14,11 +14,9 @@ const plugin = (rsmlJson, polylines, utils) => {
         }
         else {
             const plantsLines = utils.splitLinesAsPlants(polylines);
-            console.log(plantsLines);
-            const test = Object.entries(plantsLines)
-                .map(([plantID, lines]) => [plantID, utils.getExtremesX(lines)]);
-            console.log(test);
-            test.forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, maxWidth: extremes.max - extremes.min }))
+            Object.entries(plantsLines)
+                .map(([plantID, lines]) => [plantID, utils.getExtremesX(lines)])
+                .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, maxWidth: extremes.max - extremes.min }))
         }
 
 		resolve({
