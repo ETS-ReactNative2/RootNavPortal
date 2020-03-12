@@ -70,7 +70,7 @@ export default class SettingsButton extends Component {
         this.setState({  ...this.state, actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model });
         let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path)[2] + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
+        this.refreshModal("Change <b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
     }
 
     renderModalBody = () => {
@@ -116,7 +116,7 @@ export default class SettingsButton extends Component {
             /> 
             <StyledModal show={this.state.modal} onHide={this.close} onClick={e => e.stopPropagation()}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit settings for <b>{matchPathName(this.props.path)[2]}</b></Modal.Title>
+                    <Modal.Title>Edit settings for <b>{matchPathName(this.props.path).fileName}</b></Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {this.renderModalBody()}

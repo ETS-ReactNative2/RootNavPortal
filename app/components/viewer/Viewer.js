@@ -43,10 +43,10 @@ export default class Viewer extends Component {
     loadNextRSML = direction => {
         const { editStack, resetEditStack, files } = this.props;
         if (editStack.length) resetEditStack();
-        let split = matchPathName(this.state.path); 
-        let folder = split[1].replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
+        const { path, fileName } = matchPathName(this.state.path); 
+        let folder = path.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
         let keys = Object.keys(files[folder]);
-        let index = keys.indexOf(split[2]);
+        let index = keys.indexOf(fileName);
         let file;
         let initialIndex = index;
 

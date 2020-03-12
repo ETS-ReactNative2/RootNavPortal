@@ -42,7 +42,7 @@ export default class FolderChecklist extends Component {
         let nodeIndex = children.findIndex(childNode => path.includes(childNode.value));
         if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
         else {
-            const name = matchPathName(path)[2];
+            const name = matchPathName(path).fileName;
             children.push({ value: path, children: [], label: <span title={path}>{name}</span> });
         }
         return children;
