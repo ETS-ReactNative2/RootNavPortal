@@ -1,9 +1,10 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
+import React, { Component } from 'react';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
-import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row, Overlay, Tooltip } from 'react-bootstrap';
+import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
 import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
+import TooltipOverlay from '../TooltipOverlay';
 
 export default class SettingsButton extends Component {
 
@@ -99,39 +100,20 @@ export default class SettingsButton extends Component {
         )
     }
 
-
-    overlayedButton = () => {
-        const [show, setShow] = useState(false);
-        const target = useRef(null);
-        
-         //Other animation is 'grow'. Border gets a bit crazy when lots get out of sync with each other
-        let button = <StyledButton variant="secondary" onClick={e => {
-                            e.stopPropagation()
-                            this.openModal();
-                        }} 
-                        className={`btn btn-default fas fa-wrench button`} 
-                        ref={target}
-                        onMouseEnter={() => setShow(true)} 
-                        onMouseLeave={() => setShow(false)}
-                    />
-
-        return (
-            <>
-                <Overlay target={target.current} show={show} placement="top" containerPadding={-100}>
-                {({ show, ...props }) => (
-                    <Tooltip placement={"top-start"} {...props}> Settings </Tooltip>
-                )}
-                </Overlay>
-                {button}
-            </>
-        )
-    }
-
-
     render() {    
         return (
         <>
-            <this.overlayedButton/>
+            <TooltipOverlay  component={ props => <StyledButton
+                    variant="secondary"
+                    className={`btn btn-default fas fa-wrench button`}
+                    onClick={e => {
+                        e.stopPropagation()
+                        this.openModal();
+                    }} 
+                    {...props}
+                />} 
+                text={"Settings"}
+            /> 
             <StyledModal show={this.state.modal} onHide={this.close} onClick={e => e.stopPropagation()}>
                 <Modal.Header closeButton>
                     <Modal.Title>Edit settings for <b>{matchPathName(this.props.path)[2]}</b></Modal.Title>

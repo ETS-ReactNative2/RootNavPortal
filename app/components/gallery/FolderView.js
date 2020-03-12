@@ -35,7 +35,7 @@ export default class FolderView extends Component {
 					if (regex) 
 					{
 						let name = regex[1]; //Each file has an object with the key as the file name
-						let ext  = regex[2] ? regex[2].toLowerCase() : regex[3].toLowerCase(); //if it's a seg mask like file.first_order.png we'll get first_order, else we use the actual ext
+						let ext  = regex[2] ? regex[2].toUpperCase() : regex[3].toLowerCase(); //if it's a seg mask like file_C1.png we'll get _C1, else we use the actual ext
 						if (!structuredFiles[name]) structuredFiles[name] = {} // if there is rsml and the png you'll get filename: {rsml: true, png: true}
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}

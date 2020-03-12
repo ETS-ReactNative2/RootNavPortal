@@ -1,10 +1,10 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
-import { Overlay, Tooltip } from 'react-bootstrap';
+import React, { Component } from 'react';
 import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
 import { readdir } from 'fs';
 import { ALL_EXTS_REGEX } from '../../../constants/globals'
+import TooltipOverlay from '../TooltipOverlay';
 
 export default class RefreshButton extends Component {
     structuredFiles = {};
@@ -36,30 +36,15 @@ export default class RefreshButton extends Component {
         });
     }
 
-    overlayedButton = () => {
-        const [show, setShow] = useState(false);
-        const target = useRef(null);
-        const { folders, files } = this.props;
-        let button = <StyledButton variant="primary" 
-                        className={`btn btn-default fas fa-sync button`} 
-                        onClick={() => this.onClick(folders, files)}
-                        ref={target}
-                        onMouseEnter={() => setShow(true)} 
-                        onMouseLeave={() => setShow(false)}
-                     />
-        return (
-            <>
-                <Overlay target={target.current} show={show} placement="bottom">
-                {({ show, ...props }) => (
-                    <Tooltip placement={top} {...props}> Refresh </Tooltip>
-                )}
-                </Overlay>
-                {button}
-            </>
-        )
-    }
-
     render() {
-        return <this.overlayedButton/>
+        return <TooltipOverlay  component={ props => <StyledButton
+                variant="primary" 
+                className={`btn btn-default fas fa-sync button`} 
+                onClick={() => this.onClick(this.props.folders, this.props.files)} 
+                {...props}
+            />} 
+            text={"Reload Folders"}
+            placement={"bottom"}
+        /> 
     }
 }

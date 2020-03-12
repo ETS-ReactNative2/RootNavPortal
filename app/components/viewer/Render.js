@@ -226,9 +226,9 @@ export default class Render extends Component {
             this.imageSize = sizeOf(matchedPath[1] + sep + matchedPath[2] + "." + ext);
 
 
-            if (segMasks && file.first_order && file.second_order) //Composite the segmasks together
+            if (segMasks && file._C1 && file._C2) //Composite the segmasks together
                 if (!file.seg_mask) 
-                    imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + ".first_order.png", matchedPath[1] + sep + matchedPath[2] + ".second_order.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+                    imageThumb.sharpBlend(matchedPath[1] + sep + matchedPath[2] + "_C1.png", matchedPath[1] + sep + matchedPath[2] + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
                         .then(output => {
                             updateFile(matchedPath[1], matchedPath[2], { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
                             image.src = 'data:image/png;base64,' + output.toString('base64');

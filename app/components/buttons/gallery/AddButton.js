@@ -1,10 +1,11 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
-import { Button, Modal, Overlay, Tooltip } from 'react-bootstrap';
+import React, { Component } from 'react';
+import { Button, Modal } from 'react-bootstrap';
 import { ipcRenderer } from 'electron';
 import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
 import { writeConfig } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
+import TooltipOverlay from '../TooltipOverlay';
 const dree = require('dree');  
 
 export default class AddButton extends Component {
@@ -37,32 +38,18 @@ export default class AddButton extends Component {
         ipcRenderer.send('openFolder')
     }
 
-    overlayedButton = () => {
-        const [show, setShow] = useState(false);
-        const target = useRef(null);
-        
-        let button = <StyledButton variant="success" onClick={this.openFileDialog} className={`btn btn-default fas fa-plus button`} 
-                ref={target}
-                onMouseEnter={() => setShow(true)} 
-                onMouseLeave={() => setShow(false)}
-            />
-
-        return (
-            <>
-                <Overlay target={target.current} show={show} placement="bottom">
-                {({ show, ...props }) => (
-                    <Tooltip placement={top} {...props}> Import Folders </Tooltip>
-                )}
-                </Overlay>
-                {button}
-            </>
-        )
-    }
-
     render() {
         return (
             <>
-                <this.overlayedButton />
+                <TooltipOverlay  component={ props => <StyledButton
+                        variant="success" 
+                        onClick={this.openFileDialog} 
+                        className={`btn btn-default fas fa-plus button`} 
+                        {...props}
+                    />} 
+                    text={"Import Folders"}
+                    placement={"bottom"}
+                /> 
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Select plant image folders</Modal.Title>

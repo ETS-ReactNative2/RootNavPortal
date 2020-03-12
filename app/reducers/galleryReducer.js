@@ -207,8 +207,8 @@ state: {
                     txt: true, 
                     pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] },
                     parsedRSML: { rsmlJson: {}, polylines: [[{}, {}], [{}, {}]]},
-                    first_order: true,
-                    second_order: true
+                    _C1: true,
+                    _C2: true
                 },
                 RS2,5,27,testset: {
                     png: true,

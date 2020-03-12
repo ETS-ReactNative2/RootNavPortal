@@ -14,5 +14,6 @@ module.exports = {
     getAllIDs: line => line.id.match(/([0-9]+)-([0-9]+).?([0-9]+)?/),
     addToAverage: (current, newVal, frame) => (current * (frame-1) + newVal) / frame,
     getParentOfLateral: (lateral, polylines) => polylines.find(line => line.id == lateral.id.match(/(\d+\-\d+)/)[1]),
-    getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"] 
+    getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"],
+    isMultiplePlants: json => json.rsml[0].scene[0].plant.length > 1
 }

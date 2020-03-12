@@ -14,7 +14,7 @@ const name = "Primary Root Count";
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
         let tag = utils.getTag(rsmlJson); //Location of the tag
-        let multiplePlants = rsmlJson.rsml[0].scene[0].plant.length > 1 //Having multiple plants effects our naming conventions - tag:id or just tag
+        let multiplePlants = utils.isMultiplePlants(rsmlJson); //Having multiple plants effects our naming conventions - tag:id or just tag
         let results = [];
         if (!multiplePlants) results.push({ tag, primaries: 0 }); //If there aren't, we can initialise easily. Result rows must always include `tag`, and then their returned field
 

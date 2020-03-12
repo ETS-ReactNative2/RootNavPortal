@@ -2,7 +2,7 @@
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
 import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
-import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants } from 'fs';
+import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
@@ -55,7 +55,7 @@ export default class Backend extends Component {
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
         }));
-        if (apiFiles.length)
+        if (apiFiles.length && this.props.apiStatus) //cautiously adding this here so queue doesn't get updated if there's no connection. Any API config change will rescan
         {
             this.queue.push(...apiFiles);
             addQueue(apiFiles);
@@ -143,12 +143,12 @@ export default class Backend extends Component {
             Object.keys(files[path][fileName]).forEach(extension => { //For each extension in the state object
                 
                 if (extension == 'parsedRSML') return; //Get rid of the existing parsed polylines and JSON RSML
-                if (extension.match(/first_order|second_order|rsml/)) //If it's an API file
+                if (extension.match(/_C1|_C2|rsml/)) //If it's an API file
                 {
-                    access(path + sep + fileName + "." + (extension != 'rsml' ? extension + ".png" : extension), constants.F_OK, err => { //Does it exist?
+                    access(path + sep + fileName + (extension != 'rsml' ? extension + ".png" : '.' + extension), constants.F_OK, err => { //Does it exist?
                         if (!err)
                         {
-                            unlink(path + sep + fileName + "." + (extension != 'rsml' ? extension + ".png" : extension), err => {
+                            unlink(path + sep + fileName + (extension != 'rsml' ? extension + ".png" : '.' + extension), err => {
                                 if (err) console.error(err);
                             });
                         }
@@ -184,9 +184,10 @@ export default class Backend extends Component {
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
         removeQueue(matchedFile[1] + matchedFile[2] + matchedFile[3]);
-
+        
         const formData = new mFormData();
         const filePath = matchedFile[1] + matchedFile[2] + matchedFile[3];
+        if (!existsSync(filePath)) return;
 
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
@@ -241,8 +242,10 @@ export default class Backend extends Component {
             else responses.forEach(res => {
                 //Need to handle 400s, 404s, errors and timeouts too.
                 let type = res.config.url.match(/.+\/(.+)/)[1]; //returns rsml or first_order or second_order
+                if (type == 'first_order') type = '_C1'; //Modulate them to _C1 or _C2 because Mike asked us to
+                if (type == 'second_order') type = '_C2';
 
-                if (type != 'rsml') res.data.pipe(createWriteStream(filePath + '.' + type + '.png')) //name.first_order.png
+                if (type != 'rsml') res.data.pipe(createWriteStream(filePath + type + '.png')) //name_C1.png
                 else 
                 {
                     writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary

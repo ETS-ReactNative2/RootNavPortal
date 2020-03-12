@@ -122,6 +122,6 @@ export default class Routes extends Component {
                     click: () => this.modalSettings()
                 }
             ]
-        },
+        }
     ];
 }
