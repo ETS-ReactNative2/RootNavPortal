@@ -51,7 +51,7 @@ export default class Backend extends Component {
                 let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                 let filePath = folder + sep + file + "." + imageExt;
 
-                let [, path, fileName] = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
+                let { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
         }));
@@ -94,20 +94,20 @@ export default class Backend extends Component {
         }).catch(err => console.error(err));
     };
 
-    parseRSML = path => {
-        let matchedPath = matchPathName(path);
+    parseRSML = filePath => {
+        const { path, fileName } = matchPathName(filePath);
         //Ingest the RSML here if it's not cached in state
-        this.structurePolylines(matchedPath, readFileSync(matchedPath[1] + sep + matchedPath[2] + ".rsml", 'utf8'));
+        this.structurePolylines(path, fileName, readFileSync(path + sep + fileName + ".rsml", 'utf8'));
     };
 
-    structurePolylines = (matchedPath, rsml) => {
+    structurePolylines = (path, fileName, rsml) => {
         //Ingest the RSML here if it's not cached in state
         let polylines = [];
         let rsmlJson = parser.toJson(rsml, xmlOptions);
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
         plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
-        this.props.updateParsedRSML(matchedPath[1], matchedPath[2], { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+        this.props.updateParsedRSML(path, fileName, { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
     };
     
     formatPoints = (rsml, plantID, polylines) => {
@@ -177,35 +177,35 @@ export default class Backend extends Component {
         const { removeQueue, folders, addInflight, apiKey, apiAddress } = this.props;
 
         let file = this.queue.shift();
-        let matchedFile = this.matchFileParts(file);
+        let { path, fileName, ext } = this.matchFileParts(file);
 
-        let model = folders.find(folder => (folder.path + sep) == matchedFile[1]).model;
+        let model = folders.find(folder => (folder.path + sep) == path).model;
         if (!model || !API_MODELS.some(apiModel => apiModel.apiName == model)) return;
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
-        removeQueue(matchedFile[1] + matchedFile[2] + matchedFile[3]);
+        removeQueue(path + fileName + ext);
         
         const formData = new mFormData();
-        const filePath = matchedFile[1] + matchedFile[2] + matchedFile[3];
+        const filePath = path + fileName + ext;
         if (!existsSync(filePath)) return;
 
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
         formData.append('key', apiKey);
-        formData.append('io_id', matchedFile[2]);
+        formData.append('io_id', fileName);
         formData.append('io_model', model);
         const config = { headers: formData.getHeaders() };
 
         //Add file to inflight object with the model it's been processed with, and its ext, so we can requeue later if needed
         addInflight({ //Relay inflight change to frontend
-            name: matchedFile[1] + matchedFile[2],
+            name: path + fileName,
             model,
-            ext: matchedFile[3]
+            ext
         });
 
         post(apiAddress + "/job", formData, config).then(res => 
         {
-            if (res.data) setTimeout(() => this.pollJob(res.data[0], matchedFile[1] + matchedFile[2]), API_POLLTIME); //absolute path to file, with no ext
+            if (res.data) setTimeout(() => this.pollJob(res.data[0], path + fileName), API_POLLTIME); //absolute path to file, with no ext
         })
         .catch(err => {
             console.error(err);
@@ -231,12 +231,12 @@ export default class Backend extends Component {
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
             let exts = {};
             const { updateFile, removeInflight, inflightFiles, folders, addQueue } = this.props;
-            let matchedPath = matchPathName(filePath); //folder path and filename, no trailing / on the folder
-            if (inflightFiles[filePath].model != folders.find(folder => folder.path == matchedPath[1]).model)
+            const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
+            if (inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
-                addQueue([matchedPath[1] + sep + matchedPath[2] + inflightFiles[filePath].ext]);
-                this.queue.push(matchedPath[1] + sep + matchedPath[2] + inflightFiles[filePath].ext); //Readd to queue
+                addQueue([path + sep + fileName + inflightFiles[filePath].ext]);
+                this.queue.push(path + sep + fileName + inflightFiles[filePath].ext); //Readd to queue
             }
             
             else responses.forEach(res => {
@@ -249,13 +249,13 @@ export default class Backend extends Component {
                 else 
                 {
                     writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary
-                    this.structurePolylines(matchedPath, res.data);
+                    this.structurePolylines(path, fileName, res.data);
                 }
                 exts[type] = true; 
             });
 
             removeInflight(filePath);
-            updateFile(matchedPath[1], matchedPath[2], exts); //there isn't really any proof checking here :think:
+            updateFile(path, fileName, exts); //there isn't really any proof checking here :think:
         })
         .catch(err => { removeInflight(filePath); console.error(err) });
 
@@ -267,5 +267,5 @@ export default class Backend extends Component {
         return ""
     }
 
-    matchFileParts = file => file.match(/(.+\\|\/)(.+)(\..+)/); //Matches the file path into the absolute directory path/, file name and .ext
+    matchFileParts = file => file.match(/(?<path>.+\\|\/)(?<fileName>.+)(?<ext>\..+)/).groups; //Matches the file path into the absolute directory path/, file name and .ext
 }
