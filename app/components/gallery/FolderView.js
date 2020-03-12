@@ -34,7 +34,10 @@ export default class FolderView extends Component {
 		if (!files && !this.state.read) {
 			let structuredFiles = {};
 			readdir(folder, (err, folderFiles) => {
-				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX).groups) //Scan for file types we use
+
+				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX))
+					.filter(match => match) // Filter out null values, failed regex match.
+					.map(match => match.groups); //Scan for file types we use
 				matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
 					if (Object.keys(regex).length) 
 					{
