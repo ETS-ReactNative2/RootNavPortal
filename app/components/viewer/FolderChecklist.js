@@ -24,9 +24,13 @@ export default class FolderChecklist extends Component {
         const { checked, expanded } = this.state;
         this.setState({
           checked: checked.filter(it => folderPaths.includes(it)),
-          expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : tree.map(item => item.value),
+          expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : this.getDefaultExpanded(tree, folderPaths, checked),
           nodes: tree
         });
+    }
+
+    getDefaultExpanded = (tree, folderPaths, startingChecked) => {
+        return folderPaths.filter(path => startingChecked.some(checked => checked.includes(path))).concat(tree.map(item => item.value));
     }
 
     // Converts a flat list of foldername strings into a hierarchical object representing folder structure
