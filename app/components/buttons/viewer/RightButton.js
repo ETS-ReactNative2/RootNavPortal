@@ -13,7 +13,7 @@ export default class RightButton extends Component {
                     className={`btn btn-default fas fa-arrow-right button`} 
                     {...props}
                 />} 
-                text={"Navigate Right"}
+                text={"Next Image"}
             />    
         )
     }

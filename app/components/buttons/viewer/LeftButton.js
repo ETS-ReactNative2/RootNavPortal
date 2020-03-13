@@ -13,7 +13,7 @@ export default class LeftButton extends Component {
                     className={`btn btn-default fas fa-arrow-left button`} 
                     {...props}
                 />} 
-                text={"Navigate Left"}
+                text={"Previous Image"}
             /> 
         )
     }
