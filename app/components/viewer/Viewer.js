@@ -92,7 +92,7 @@ export default class Viewer extends Component {
             <StyledContainer>
                 <TopBar path={path} date={this.getDate()} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
-                    <StyledFolderChecklist/>
+                    <StyledFolderChecklist path={matchPathName(this.state.path).path}/>
                     <Render path={path}/>
                     <PluginBar/>
                 </StyledSidebarContainer>

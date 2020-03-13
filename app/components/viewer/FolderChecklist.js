@@ -8,7 +8,7 @@ export default class FolderChecklist extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            checked: [],
+            checked: [props.path],
             expanded: [],
             nodes: []
         }
@@ -24,7 +24,7 @@ export default class FolderChecklist extends Component {
         const { checked, expanded } = this.state;
         this.setState({
           checked: checked.filter(it => folderPaths.includes(it)),
-          expanded: expanded.length == 0 ? expanded.filter(it => folderPaths.includes(it)) : tree.map(item => item.value),
+          expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : tree.map(item => item.value),
           nodes: tree
         });
     }
