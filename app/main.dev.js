@@ -72,7 +72,7 @@ const openGallery = () => {
             buttons: ['Close App', 'Background App'], 
             title: 'Close RootNav Portal', 
             cancelId: 2,
-            message: 'Would you like to send RootNav Portal to the background to continue processing, or close the app completely? It can be reopened or closed from the app icon.'
+            message: 'There are currently files being, or waiting to be processed, would you like to close RootNav or background it to continue processing? It can be reopened or closed from the app icon.'
         }).then(response => {
             switch (response)
             {
