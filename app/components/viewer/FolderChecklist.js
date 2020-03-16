@@ -22,11 +22,13 @@ export default class FolderChecklist extends Component {
         const folderPaths = this.props.folders.map(it => it.path);
         const tree = this.folderListToTree(folderPaths);
         const { checked, expanded } = this.state;
+        const { updateChecked } = this.props;
         this.setState({
           checked: checked.filter(it => folderPaths.includes(it)),
           expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : this.getDefaultExpanded(tree, folderPaths, checked),
           nodes: tree
         });
+        updateChecked(this.state.checked);
     }
 
     getDefaultExpanded = (tree, folderPaths, startingChecked) => {
@@ -68,8 +70,8 @@ export default class FolderChecklist extends Component {
     }
 
     render() {
-        let { nodes, checked, expanded } = this.state;
-        let { updateChecked } = this.props;
+        const { nodes, checked, expanded } = this.state;
+        const { updateChecked } = this.props;
         return (
             <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}><b>Select folders to measure</b></Card.Header>
