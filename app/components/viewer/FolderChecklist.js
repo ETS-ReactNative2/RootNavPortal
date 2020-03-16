@@ -47,7 +47,8 @@ export default class FolderChecklist extends Component {
         if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
         else {
             const name = matchPathName(path).fileName;
-            children.push({ value: path, children: [], label: <span title={path}>{name}</span> });
+            const fontWeight = path == this.props.path ? "800" : "normal";
+            children.push({ value: path, children: [], label: <span style={{ fontWeight }} title={path}>{name}</span> });
         }
         return children;
     }

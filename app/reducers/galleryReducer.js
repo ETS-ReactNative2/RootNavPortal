@@ -4,7 +4,7 @@ import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL
     TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS } from '../actions/galleryActions';
 
 const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
-    filterAnalysed: false, labels: true, architecture: true, apiAddress: '', apiKey: '', apiStatus: false };
+    filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false };
 
 export default (state = initialState, action) => {
     switch (action.type)

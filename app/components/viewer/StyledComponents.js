@@ -33,8 +33,8 @@ export const StyledCardHeader = styled(Card.Header)` && {
 }`
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
-    width: 15em;
-    min-width: 15em;
+    width: 20vw;
+    min-width: 20vw;
 }`
 
 export const StyledCardContents = styled.div` && {
