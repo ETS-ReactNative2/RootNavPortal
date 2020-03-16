@@ -58,7 +58,8 @@ export default class Render extends Component {
     setCanvasStyle = () => {
         // Because fabric does DOM manipulation, we need to do it *as well* to style it the way we want!
         var container = document.getElementsByClassName("canvas-container")[0];
-        container.style.width = "100%";
+        container.style.flexGrow = "1";
+        container.style.width = "none";
         container.style.height = "auto";
         container.style.border = "1px solid";
         container.style.overflow = "hidden";

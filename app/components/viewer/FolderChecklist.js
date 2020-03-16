@@ -71,7 +71,7 @@ export default class FolderChecklist extends Component {
         let { nodes, checked, expanded } = this.state;
         let { updateChecked } = this.props;
         return (
-            <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em"}}>
+            <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}><b>Select folders to measure</b></Card.Header>
                 <div style={{ padding: '0.5em' }}><CheckboxTree
                     noCascade={true}

@@ -1,7 +1,8 @@
 // @flow
 import React, { Component } from 'react';
 import TopBar from '../containers/viewer/TopBarContainer';
-import { StyledContainer, StyledSidebarContainer, StyledFolderChecklist, StyledRender } from './StyledComponents';
+import FolderChecklist from '../containers/viewer/FolderListContainer';
+import { StyledContainer, StyledSidebarContainer } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
 import { matchPathName } from '../../constants/globals';
@@ -92,7 +93,7 @@ export default class Viewer extends Component {
             <StyledContainer>
                 <TopBar path={path} date={this.getDate()} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
-                    <StyledFolderChecklist path={matchPathName(this.state.path).path}/>
+                    <FolderChecklist path={matchPathName(this.state.path).path}/>
                     <Render path={path}/>
                     <PluginBar/>
                 </StyledSidebarContainer>

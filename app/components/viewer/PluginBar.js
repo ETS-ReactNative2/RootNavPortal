@@ -57,14 +57,12 @@ export default class PluginBar extends Component {
                         return (
                         <React.Fragment key={i}>
                             <StyledCardHeader variant="light" as={Button} onClick={() => this.togglePluginGroup(groupName)}>
-                                <div className="container">
-                                    <Row>
-                                        <StyledChevron className="col-3">
-                                            <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
-                                        </StyledChevron>
-                                        <div className="col-9">{groupName}</div>
-                                    </Row>
-                                </div>
+                                <Row>
+                                    <StyledChevron className="col-2">
+                                        <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
+                                    </StyledChevron>
+                                    <div className="col-8 text-left">{groupName}</div>
+                                </Row>
                             </StyledCardHeader>
                             <Collapse in={!!this.state[groupName]}>
                                 <div>

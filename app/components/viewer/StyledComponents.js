@@ -6,7 +6,7 @@ export const StyledListGroupItem = styled(ListGroupItem)` && {
     padding: 0.5em;
     color: black;
     border-radius: 0;
-    transition: 0.2s ease-in-out
+    transition: 0.2s ease-in-out;
 }`
 
 export const StyledCenterListGroupItem = styled(StyledListGroupItem)` && {
@@ -30,15 +30,17 @@ export const StyledCardHeader = styled(Card.Header)` && {
     color: black;
     text-align: center;
     font-weight: bold;
+    width: 100%;
 }`
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     width: 20vw;
-    min-width: 20vw;
+    min-width: 240px;
 }`
 
 export const StyledCardContents = styled.div` && {
-    overflow-y:overlay;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }`
 
 export const StyledChevron = styled.div` && {
@@ -52,9 +54,6 @@ export const StyledSidebarContainer = styled.div` && {
     height: 100%;
     overflow: hidden;
     margin-top: 1em;
-}`
-
-export const StyledFolderChecklist = styled(FolderChecklist).attrs({border:"dark"})` && {
 }`
 
 export const StyledMeasureButton = styled(Button)` && {
