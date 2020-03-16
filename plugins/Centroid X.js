@@ -11,13 +11,13 @@ const plugin = (rsmlJson, polylines, utils) => {
         if (!multiplePlants) 
         {
             const points = utils.flatten(polylines);
-            results.push({ tag, centroidX: points.reduce((acc, current) => acc += current.x, 0) / points.length });
+            results.push({ tag, centroidX: points.reduce((acc, current) => acc += current.x, 0) / points.length - points[0].x });
         } else 
         {
             const plantsLines = utils.groupLinesByPlantID(polylines);
             Object.entries(plantsLines)
                 .map(([plantID, lines]) => [plantID, utils.flatten(lines)])
-                .forEach(([plantID, points]) => results.push({ tag: `${tag}:${plantID}`, centroidX: points.reduce((acc, current) => acc += current.x, 0) / points.length }))
+                .forEach(([plantID, points]) => results.push({ tag: `${tag}:${plantID}`, centroidX: points.reduce((acc, current) => acc += current.x, 0) / points.length - points[0].x }))
         }
 
 		resolve({
