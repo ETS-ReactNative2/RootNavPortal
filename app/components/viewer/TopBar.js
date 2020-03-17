@@ -42,7 +42,7 @@ export default class TopBar extends Component {
                             <LeftButton click={buttonHandler}/>
                             <RightButton click={buttonHandler}/>
                         </div>
-                        <div className="col-4">
+                        <div className="col-4" style={{textAlign: "right"}}>
                             <ResetChangesButton />
                             <UndoChangesButton />
                             <SaveRSMLButton path={path} />

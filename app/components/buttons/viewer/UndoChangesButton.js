@@ -16,7 +16,7 @@ export default class UndoChanges extends Component {
                     className={`btn btn-default fa fa-undo button`}
                 /></span>
             } 
-                text={"Undo Changes"}
+                text={"Undo RSML Changes"}
             />
         )
     }
