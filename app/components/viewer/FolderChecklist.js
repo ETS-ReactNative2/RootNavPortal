@@ -16,19 +16,18 @@ export default class FolderChecklist extends Component {
 
     componentDidMount() {
         this.reset();
+        this.props.updateChecked(this.state.checked);
     }   
 
     reset = () => {
         const folderPaths = this.props.folders.map(it => it.path);
         const tree = this.folderListToTree(folderPaths);
         const { checked, expanded } = this.state;
-        const { updateChecked } = this.props;
         this.setState({
           checked: checked.filter(it => folderPaths.includes(it)),
           expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : this.getDefaultExpanded(tree, folderPaths, checked),
           nodes: tree
         });
-        updateChecked(this.state.checked);
     }
 
     getDefaultExpanded = (tree, folderPaths, startingChecked) => {
@@ -49,8 +48,8 @@ export default class FolderChecklist extends Component {
         if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
         else {
             const name = matchPathName(path).fileName;
-            const fontWeight = path == this.props.path ? "800" : "normal";
-            children.push({ value: path, children: [], label: <span style={{ fontWeight }} title={path}>{name}</span> });
+            const style = path == this.props.path ? { fontWeight: "800"} : { fontWeight: "normal" };
+            children.push({ value: path, children: [], label: <span style={style} title={path}>{name}</span> });
         }
         return children;
     }
@@ -66,12 +65,12 @@ export default class FolderChecklist extends Component {
     componentDidUpdate(prevProps) {
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
-        if (folderPaths.length != oldFolderPaths.length) this.reset();
+        if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path) this.reset();
     }
 
     render() {
         const { nodes, checked, expanded } = this.state;
-        const { updateChecked } = this.props;
+        const { updateChecked, updatePath } = this.props;
         return (
             <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}><b>Select folders to measure</b></Card.Header>
@@ -99,6 +98,7 @@ export default class FolderChecklist extends Component {
                         this.setState({ checked })
                         updateChecked(checked);
                     }} 
+                    onClick={node => updatePath(node.value)}
                     onExpand={expanded => this.setState({ expanded })}
                 /></div>
             </StyledCard>

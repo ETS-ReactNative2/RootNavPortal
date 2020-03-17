@@ -86,6 +86,15 @@ export default class Viewer extends Component {
         return file.hasOwnProperty("_C1") && file.hasOwnProperty("_C2");
     }
 
+    updatePath = newPath => {
+        const folder = newPath.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
+        const files = Object.keys(this.props.files[folder]);
+        if (files.length == 0) return; // Don't change the folder if there's no files in it!
+
+        this.setState({path: folder + sep + files[0]});
+        console.log(this.state);
+    }
+
     render() 
     {
         const { path } = this.state;
@@ -93,7 +102,7 @@ export default class Viewer extends Component {
             <StyledContainer>
                 <TopBar path={path} date={this.getDate()} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
-                    <FolderChecklist path={matchPathName(this.state.path).path}/>
+                    <FolderChecklist path={matchPathName(this.state.path).path} updatePath={this.updatePath}/>
                     <Render path={path}/>
                     <PluginBar/>
                 </StyledSidebarContainer>
