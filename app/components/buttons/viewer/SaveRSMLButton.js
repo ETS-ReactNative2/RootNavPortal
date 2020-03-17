@@ -71,13 +71,16 @@ export default class SaveRSMLButton extends Component {
     };
 
     render() {    
+        const isActive = this.props.editStack.length;
         return (
-            <TooltipOverlay  component={ props => <StyledButton
+            <TooltipOverlay  component={ props => <span className="d-inline-block" {...props}><StyledButton
                     variant="primary" 
+                    disabled={!isActive}
+                    style={{pointerEvents: isActive ? 'all' : 'none' }}
                     onClick={this.saveRSML} 
                     className={`btn btn-default fa fa-save button`}
-                    {...props}
-                />} 
+                /></span>
+            } 
                 text={"Save RSML Changes"}
             />  
         )
