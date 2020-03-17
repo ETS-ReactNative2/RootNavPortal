@@ -92,7 +92,7 @@ export default class Viewer extends Component {
         if (files.length == 0) return; // Don't change the folder if there's no files in it!
 
         this.setState({path: folder + sep + files[0]});
-        console.log(this.state);
+        resetEditStack();
     }
 
     render() 

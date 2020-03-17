@@ -30,7 +30,7 @@ export default class Render extends Component {
     fabricCache = {
         selectedID: null,
     };
-    deleteKey = "Backspace";
+    deleteKeys = ["Backspace", "Delete"];
     lastPosX = 0;
     lastPosY = 0;
     zoom = 1; //Persist zoom over component renders - when the user does something to the canvas
@@ -185,7 +185,7 @@ export default class Render extends Component {
 
     handleDelete = e =>
     {
-        if (e.key != this.deleteKey) return;
+        if (!(this.deleteKeys.includes(e.key))) return;
         const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
         const { selectedID } = this.fabricCache;
         if (selectedID)
