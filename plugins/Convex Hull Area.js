@@ -16,7 +16,7 @@ const plugin = (rsmlJson, polylines, utils) => {
 
         //Take the flattened plant points and construct the results objects with the convex hull areas
         Object.keys(plantPoints).forEach(plantID => {
-            results.push({ tag: `${tag}${multiplePlants ? (':'+plantID) : ''}`, convexHull: polygonArea(makeHull(plantPoints[plantID])) });
+            results.push({ tag: `${tag}${multiplePlants ? (':'+plantID) : ''}`, convexHull: polygonArea(utils.makeHull(plantPoints[plantID])) });
         });
 
 		resolve({
