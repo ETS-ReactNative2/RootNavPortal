@@ -98,7 +98,7 @@ export default class FolderChecklist extends Component {
                         this.setState({ checked })
                         updateChecked(checked);
                     }} 
-                    onClick={node => updatePath(node.value)}
+                    onClick={node => { if (node.value != this.props.path) updatePath(node.value) }}
                     onExpand={expanded => this.setState({ expanded })}
                 /></div>
             </StyledCard>
