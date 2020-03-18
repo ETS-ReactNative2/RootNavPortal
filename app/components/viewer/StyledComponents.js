@@ -39,7 +39,7 @@ export const StyledCard = styled(Card).attrs({border:"dark"})` && {
 }`
 
 export const StyledCardContents = styled.div` && {
-    overflow-y: scroll;
+    overflow-y: overlay;
     overflow-x: hidden;
 }`
 

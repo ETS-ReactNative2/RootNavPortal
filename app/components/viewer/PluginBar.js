@@ -61,7 +61,7 @@ export default class PluginBar extends Component {
                                         <StyledChevron className="col-2">
                                             <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
                                         </StyledChevron>
-                                        <div className="col-8 text-left">{groupName}</div>
+                                        <div className="col-8 text-center">{groupName}</div>
                                     </Row>
                                 </StyledCardHeader>
                                 <Collapse in={!!this.state[groupName]}>
