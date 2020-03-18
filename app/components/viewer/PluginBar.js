@@ -68,7 +68,6 @@ export default class PluginBar extends Component {
                                     <div>
                                     {
                                         Object.entries(pluginGroup[1]).map((plugin, i) => {
-                                            console.log(plugin);
                                             return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
                                                 <Plugin key={i} name={plugin[0]} active={plugin[1].active} description={plugin[1].description}/>
                                             </div>

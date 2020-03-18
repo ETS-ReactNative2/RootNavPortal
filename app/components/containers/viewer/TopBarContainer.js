@@ -9,6 +9,7 @@ const mapStateToProps = (state, ownProps) => {
         path: ownProps.path,
         plants: ownProps.plants,
         segMasks: viewer ? viewer.segMasks : false,
+        files: state.gallery.files,
     };
 };
 
