@@ -1,5 +1,7 @@
 const group = "Plant Measurements";
 const name = "Average Primary Emergence Angle";
+const id = 'primEmergenceAngle';
+const description = "text";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -9,7 +11,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
 		resolve({
             header: [
-                { id: 'primEmergenceAngle', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -20,5 +22,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

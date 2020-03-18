@@ -1,6 +1,8 @@
 
 const group = "Plant Measurements";
 const name = "Width : Depth Ratio";
+const id = 'wdRatio';
+const description = "Width to depth ratio per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -11,19 +13,19 @@ const plugin = (rsmlJson, polylines, utils) => {
         if (!multiplePlants) {
             const extremesX = utils.getExtremesX(polylines);
             const extremesY = utils.getExtremesY(polylines);
-            results.push({ tag, wdRatio: (extremesX.max - extremesX.min)/(extremesY.max - extremesY.min) });
+            results.push({ tag, [id]: (extremesX.max - extremesX.min)/(extremesY.max - extremesY.min) });
         }
         else {
             const plantsLines = utils.splitLinesAsPlants(polylines);
             Object.entries(plantsLines)
                 .map(([plantID, lines]) => [plantID, {x: utils.getExtremesX(lines), y: utils.getExtremesY(lines)}])
-                .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, wdRatio: (extremes.x.max - extremes.x.min)/(extremes.y.max - extremes.y.min) }))
+                .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, [id]: (extremes.x.max - extremes.x.min)/(extremes.y.max - extremes.y.min) }))
         }
 
 
 		resolve({
             header: [
-                { id: 'wdRatio', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -34,5 +36,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

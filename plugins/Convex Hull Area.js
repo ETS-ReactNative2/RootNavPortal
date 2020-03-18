@@ -1,6 +1,8 @@
 
 const group = "Plant Measurements";
 const name = "Convex Hull Area";
+const id = 'convexHull';
+const description = "Area of the convex hull, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -16,12 +18,12 @@ const plugin = (rsmlJson, polylines, utils) => {
 
         //Take the flattened plant points and construct the results objects with the convex hull areas
         Object.keys(plantPoints).forEach(plantID => {
-            results.push({ tag: `${tag}${multiplePlants ? (':'+plantID) : ''}`, convexHull: polygonArea(utils.makeHull(plantPoints[plantID])) });
+            results.push({ tag: `${tag}${multiplePlants ? (':'+plantID) : ''}`, [id]: polygonArea(utils.makeHull(plantPoints[plantID])) });
         });
 
 		resolve({
             header: [
-                { id: 'convexHull', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -109,5 +111,6 @@ pointComparator = (a, b) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

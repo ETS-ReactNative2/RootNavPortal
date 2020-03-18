@@ -1,6 +1,8 @@
 
 const group = "Root Measurements";
 const name = "Total Length";
+const id = 'rootTotalLength';
+const description = "Total length of each root";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -10,12 +12,12 @@ const plugin = (rsmlJson, polylines, utils) => {
         polylines.forEach(line => {
             let distance = utils.lineDistance(line.points);
             let object = results.find(record => record.tag == `${tag}:${line.id}`); 
-            object ? object.rootTotalLength += distance : results.push({ tag: `${tag}:${line.id}`, rootTotalLength: distance });
+            object ? object[id] += distance : results.push({ tag: `${tag}:${line.id}`, [id]: distance });
         });
 
 		resolve({
             header: [
-                { id: 'rootTotalLength', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -26,5 +28,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

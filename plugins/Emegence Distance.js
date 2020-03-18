@@ -1,6 +1,8 @@
 
 const group = "Root Measurements";
 const name = "Emergence Distance";
+const id = 'emergenceDistance';
+const description = "Length upon a primary root that each lateral emerges from";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -14,12 +16,12 @@ const plugin = (rsmlJson, polylines, utils) => {
 
             let parent = utils.getParentOfLateral(line, polylines);
             let emergenceDistance = utils.getDistanceUntilPoint(parent.points, utils.getNearestPoint(parent.points, line.points[0]));
-            results.push({ tag: `${tag}:${line.id}`, emergenceDistance });
+            results.push({ tag: `${tag}:${line.id}`, [id]: emergenceDistance });
         });
 
 		resolve({
             header: [
-                { id: 'emergenceDistance', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -30,5 +32,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

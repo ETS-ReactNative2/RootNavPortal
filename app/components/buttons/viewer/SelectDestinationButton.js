@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
 import { ipcRenderer } from 'electron';
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class SelectDestinationButton extends Component {
     constructor(props)

@@ -5,7 +5,7 @@ import { ipcRenderer } from 'electron';
 import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
 import { writeConfig } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 const dree = require('dree');  
 
 export default class AddButton extends Component {

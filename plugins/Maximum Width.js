@@ -1,6 +1,8 @@
 
 const group = "Plant Measurements";
 const name = "Maximum Width";
+const id = 'maxWidth';
+const description = "Maximum width per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -10,18 +12,18 @@ const plugin = (rsmlJson, polylines, utils) => {
         
         if (!multiplePlants) {
             const extremes = utils.getExtremesX(polylines);
-            results.push({ tag, maxWidth: extremes.max - extremes.min });
+            results.push({ tag, [id]: extremes.max - extremes.min });
         }
         else {
             const plantsLines = utils.groupLinesByPlantID(polylines);
             Object.entries(plantsLines)
                 .map(([plantID, lines]) => [plantID, utils.getExtremesX(lines)])
-                .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, maxWidth: extremes.max - extremes.min }))
+                .forEach(([plantID, extremes]) => results.push({ tag: `${tag}:${plantID}`, [id]: extremes.max - extremes.min }))
         }
 
 		resolve({
             header: [
-                { id: 'maxWidth', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -32,5 +34,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

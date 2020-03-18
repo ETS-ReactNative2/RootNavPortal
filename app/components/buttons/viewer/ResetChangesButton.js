@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class ResetChanges extends Component {
 

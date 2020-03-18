@@ -1,30 +1,32 @@
 const group = "Plant Measurements";
 const name = "Total Length - Lateral";
+const id = 'plantTotalLengthLateral';
+const description = "Cumulative length of all lateral roots per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
         let tag = utils.getTag(rsmlJson); 
         let multiplePlants = utils.isMultiplePlants(rsmlJson);;
         let results = [];
-        if (!multiplePlants) results.push({ tag, plantTotalLengthLateral: 0 });
+        if (!multiplePlants) results.push({ tag, [id]: 0 });
 
         polylines.forEach(line => {
             if (line.type == 'primary') return;
 
             let distance = utils.lineDistance(line.points);
 
-            if (!multiplePlants) results[0].plantTotalLengthLateral += distance;
+            if (!multiplePlants) results[0][id] += distance;
             else
             {
                 let plantID = utils.getPlantID(line);
                 let object = results.find(record => record.tag == `${tag}:${plantID}`); 
-                object ? object.plantTotalLengthLateral += distance : results.push({ tag: `${tag}:${plantID}`, plantTotalLengthLateral: distance });
+                object ? object[id] += distance : results.push({ tag: `${tag}:${plantID}`, [id]: distance });
             }
         });
         
 		resolve({
             header: [
-                { id: 'plantTotalLengthLateral', title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -35,5 +37,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

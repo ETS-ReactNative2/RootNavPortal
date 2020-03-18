@@ -4,7 +4,7 @@ import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
 import { readdir } from 'fs';
 import { ALL_EXTS_REGEX } from '../../../constants/globals'
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class RefreshButton extends Component {
     structuredFiles = {};
