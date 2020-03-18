@@ -1,6 +1,7 @@
 
 const group = "Plant Measurements";
 const name = "Convex Hull Centroid Y";
+const id = 'convexCentroidY';
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -18,13 +19,13 @@ const plugin = (rsmlJson, polylines, utils) => {
             const points = utils.makeHull(plantPoints[plantID]);
             results.push({
                 tag: `${tag}${multiplePlants ? (':'+plantID) : ''}`, 
-                convexCentroidY: points.reduce((acc, current) => acc += current.y, 0) / points.length - plantPoints[plantID].y
+                [id]: points.reduce((acc, current) => acc += current.y, 0) / points.length - plantPoints[plantID].y
             });
         });
 
 		resolve({
             header: [
-                { id: 'convexCentroidY', title: name}
+                { id, title: name}
             ],
             results, 
             group 

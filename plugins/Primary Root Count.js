@@ -1,5 +1,6 @@
 const group = "Plant Measurements";
 const name = "Primary Root Count";
+const id = 'primaries';
 
 //Each function is responsible for calculating the measurement on all data for a whole image
 //So for plant measurements, this is for each plant, and root measurements, for all roots of all plants
@@ -16,23 +17,23 @@ const plugin = (rsmlJson, polylines, utils) => {
         let tag = utils.getTag(rsmlJson); //Location of the tag
         let multiplePlants = utils.isMultiplePlants(rsmlJson); //Having multiple plants effects our naming conventions - tag:id or just tag
         let results = [];
-        if (!multiplePlants) results.push({ tag, primaries: 0 }); //If there aren't, we can initialise easily. Result rows must always include `tag`, and then their returned field
+        if (!multiplePlants) results.push({ tag, [id]: 0 }); //If there aren't, we can initialise easily. Result rows must always include `tag`, and then their returned field
 
         polylines.forEach(line => {
-            if (!multiplePlants && line.type == 'primary') return results[0].primaries++;
+            if (!multiplePlants && line.type == 'primary') return results[0][id]++;
 
             if (line.type == 'primary') 
             {
                 let plantID = utils.getPlantID(line); //Get plant ID
                 let object = results.find(record => record.tag == `${tag}:${plantID}`); //Does a record exist
-                object ? object.primaries++ : results.push({ tag: `${tag}:${plantID}`, primaries: 1 }); //If so, increment, else add a record for it
+                object ? object[id]++ : results.push({ tag: `${tag}:${plantID}`, [id]: 1 }); //If so, increment, else add a record for it
             }
         });
 
         //The tag header is included in the exporter itself, so plugins don't need to worry about duplicating it. It must always be present in the results objects.
 		resolve({
             header: [
-                { id: 'primaries', title: name} //Specifies what the field name of our data value is, for constructing the CSV later
+                { id, title: name} //Specifies what the field name of our data value is, for constructing the CSV later
             ],
             results, //Array of objects: { tag: 'name', primaries: 4 } - name of the object property denoting the data is specified in the header object
             group    //Group is passed through so we can differentiate which result needs to be written to which group's CSV

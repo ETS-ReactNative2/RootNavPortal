@@ -1,6 +1,7 @@
 
 const group = "Root Measurements";
 const name = "Total Primary Angle";
+const id = 'totalPrimaryAngle';
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -10,7 +11,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
 		resolve({
             header: [
-                { id: 'totalPrimaryAngle', title: name}
+                { id, title: name}
             ],
             results, 
             group 

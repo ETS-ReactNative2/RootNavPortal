@@ -1,5 +1,6 @@
 const group = "Plant Measurements";
 const name = "Average Lateral Tip Angle";
+const id = 'latTipAngle';
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -9,7 +10,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
 		resolve({
             header: [
-                { id: 'latTipAngle', title: name}
+                { id, title: name}
             ],
             results, 
             group 

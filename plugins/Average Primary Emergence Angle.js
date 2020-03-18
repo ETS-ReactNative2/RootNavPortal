@@ -1,5 +1,6 @@
 const group = "Plant Measurements";
 const name = "Average Primary Emergence Angle";
+const id = 'primEmergenceAngle';
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -9,7 +10,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
 		resolve({
             header: [
-                { id: 'primEmergenceAngle', title: name}
+                { id, title: name}
             ],
             results, 
             group 

@@ -1,6 +1,7 @@
 
 const group = "Root Measurements";
 const name = "Emergence Parent Angle";
+const id = 'emergenceParentAngle';
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -10,7 +11,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
 		resolve({
             header: [
-                { id: 'emergenceParentAngle', title: name}
+                { id, title: name}
             ],
             results, 
             group 
