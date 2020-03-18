@@ -6,7 +6,7 @@ import { jsonOptions, matchPathName } from '../../../constants/globals';
 import Parser from 'xml2json';
 import { writeFileSync } from 'fs';
 import { sep } from 'path';
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class SaveRSMLButton extends Component {
 

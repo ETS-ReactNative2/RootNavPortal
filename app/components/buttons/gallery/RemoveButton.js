@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { writeConfig } from '../../../constants/globals';
 import { StyledButton } from '../StyledComponents'; 
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class RemoveButton extends Component {
 

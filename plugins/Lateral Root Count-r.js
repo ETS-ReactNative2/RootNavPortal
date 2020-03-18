@@ -1,7 +1,8 @@
 
 const group = "Root Measurements";
 const name = "Lateral Root Count";
-const id = 'lateralRootCount'
+const id = 'lateralRootCount';
+const description = "Number of lateral roots per primary root";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -15,12 +16,12 @@ const plugin = (rsmlJson, polylines, utils) => {
                 let { plantID, primaryID } = utils.getPlantPrimaryID(line);
                 let object = results.find(record => record.tag == `${tag}:${plantID}-${primaryID}`); 
                 object ? object[id]++ : results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: 1 });
-            }
+            } 
         });
 
 		resolve({
             header: [
-                { id, title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -31,5 +32,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

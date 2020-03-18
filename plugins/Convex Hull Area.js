@@ -2,6 +2,7 @@
 const group = "Plant Measurements";
 const name = "Convex Hull Area";
 const id = 'convexHull';
+const description = "Area of the convex hull, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -22,7 +23,7 @@ const plugin = (rsmlJson, polylines, utils) => {
 
 		resolve({
             header: [
-                { id, title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -110,5 +111,6 @@ pointComparator = (a, b) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

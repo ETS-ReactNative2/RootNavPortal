@@ -55,27 +55,28 @@ export default class PluginBar extends Component {
                     Object.entries(this.state.plugins).map((pluginGroup, i) => {
                         const groupName = pluginGroup[0];
                         return (
-                        <React.Fragment key={i}>
-                            <StyledCardHeader variant="light" as={Button} onClick={() => this.togglePluginGroup(groupName)}>
-                                <Row>
-                                    <StyledChevron className="col-2">
-                                        <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
-                                    </StyledChevron>
-                                    <div className="col-8 text-left">{groupName}</div>
-                                </Row>
-                            </StyledCardHeader>
-                            <Collapse in={!!this.state[groupName]}>
-                                <div>
-                                {
-                                    Object.entries(pluginGroup[1]).map((plugin, i) => {
-                                        return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
-                                            <Plugin key={i} name={plugin[0]} active={plugin[1].active}/>
-                                        </div>
-                                    })
-                                }
-                                </div>
-                            </Collapse>
-                        </React.Fragment>
+                            <React.Fragment key={i}>
+                                <StyledCardHeader variant="light" as={Button} onClick={() => this.togglePluginGroup(groupName)}>
+                                    <Row>
+                                        <StyledChevron className="col-2">
+                                            <StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${this.state[groupName] ? '90' : '0'}deg)`}}/>
+                                        </StyledChevron>
+                                        <div className="col-8 text-left">{groupName}</div>
+                                    </Row>
+                                </StyledCardHeader>
+                                <Collapse in={!!this.state[groupName]}>
+                                    <div>
+                                    {
+                                        Object.entries(pluginGroup[1]).map((plugin, i) => {
+                                            console.log(plugin);
+                                            return <div key={i} onClick = {() => this.togglePlugin(groupName, plugin[0])}>
+                                                <Plugin key={i} name={plugin[0]} active={plugin[1].active} description={plugin[1].description}/>
+                                            </div>
+                                        })
+                                    }
+                                    </div>
+                                </Collapse>
+                            </React.Fragment>
                         );
                     })
                 }    
@@ -248,10 +249,10 @@ export default class PluginBar extends Component {
             pluginFilenames.forEach(filename => {
                 const plugin = _require(`${PLUGINDIR}${filename.replace('.js', '')}`); // For each filename, import the plugin
                 
-                if (["name", "group", "function"].every(param => param in plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
+                if (["name", "group", "function", "description"].every(param => param in plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
                     // Todo good typechecking
                     if (!(plugin.group in plugins)) plugins[plugin.group] = {}; // Initialise empty object for group
-                    plugins[plugin.group][plugin.name] = {"function": plugin.function, "active": false};
+                    plugins[plugin.group][plugin.name] = { "function": plugin.function, "active": false, description: plugin.description };
                 }
                 else console.log("Bad Plugin: " + JSON.stringify(plugin));
             });

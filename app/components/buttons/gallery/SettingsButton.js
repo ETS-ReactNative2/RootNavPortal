@@ -4,7 +4,7 @@ import { StyledButton, StyledModal } from '../StyledComponents';
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
 import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
-import TooltipOverlay from '../TooltipOverlay';
+import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class SettingsButton extends Component {
 

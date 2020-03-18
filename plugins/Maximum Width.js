@@ -2,6 +2,7 @@
 const group = "Plant Measurements";
 const name = "Maximum Width";
 const id = 'maxWidth';
+const description = "Maximum width per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -22,7 +23,7 @@ const plugin = (rsmlJson, polylines, utils) => {
 
 		resolve({
             header: [
-                { id, title: name}
+                { id, title: name }
             ],
             results, 
             group 
@@ -33,5 +34,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };

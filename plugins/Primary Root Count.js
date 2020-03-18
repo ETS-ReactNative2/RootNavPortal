@@ -1,6 +1,7 @@
 const group = "Plant Measurements";
 const name = "Primary Root Count";
 const id = 'primaries';
+const description = "Total primary roots per plant";
 
 //Each function is responsible for calculating the measurement on all data for a whole image
 //So for plant measurements, this is for each plant, and root measurements, for all roots of all plants
@@ -33,7 +34,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         //The tag header is included in the exporter itself, so plugins don't need to worry about duplicating it. It must always be present in the results objects.
 		resolve({
             header: [
-                { id, title: name} //Specifies what the field name of our data value is, for constructing the CSV later
+                { id, title: name } //Specifies what the field name of our data value is, for constructing the CSV later
             ],
             results, //Array of objects: { tag: 'name', primaries: 4 } - name of the object property denoting the data is specified in the header object
             group    //Group is passed through so we can differentiate which result needs to be written to which group's CSV
@@ -44,5 +45,6 @@ const plugin = (rsmlJson, polylines, utils) => {
 module.exports = {
     name,
     group,
+    description,
     function: plugin
 };
