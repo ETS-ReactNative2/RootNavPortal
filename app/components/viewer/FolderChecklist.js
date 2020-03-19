@@ -3,6 +3,8 @@ import { Card } from 'react-bootstrap';
 import { matchPathName } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
 import { StyledCard } from './StyledComponents'
+import TooltipOverlay from '../common/TooltipOverlay';
+import { StyledIcon } from '../CommonStyledComponents';
 
 export default class FolderChecklist extends Component {
     constructor(props) {
@@ -73,7 +75,16 @@ export default class FolderChecklist extends Component {
         const { updateChecked, updatePath } = this.props;
         return (
             <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
-                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}><b>Select folders to measure</b></Card.Header>
+                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
+                    <b>Select folders to measure</b>
+                    <TooltipOverlay component={ props => <StyledIcon
+                            className={`fas fa-info-circle`} 
+                            {...props}
+                        />} 
+                        text={"Check a folder to add it to the measure group, and click the name to view its contents"}
+                        placement={"top"}
+                    /> 
+                </Card.Header>
                 <div style={{ padding: '0.5em' }}><CheckboxTree
                     noCascade={true}
                     nodes={nodes}
