@@ -8,6 +8,7 @@ export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
 export const API_THUMB = 'api-thumb';
+export const CLOSE_VIEWER = 'close-viewer';
 
 export const WINDOW_HEIGHT = 728;
 export const WINDOW_WIDTH  = 1024;

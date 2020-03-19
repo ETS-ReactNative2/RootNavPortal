@@ -17,13 +17,13 @@ export default class TopBar extends Component {
         const splitPath = matchPathName(path);
         let tag = path ? splitPath.fileName : ""; //Matches the file path into the absolute directory path and file name
         const folderFiles = this.props.files[splitPath.path];
-        console.log(folderFiles);
+
         return (
             <div>
                 <StyledTopBarDiv data-tid="container">
                     <StyledRow>
                         <div className="col-sm-4"><b>Tag:</b> {tag}</div>
-                        <div className="col-sm-2"><b>Image:</b> {Object.keys(folderFiles).indexOf(tag) + 1} of {Object.keys(folderFiles).length}</div>
+                        <div className="col-sm-2"><b>Open Image:</b> {Object.keys(folderFiles).indexOf(tag) + 1} of {Object.keys(folderFiles).length}</div>
                         <div className="col-sm-3"><b>Analysis Date:</b> {date}</div>
                         <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>
                     </StyledRow>

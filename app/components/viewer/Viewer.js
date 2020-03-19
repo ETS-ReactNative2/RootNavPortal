@@ -5,8 +5,8 @@ import FolderChecklist from '../containers/viewer/FolderListContainer';
 import { StyledContainer, StyledSidebarContainer } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
-import { matchPathName } from '../../constants/globals';
-import { remote } from 'electron';
+import { matchPathName, CLOSE_VIEWER } from '../../constants/globals';
+import { remote, ipcRenderer } from 'electron';
 import Render from '../containers/viewer/RenderContainer';
 
 export default class Viewer extends Component {
@@ -18,11 +18,17 @@ export default class Viewer extends Component {
         super(props);
         const { addViewer, removeViewer, path } = props;
         this.state = { path };
-
+        
         addViewer();
         remote.getCurrentWindow().on('close', () => { //These will cause memory leaks in prod if lots of viewers get opened
             removeViewer(); //However, removing the listener seems to remove it from all viewers (in my limited test), which is bad too.
         });
+
+        ipcRenderer.on(CLOSE_VIEWER, (event, closePath) => {
+            if (matchPathName(path).path == closePath) // If the viewer is currently open on a folder that's been deleted, close the viewer.
+                remote.getCurrentWindow().close();
+        });
+        
     }
 
     componentDidMount()

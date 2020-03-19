@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, API_THUMB } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, API_THUMB, CLOSE_VIEWER } from './constants/globals';
 import { join } from 'path';
 
 // export default class AppUpdater {
@@ -195,6 +195,10 @@ ipcMain.on('getExportDest', event => {
     dialog.showSaveDialog(event.sender.getOwnerBrowserWindow(), { properties: ['showOverwriteConfirmation'], filters: [{ name: 'CSV (Comma delimited)', extensions: ['csv'] }] }).then(result => {
         if (result.filePath && !result.canceled) event.sender.send('exportDest', result.filePath);
     });
+});
+
+ipcMain.on(CLOSE_VIEWER, (event, path) => {
+    BrowserWindow.getAllWindows().forEach(window => window.webContents.send(CLOSE_VIEWER, path));
 });
 
 /**********************
