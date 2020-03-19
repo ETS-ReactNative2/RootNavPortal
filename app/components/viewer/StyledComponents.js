@@ -32,6 +32,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
     font-weight: bold;
     width: 100%;
     border: 1px solid rgba(0, 0, 0, .125);
+    background-color: #e9ecef;
 }`
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
