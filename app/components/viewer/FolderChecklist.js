@@ -85,7 +85,7 @@ export default class FolderChecklist extends Component {
                                     className={`fas fa-info-circle`} 
                                     {...props}
                                 />} 
-                                text={"Check a folder to add it to the measure group, and click the name to view its contents"}
+                                text={"Check a folder to add it to be measured. Click on a folder name to switch between open folders (highlighted). "}
                                 placement={"top"}
                             />
                         </div>
