@@ -17,7 +17,7 @@ export default class Viewer extends Component {
     {
         super(props);
         const { addViewer, removeViewer, path } = props;
-        this.state = { path };
+        this.state = { path, redFolderBorder: false };
         
         addViewer();
         remote.getCurrentWindow().on('close', () => { //These will cause memory leaks in prod if lots of viewers get opened
@@ -39,6 +39,12 @@ export default class Viewer extends Component {
     componentWillUnmount()
     {
         document.removeEventListener("keydown", this.handleClick, false);
+    }
+
+    toggleFolderBorder = () => {
+        console.log("hmm");
+        this.setState({redFolderBorder: true})
+        setTimeout(() => this.setState({redFolderBorder: false}), 4000);
     }
 
     handleClick = e =>
@@ -103,14 +109,14 @@ export default class Viewer extends Component {
 
     render() 
     {
-        const { path } = this.state;
+        const { path, redFolderBorder } = this.state;
         return (
             <StyledContainer>
                 <TopBar path={path} date={this.getDate()} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
                 <StyledSidebarContainer>
-                    <FolderChecklist path={matchPathName(this.state.path).path} updatePath={this.updatePath}/>
+                    <FolderChecklist path={matchPathName(path).path} updatePath={this.updatePath} redFolderBorder={redFolderBorder}/>
                     <Render path={path}/>
-                    <PluginBar/>
+                    <PluginBar toggleFolderBorder={this.toggleFolderBorder}/>
                 </StyledSidebarContainer>
             </StyledContainer>
         );

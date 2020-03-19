@@ -38,6 +38,14 @@ export const StyledCardHeader = styled(Card.Header)` && {
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     width: 20vw;
     min-width: 240px;
+    border-color: ${props => props.redborder ? "red !important" : "inherit"};
+    transition: 0.4s;
+}`
+
+export const StyledRedI = styled.i` && {
+    background-color: ${props => props.redborder ? "#fcc !important" : "inherit"};
+    box-shadow: ${props => props.redborder ? "0px 0px 8px 2px #FFB2B2" : "inherit"};
+    transition: 0.4s;
 }`
 
 export const StyledCardContents = styled.div` && {

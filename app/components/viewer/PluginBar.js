@@ -229,8 +229,9 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = () => {
-        if (!this.props.folders.length) return this.setState({ ...this.state, toast: true });
-        this.setState({ ...this.state, modal: true });
+        if (this.props.folders.length) return this.setState({ ...this.state, modal: true });
+        this.props.toggleFolderBorder();
+        this.setState({ ...this.state, toast: true });
     };
     
     loadPlugins = () => {

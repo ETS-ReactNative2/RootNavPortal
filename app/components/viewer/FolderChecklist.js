@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Card, Row } from 'react-bootstrap';
 import { matchPathName } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
-import { StyledCard } from './StyledComponents'
+import { StyledCard, StyledRedI } from './StyledComponents'
 import TooltipOverlay from '../common/TooltipOverlay';
 import { StyledIcon } from '../CommonStyledComponents';
 
@@ -65,16 +65,19 @@ export default class FolderChecklist extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        console.log("PropChanges");
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
         if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path) this.reset();
     }
 
     render() {
+        console.log("RENDER");
         const { nodes, checked, expanded } = this.state;
-        const { updateChecked, updatePath } = this.props;
+        const { updateChecked, updatePath, redFolderBorder } = this.props;
+        console.log(redFolderBorder);
         return (
-            <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
+            <StyledCard redborder={redFolderBorder ? 1 : 0} style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
                     <Row>
                         <div className="col-11">
@@ -99,7 +102,7 @@ export default class FolderChecklist extends Component {
                     checkModel={'all'}
                     icons={{
                         check: <i className="far fa-check-square"/>,
-                        uncheck: <i className="far fa-square"/>,
+                        uncheck: <StyledRedI redborder={redFolderBorder ? 1 : 0} className="far fa-square"/>,
                         halfCheck: <i className="far fa-minus-square"/>,
                         expandClose: <i className="fas fa-chevron-right"/>,
                         expandOpen: <i className="fas fa-chevron-down"/>,
