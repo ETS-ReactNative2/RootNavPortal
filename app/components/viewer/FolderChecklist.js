@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card } from 'react-bootstrap';
+import { Card, Row } from 'react-bootstrap';
 import { matchPathName } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
 import { StyledCard } from './StyledComponents'
@@ -76,14 +76,20 @@ export default class FolderChecklist extends Component {
         return (
             <StyledCard style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
-                    <b>Select folders to measure</b>
-                    <TooltipOverlay component={ props => <StyledIcon
-                            className={`fas fa-info-circle`} 
-                            {...props}
-                        />} 
-                        text={"Check a folder to add it to the measure group, and click the name to view its contents"}
-                        placement={"top"}
-                    /> 
+                    <Row>
+                        <div className="col-11">
+                            <b>Select folders to measure</b>
+                        </div>
+                        <div style={{position: "absolute", right: "0.5em"}}>
+                            <TooltipOverlay component={ props => <StyledIcon
+                                    className={`fas fa-info-circle`} 
+                                    {...props}
+                                />} 
+                                text={"Check a folder to add it to the measure group, and click the name to view its contents"}
+                                placement={"top"}
+                            />
+                        </div>
+                    </Row> 
                 </Card.Header>
                 <div style={{ padding: '0.5em' }}><CheckboxTree
                     noCascade={true}
