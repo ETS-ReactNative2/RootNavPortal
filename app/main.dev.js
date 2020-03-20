@@ -23,7 +23,8 @@ import { join } from 'path';
 //     autoUpdater.checkForUpdatesAndNotify();
 //   }
 // }
-
+const CLOSE = 0;
+const BACKGROUND = 1;
 let closeFlag; //Hack - app.quit causes the close event to fire again, so we need to terminate it early if the user wants to close the app
 let appIcon = null; //Orphan variable required so the icon doesn't get GC'd by V8
 let mainWindow = null;
@@ -34,6 +35,7 @@ let iconClick = () => mainWindow ? mainWindow.focus() : openGallery();
 **  Open the Gallery
 ***********************/
 const openGallery = () => {
+    closeFlag = undefined; //Reset closeFlag to prevent close behaviour getting locked
     mainWindow = new BrowserWindow({
         show: false,
         width: WINDOW_WIDTH,
@@ -61,30 +63,45 @@ const openGallery = () => {
     mainWindow.on('close', event => {
 
         let state = store.getState();
-        if ((!state.backend.queue.length && !Object.keys(state.backend.inFlight).length) || closeFlag) //If API is doing nothing, close all as per
+        if (closeFlag == BACKGROUND) //Due to dialog being async, the actual action needs to be done in a second go through the close handler, since returning from the callback won't do anything
+        {
+            console.log("Nulling for backgrounding")
+            BrowserWindow.getAllWindows().forEach(window => { window.webContents.getURL().match(/\?(?:backend)|(?:gallery)/) ? {} : window.close(); window = null }); 
+            mainWindow = null;  //Don't catch gallery in the above loop else it infinitely loops. Null and close it properly here.
+            return;
+        }
+        if ((!state.backend.queue.length && !Object.keys(state.backend.inFlight).length) || closeFlag == CLOSE) //If API is doing nothing, close all as per
         {
             mainWindow = null;
             return app.quit();
         }
 
-        response = dialog.showMessageBox(mainWindow, { 
+        dialog.showMessageBox(mainWindow, { 
             type: 'question', 
             buttons: ['Close App', 'Background App'], 
             title: 'Close RootNav Portal', 
             cancelId: 2,
             message: 'There are currently files being, or waiting to be processed, would you like to close RootNav or background it to continue processing? It can be reopened or closed from the app icon.'
         }).then(response => {
-            switch (response)
+            switch (response.response)
             {
-                case 0: { closeFlag = true; app.quit(); }; //app.quit causes this to refire - so closeFlag will kill the app
+                case 0: { closeFlag = CLOSE; 
+                    app.quit(); 
+                }; //app.quit causes this to refire - so closeFlag will kill the app
                 case 1: { 
-                    BrowserWindow.getAllWindows().forEach(window => window.webContents.getURL().match(/\?(?:backend)|(?:gallery)/) ? {} : window.close()); 
-                    mainWindow = null; 
-                    return; 
+                    closeFlag = BACKGROUND;
+                    BrowserWindow.getAllWindows().forEach(window => { 
+                        window.webContents.getURL().match(/\?(?:backend)/) ? {} : window.close(); 
+                        window = null;
+                    }); //Close everyhing but backend
                 }
-                case 2: event.preventDefault(); //cancel the close
+                case 2: {
+                    closeFlag = undefined; //Reset flag in case of reopening behaviour getting interfered with
+                    return event.preventDefault(); //cancel the close
+                }
             } //0 is close, 1 is background, 2 is cancelled
         });
+        return event.preventDefault(); //Early termination of this function does the actual closing
     });
 };
 
