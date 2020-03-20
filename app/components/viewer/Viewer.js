@@ -42,7 +42,6 @@ export default class Viewer extends Component {
     }
 
     toggleFolderBorder = () => {
-        console.log("hmm");
         this.setState({redFolderBorder: true})
         setTimeout(() => this.setState({redFolderBorder: false}), 4000);
     }

@@ -65,7 +65,6 @@ const openGallery = () => {
         let state = store.getState();
         if (closeFlag == BACKGROUND) //Due to dialog being async, the actual action needs to be done in a second go through the close handler, since returning from the callback won't do anything
         {
-            console.log("Nulling for backgrounding")
             BrowserWindow.getAllWindows().forEach(window => { window.webContents.getURL().match(/\?(?:backend)|(?:gallery)/) ? {} : window.close(); window = null }); 
             mainWindow = null;  //Don't catch gallery in the above loop else it infinitely loops. Null and close it properly here.
             return;

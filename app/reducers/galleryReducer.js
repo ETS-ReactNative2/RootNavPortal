@@ -159,7 +159,7 @@ export default (state = initialState, action) => {
 // architecture  = bool that toggles drawing RSML on the thumbnails
 // filteranalysed = bool that toggles if the filter bar only displays files with RSML present
 // apiAddress/Key = Address/port and key used for the API connection
-// apiStatus      = is the API up or not
+// apiStatus      = is the API up or not -- these are here due to the gallery reducer handling config, which also handles the API, so it's easier to keep them together in one reducer
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists
@@ -177,8 +177,8 @@ Full example of state:
 state: {
     gallery: {
         folders: [ 
-            { path: "C:\Users\Andrew\Desktop\hkj", model: "wheat_bluepaper"}, 
-            { path: "C:\Users\Andrew\Desktop\experiments", model: "arabidopsis_plate" }
+            { path: "C:\Users\Andrew\Desktop\hkj", model: "wheat_bluepaper", active: true }, 
+            { path: "C:\Users\Andrew\Desktop\experiments", model: "arabidopsis_plate", active: false }
         ],
         modal: false,
         modalBody: [{
@@ -191,6 +191,7 @@ state: {
         labels: true,
         apiAddress: "https://xavier.cs.nott.ac.uk:8841",
         apiKey: "dkfskisfg;lleslfds/fesf",
+        apiStatus: true
         architecture: true,
         files: {
             C:\Users\Andrew\Desktop\hkj: {

@@ -37,9 +37,7 @@ export default class SettingsButton extends Component {
 
     close = () => {
         let reduxModel = this.props.folders.find(it => it.path == this.props.path).model;
-
         this.setState({ 
-            ...this.state,
             modal: false, 
             confirmText: "", 
             currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
@@ -47,19 +45,20 @@ export default class SettingsButton extends Component {
     }
 
     openModal = () => {
-        this.setState({ ...this.state, modal: true, confirmText: "" });
+        this.setState({ modal: true, confirmText: "" });
     }
 
     refreshModal = confirmText => {
-        this.setState({ ...this.state, modal: false });
-        setTimeout(() => this.setState({ ...this.state, modal: true, confirmText }), 250);
+        this.setState({ modal: false });
+        setTimeout(() => this.setState({ modal: true, confirmText }), 250);
     }
 
     handleAction = () => {
         const { path, updateFolderModel } = this.props; 
-        const { apiName } = this.state.currentModel;
+        const { actionFlag, currentModel: { apiName } } = this.state;
+        
         ipcRenderer.send(API_DELETE, { path });
-        if (this.actionFlag == this.CHANGE_MODEL) {
+        if (actionFlag == this.ACTION_CHANGE_MODEL) {
             updateFolderModel(path, apiName); //Finish when model is in state
             this.writeUpdatedModel(apiName);
         }
@@ -67,7 +66,11 @@ export default class SettingsButton extends Component {
 
     selectDropdown = model => {
         let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName);
-        this.setState({  ...this.state, actionFlag: this.ACTION_CHANGE_MODEL, currentModel: model });
+        this.setState({  
+            actionFlag: this.ACTION_CHANGE_MODEL, 
+            currentModel: model 
+        });
+
         let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
 
         this.refreshModal("Change <b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
@@ -91,7 +94,7 @@ export default class SettingsButton extends Component {
                     <Col> 
                         <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
                             e.stopPropagation(); 
-                            this.setState({  ...this.state, actionFlag: this.ACTION_REANALYSE })
+                            this.setState({ actionFlag: this.ACTION_REANALYSE })
                             this.refreshModal("Reanalysing " + this.DELETE_MESSAGE) 
                         }}>Reanalyse</Button>
                     </Col>
@@ -124,8 +127,8 @@ export default class SettingsButton extends Component {
                 <Modal.Footer style={{'justifyContent': this.state.confirmText ? 'space-between' : 'flex-end'}}>
                     {this.state.confirmText && <Button variant="danger" onClick={e => {         
                             e.stopPropagation();
-                            this.close();
                             this.handleAction();
+                            this.close();
                         }}>
                             Confirm
                     </Button>}

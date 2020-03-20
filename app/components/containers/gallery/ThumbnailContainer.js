@@ -1,17 +1,21 @@
 import { connect } from 'react-redux';
 import Thumbnail from '../../gallery/Thumbnail';
 
-const mapStateToProps = (state, ownProps) => (
-    { 
+const mapStateToProps = (state, ownProps) => { 
+    let folder = state.gallery.folders.find(folder => folder.path == ownProps.folder);
+
+    return {
         file: state.gallery.files[ownProps.folder][ownProps.fileName],
         folder: ownProps.folder,
         fileName: ownProps.fileName,
         queue: state.backend.queue,
         inFlight: state.backend.inFlight,
         architecture: state.gallery.architecture,
-        active: state.gallery.folders.find(folder => folder.path == ownProps.folder).active
-    }
-);
+        active: folder.active,
+        model: folder.model,
+        apiStatus: state.gallery.apiStatus
+    };
+};
 
 const mapDispatchToProps = dispatch => (
     { }
