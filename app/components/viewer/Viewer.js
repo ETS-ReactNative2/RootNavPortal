@@ -25,10 +25,9 @@ export default class Viewer extends Component {
         });
 
         ipcRenderer.on(CLOSE_VIEWER, (event, closePath) => {
-            if (matchPathName(path).path == closePath) // If the viewer is currently open on a folder that's been deleted, close the viewer.
+            if (matchPathName(this.state.path).path == closePath) // If the viewer is currently open on a folder that's been deleted, close the viewer.
                 remote.getCurrentWindow().close();
         });
-        
     }
 
     componentDidMount()

@@ -22,7 +22,7 @@ export default class FolderChecklist extends Component {
     }   
 
     reset = () => {
-        const folderPaths = this.props.folders.map(it => it.path);
+        const folderPaths = this.props.folders.map(it => it.path).sort();
         const tree = this.folderListToTree(folderPaths);
         const { checked, expanded } = this.state;
         this.setState({
@@ -65,17 +65,14 @@ export default class FolderChecklist extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        console.log("PropChanges");
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
         if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path) this.reset();
     }
 
     render() {
-        console.log("RENDER");
         const { nodes, checked, expanded } = this.state;
         const { updateChecked, updatePath, redFolderBorder } = this.props;
-        console.log(redFolderBorder);
         return (
             <StyledCard redborder={redFolderBorder ? 1 : 0} style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
