@@ -22,7 +22,8 @@ export default class FolderChecklist extends Component {
     }   
 
     reset = () => {
-        const folderPaths = this.props.folders.map(it => it.path).sort();
+        const { folders, files } = this.props;
+        const folderPaths = folders.map(it => it.path).sort().filter(it => Object.keys(files).includes(it) && Object.values(files[it]).some(file => file.parsedRSML));
         const tree = this.folderListToTree(folderPaths);
         const { checked, expanded } = this.state;
         this.setState({

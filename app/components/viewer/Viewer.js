@@ -76,15 +76,15 @@ export default class Viewer extends Component {
         }
     };
 
-    getDate = () => {
-        let { path, fileName } = matchPathName(this.state.path);
-        path.replace(/\\\\/g, '\\');
-        const date = this.props.files[path][fileName].parsedRSML.rsmlJson.rsml[0].metadata[0]["last-modified"][0]["$t"];
+    getDate = rsml => {
+        if (!rsml) return "Unknown";
+        const date = rsml.rsmlJson.rsml[0].metadata[0]["last-modified"][0]["$t"];
         const isValidDate = date.match(/^\d{4}(-\d\d(-\d\d(T\d\d:\d\d(:\d\d)?(\.\d+)?(([+-]\d\d:\d\d)|Z)?)?)?)?$/i); // Todo ensure this is valid
         return isValidDate ? new Date(date).toDateString() : "Unknown";
     }
 
-    getNumberOfPlants = () => {
+    getNumberOfPlants = rsml => {
+        if (!rsml) return "Unknown";
         let { path, fileName } = matchPathName(this.state.path);
         path.replace(/\\\\/g, '\\');
         return this.props.files[path][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
@@ -98,9 +98,9 @@ export default class Viewer extends Component {
 
     updatePath = newPath => {
         const folder = newPath.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
+        console.log(this.props.files);
         const files = Object.keys(this.props.files[folder]);
         if (files.length == 0) return; // Don't change the folder if there's no files in it!
-
         this.setState({path: folder + sep + files[0]});
         this.props.resetEditStack();
     }
@@ -108,9 +108,12 @@ export default class Viewer extends Component {
     render() 
     {
         const { path, redFolderBorder } = this.state;
+        const matchedPath = matchPathName(path);
+        matchedPath.path.replace(/\\\\/g, '\\');
+        const rsml = this.props.files[matchedPath.path][matchedPath.fileName].parsedRSML;
         return (
             <StyledContainer>
-                <TopBar path={path} date={this.getDate()} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants()}/>
+                <TopBar path={path} date={this.getDate(rsml)} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants(rsml)}/>
                 <StyledSidebarContainer>
                     <FolderChecklist path={matchPathName(path).path} updatePath={this.updatePath} redFolderBorder={redFolderBorder}/>
                     <Render path={path}/>
