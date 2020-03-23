@@ -21,7 +21,7 @@ export default class PluginBar extends Component {
         super(props);
         const _plugins = this.loadPlugins();
         this.state = {
-            ...Object.fromEntries(Object.keys(_plugins).map(group => [group, true])),
+            ...this.getGroupsFromPlugins(_plugins),
             plugins: _plugins,
             modal: false,
             exportable: true,
@@ -32,14 +32,25 @@ export default class PluginBar extends Component {
         this.exportDest = React.createRef();
     }
 
-    resetPlugins = () => {
+    getGroupsFromPlugins = plugins => Object.fromEntries(Object.keys(plugins).map(group => [group, true]));
+
+    deactivateAllPlugins = () => {
         let plugins = cloneDeep(this.state.plugins);
         Object.values(plugins).forEach(group => Object.values(group).forEach(plugin => plugin.active = false));
 
-        this.setState({ ...this.state,
+        this.setState({
             plugins
         });
     };
+
+    reloadPlugins = () => {
+        const plugins = this.loadPlugins();
+        this.setState
+        ({ 
+            ...this.getGroupsFromPlugins(plugins),
+            plugins 
+        });
+    }
 
     render() {
         let pluginActive = Object.keys(this.state.plugins).some(group => Object.values(this.state.plugins[group]).some(plugin => plugin.active));
@@ -47,8 +58,8 @@ export default class PluginBar extends Component {
         <>
             <StyledCard style={{borderRadius: '.25rem 0 0 0', marginLeft: '0.5em'}}>
                 <StyledCenterListGroupItem>
-                    <RefreshButton/>
-                    <ClearButton resetPlugins={this.resetPlugins}/>
+                    <RefreshButton loadPlugins={this.reloadPlugins}/>
+                    <ClearButton resetPlugins={this.deactivateAllPlugins}/>
                 </StyledCenterListGroupItem>
                 <StyledCardContents>
                 {

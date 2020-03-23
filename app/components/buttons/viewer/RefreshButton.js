@@ -7,10 +7,10 @@ export default class RefreshButton extends Component {
 
     render() {    
         return (
-            <TooltipOverlay  component={ props => <StyledButton
+            <TooltipOverlay component={ props => <StyledButton
                     variant="primary" 
                     className={`btn btn-default fas fa-sync button`} 
-                    onClick={() => {}} 
+                    onClick={this.props.loadPlugins} 
                     {...props}
                 />} 
                 text={"Reload Plugins"}
