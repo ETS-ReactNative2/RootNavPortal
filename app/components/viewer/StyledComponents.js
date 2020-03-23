@@ -1,6 +1,5 @@
 import styled from 'styled-components';
 import { Card, ListGroupItem, Row, Button } from 'react-bootstrap';
-import FolderChecklist from '../containers/viewer/FolderListContainer';
 
 export const StyledListGroupItem = styled(ListGroupItem)` && {
     padding: 0.5em;

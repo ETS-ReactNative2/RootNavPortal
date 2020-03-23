@@ -9,7 +9,7 @@ import { StyledIcon } from '../CommonStyledComponents'
 import ClearButton from '../buttons/viewer/ClearButton';
 import RefreshButton from '../buttons/viewer/RefreshButton';
 import SelectDestinationButton from '../buttons/viewer/SelectDestinationButton';
-import { StyledModal } from '../buttons/StyledComponents'; 
+import { StyledModal, StyledModalDialog } from '../buttons/StyledComponents'; 
 import { createObjectCsvWriter } from 'csv-writer';
 import utils from '../../constants/pluginUtils';
 import cloneDeep from 'lodash.clonedeep';
@@ -83,7 +83,7 @@ export default class PluginBar extends Component {
                 <StyledMeasureButton variant={pluginActive ? "primary" : "secondary"} onClick={this.measure} disabled={!pluginActive}>Measure</StyledMeasureButton>
             </StyledCard>
 
-            <StyledModal show={this.state.modal} onHide={this.closeModal} style={{minWidth: 'max-content !important'}}>
+            <StyledModal show={this.state.modal} onHide={this.closeModal} dialogAs={StyledModalDialog}>
                 <Modal.Header closeButton>
                     <Modal.Title>Export Measurements</Modal.Title>
                 </Modal.Header>

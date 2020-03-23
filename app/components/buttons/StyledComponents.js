@@ -15,10 +15,12 @@ export const StyledButton = styled(Button)` && {
   margin: 0px 0.5em;
 }`
 
-
 export const StyledModal = styled(Modal)` && {
   color: black;
   white-space: pre-wrap;
-  min-width: max-content !important; 
 }`   
+
+export const StyledModalDialog = styled(Modal.Dialog)` && {
+  min-width: max-content !important;
+}`
 //min-width gets totally ignored. even inline on the modal component
