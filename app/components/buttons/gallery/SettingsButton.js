@@ -4,6 +4,7 @@ import { StyledButton, StyledModal } from '../StyledComponents';
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
 import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
+import { StyledIcon } from '../../CommonStyledComponents';
 import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class SettingsButton extends Component {
@@ -82,14 +83,25 @@ export default class SettingsButton extends Component {
         : (
             <Container>
                 <Row>
-                    <Col>
-                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
-                            { 
-                                API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
-                                    <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
-                                    : "") 
-                            }
-                        </DropdownButton>
+                    <Col style={{display: "flex"}}>
+                        <TooltipOverlay component={ props => 
+                            <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()} {...props}>
+                                { 
+                                    API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
+                                        <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
+                                        : "") 
+                                }
+                            </DropdownButton>}
+                            text={"This is the plant model used for analysis with RootNav. You can change this, but it will require a reanalysis."}
+                        />
+                        <TooltipOverlay  component={ props => <StyledIcon
+                                className={"fas fa-info-circle"}
+                                style={{ marginTop: "auto", marginBottom: "auto" }}
+                                {...props}
+                            />} 
+                            text={"This is the plant model used for analysis with RootNav. You can change this, but it will require a reanalysis."}
+                            placement={"top"}
+                        /> 
                     </Col>
                     <Col> 
                         <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
@@ -106,7 +118,7 @@ export default class SettingsButton extends Component {
     render() {    
         return (
         <>
-            <TooltipOverlay  component={ props => <StyledButton
+            <TooltipOverlay component={ props => <StyledButton
                     variant="secondary"
                     className={`btn btn-default fas fa-wrench button`}
                     onClick={e => {
