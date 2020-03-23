@@ -84,16 +84,13 @@ export default class SettingsButton extends Component {
             <Container>
                 <Row>
                     <Col style={{display: "flex"}}>
-                        <TooltipOverlay component={ props => 
-                            <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()} {...props}>
-                                { 
-                                    API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
-                                        <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
-                                        : "") 
-                                }
-                            </DropdownButton>}
-                            text={"This is the plant model used for analysis with RootNav. You can change this, but it will require a reanalysis."}
-                        />
+                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
+                            { 
+                                API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
+                                    <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
+                                    : "") 
+                            }
+                        </DropdownButton>
                         <TooltipOverlay  component={ props => <StyledIcon
                                 className={"fas fa-info-circle"}
                                 style={{ marginTop: "auto", marginBottom: "auto" }}
