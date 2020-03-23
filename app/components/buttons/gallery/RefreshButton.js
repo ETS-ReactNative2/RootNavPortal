@@ -13,8 +13,9 @@ export default class RefreshButton extends Component {
         each(folders, (folder, callback) => {
             readdir(folder.path, (err, files) => {
                 if (!this.structuredFiles[folder]) this.structuredFiles[folder] = {};
-
-                let matched = files.map(file => file.match(ALL_EXTS_REGEX).groups) //Scan for file types we use
+				let matched = files.map(file => file.match(ALL_EXTS_REGEX))
+					.filter(match => match) // Filter out null values, failed regex match.
+					.map(match => match.groups); //Scan for file types we use
                 matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
                     if (!Object.keys(regex).length === 0) 
                     {
@@ -26,14 +27,15 @@ export default class RefreshButton extends Component {
                     }
                 });
                 callback();
-            }), err => {
-                if (Object.keys(this.structuredFiles).length) 
-                {
-                    if (err) console.error(err)
-                    else this.props.refreshFiles(this.structuredFiles); //Add our struct with the folder as the key to state
-                }
-            };
-        });
+            });
+        }, err => {
+            if (Object.keys(this.structuredFiles).length) 
+            {
+                console.log(this.structuredFiles);
+                if (err) console.error(err)
+                else this.props.refreshFiles(this.structuredFiles); //Add our struct with the folder as the key to state
+            }
+        } );
     }
 
     render() {
