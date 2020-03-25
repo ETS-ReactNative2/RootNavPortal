@@ -25,7 +25,7 @@ export const _require = typeof __webpack_require__ === "function" ? __non_webpac
 
 //Backend
 export const INFLIGHT_REQS = 5;
-export const API_POLLTIME  = 1000 * 10; //API poll interval in milliseconds
+export const API_POLLTIME  = 1000 * 5; //API poll interval in milliseconds
 export const API_MODELS = [
     { apiName: "arabidopsis_plate", displayName: "Arabidopsis Plate Assay" }, 
     { apiName: "osr_bluepaper",     displayName: "Oilseed Rape (Blue Paper)" }, 

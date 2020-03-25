@@ -188,7 +188,7 @@ export default class Backend extends Component {
         const formData = new mFormData();
         const filePath = path + fileName + ext;
         if (!existsSync(filePath)) return;
-
+        
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
         formData.append('key', apiKey);
@@ -227,11 +227,12 @@ export default class Backend extends Component {
             get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
             get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
         ]
+        const { updateFile, removeInflight, inflightFiles, folders, addQueue } = this.props;
 
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
             let exts = {};
-            const { updateFile, removeInflight, inflightFiles, folders, addQueue } = this.props;
             const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
+
             if (inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
@@ -259,6 +260,15 @@ export default class Backend extends Component {
         })
         .catch(err => { removeInflight(filePath); console.error(err) });
 
+        //This doesn't work in Win7, needs testing in Win10.
+        if (Object.keys(inflightFiles).length == 0 && this.queue.length == 0)
+        {
+            new Notification("RootNav Portal", {
+                title: "Content-Image Notification",
+                body: "Images finished processing",
+                icon: path.join(__dirname, 'resources', 'icons', '16x16.png')
+            });
+        }
         this.inflightReqs++;
     }
 

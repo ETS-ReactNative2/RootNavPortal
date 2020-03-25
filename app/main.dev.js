@@ -30,6 +30,7 @@ let appIcon = null; //Orphan variable required so the icon doesn't get GC'd by V
 let mainWindow = null;
 let backendWindow = null;
 let iconClick = () => mainWindow ? mainWindow.focus() : openGallery();
+app.setAppUserModelId("rootnavportal"); //This may be needed for Win10/8 in dev, confirm this. It can be removed for release apparently.
 
 /**********************
 **  Open the Gallery
@@ -235,7 +236,7 @@ ipcMain.on('openViewer', (event, path) => {
     subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
 
     subWindow.webContents.on('did-finish-load', () => {
-        if (!subWindow) throw new Error('"subWindow" is not defined');
+        if (!subWindow) return subWindow = null;
         subWindow.show();
         subWindow.focus();
     });
