@@ -18,7 +18,6 @@ export default class RefreshButton extends Component {
 					.filter(match => match) // Filter out null values, failed regex match.
                     .map(match => match.groups) //Scan for file types we use
                     .filter(regex => Object.keys(regex).length);
-                console.log(matched);
                 matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
                     if (!structuredFiles[folder.path]) structuredFiles[folder.path] = {};
                     if (this.props.files[folder.path][regex.fileName]) {
@@ -44,7 +43,8 @@ export default class RefreshButton extends Component {
                     Object.entries(structuredFiles).forEach(([folder, files]) => {
                         let filesToParse = [];
                         Object.keys(files).forEach(fileName => {
-                            if (structuredFiles[folder][fileName].rsml && !structuredFiles[folder][fileName].parsedRSML) filesToParse.push(folder + sep + fileName);
+                            if (structuredFiles[folder][fileName].rsml && !structuredFiles[folder][fileName].parsedRSML) 
+                                filesToParse.push(folder + sep + fileName); // Only parse if the folder has RSML, and it hasn't already been parsed!
                         });
                         if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);    
                     });
