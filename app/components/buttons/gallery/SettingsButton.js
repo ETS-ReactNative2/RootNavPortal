@@ -74,7 +74,6 @@ export default class SettingsButton extends Component {
         });
 
         let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
-
         this.refreshModal("Change folder<b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE, "Change Model");
     }
 
@@ -149,7 +148,6 @@ export default class SettingsButton extends Component {
                     }}>
                         Cancel
                     </Button>
-
                 </Modal.Footer>
             </StyledModal>
         </> 

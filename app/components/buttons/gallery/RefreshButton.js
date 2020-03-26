@@ -3,6 +3,8 @@ import React, { Component } from 'react';
 import each from 'async/each';
 import { StyledButton } from '../StyledComponents'; 
 import { readdir } from 'fs';
+import { sep } from 'path';
+import { ipcRenderer } from 'electron';
 import { ALL_EXTS_REGEX, API_PARSE } from '../../../constants/globals'
 import TooltipOverlay from '../../common/TooltipOverlay';
 
@@ -10,15 +12,19 @@ export default class RefreshButton extends Component {
     onClick = (folders, files) => {
         let structuredFiles;
         each(folders, (folder, callback) => {
-            console.log(folder);
             structuredFiles = {};
             readdir(folder.path, (err, files) => {
-                if (!structuredFiles[folder.path]) structuredFiles[folder.path] = {};
 				let matched = files.map(file => file.match(ALL_EXTS_REGEX))
 					.filter(match => match) // Filter out null values, failed regex match.
-                    .map(match => match.groups); //Scan for file types we use
+                    .map(match => match.groups) //Scan for file types we use
+                    .filter(regex => Object.keys(regex).length);
+                console.log(matched);
                 matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
-                    if (Object.keys(regex).length) 
+                    if (!structuredFiles[folder.path]) structuredFiles[folder.path] = {};
+                    if (this.props.files[folder.path][regex.fileName]) {
+                        structuredFiles[folder.path][regex.fileName] = this.props.files[folder.path][regex.fileName];
+                    }
+                    else
                     {
                         let name = regex.fileName; //Each file has an object with the key as the file name
 						let ext  = regex.segMask ? regex.segMask.toUpperCase() : regex.ext.toLowerCase(); //if it's a seg mask like file_C1.png we'll get _C1, else we use the actual ext
@@ -31,11 +37,20 @@ export default class RefreshButton extends Component {
         }, err => {
             if (Object.keys(structuredFiles).length) 
             {
-                console.log(structuredFiles);
                 if (err) console.error(err)
-                else this.props.refreshFiles(structuredFiles); //Add our struct with the folder as the key to state
+                else 
+                {
+                    this.props.refreshFiles(structuredFiles); //Add our struct with the folder as the key to stat
+                    Object.entries(structuredFiles).forEach(([folder, files]) => {
+                        let filesToParse = [];
+                        Object.keys(files).forEach(fileName => {
+                            if (structuredFiles[folder][fileName].rsml && !structuredFiles[folder][fileName].parsedRSML) filesToParse.push(folder + sep + fileName);
+                        });
+                        if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);    
+                    });
+                }
             }
-        } );
+        });
     }
 
     render() {

@@ -13,10 +13,7 @@ export default class GalleryView extends Component {
                 </div>
                 <StyledGalleryViewDiv>
                 {
-                    folders.map((item, i) => {
-                        if (folders.length > 0)
-                            return <FolderView key={i} folder={item.path} isActive={item.active} />;
-                    })
+                    folders.map((item, i) => <FolderView key={i} folder={item.path} isActive={item.active} />)
                 }
                 </StyledGalleryViewDiv>
             </div>
