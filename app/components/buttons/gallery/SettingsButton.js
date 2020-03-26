@@ -113,7 +113,7 @@ export default class SettingsButton extends Component {
         )
     }
 
-    render() {    
+    render() {   
         return (
         <>
             <TooltipOverlay component={ props => <StyledButton
@@ -126,7 +126,7 @@ export default class SettingsButton extends Component {
                     {...props}
                 />} 
                 text={"Settings"}
-            /> 
+                />
             <StyledModal show={this.state.modal} onHide={this.close} onClick={e => e.stopPropagation()}>
                 <Modal.Header closeButton>
                     <Modal.Title>{this.state.titleText ? this.state.titleText : <>Edit settings for <b>{matchPathName(this.props.path).fileName}</b></>}</Modal.Title>

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import RefreshButton from '../../buttons/gallery/RefreshButton';
-import { refreshFiles } from '../../../actions/galleryActions';
+import { refreshFiles, addFiles } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
@@ -10,7 +10,10 @@ const mapStateToProps = (state, ownProps) => (
 );
 
 const mapDispatchToProps = dispatch => (
-    { refreshFiles: files => dispatch(refreshFiles(files)) }
+    { 
+        refreshFiles: files => dispatch(refreshFiles(files)),
+        addFiles: (folder, files) => dispatch(addFiles(folder, files)),
+    }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(RefreshButton)
