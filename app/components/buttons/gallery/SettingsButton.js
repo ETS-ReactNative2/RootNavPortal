@@ -13,7 +13,7 @@ export default class SettingsButton extends Component {
     ACTION_REANALYSE    = 1;
     ACTION_CHANGE_MODEL = 2;
 
-    DELETE_MESSAGE = "will <b>delete all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
+    DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
     defaultModel = { displayName: "Please select a model", apiName: "" };
 
     constructor(props) {
@@ -23,6 +23,7 @@ export default class SettingsButton extends Component {
         this.state = {
             modal: false,
             confirmText: "",
+            titleText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
             currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : this.defaultModel
@@ -38,20 +39,20 @@ export default class SettingsButton extends Component {
 
     close = () => {
         let reduxModel = this.props.folders.find(it => it.path == this.props.path).model;
-        this.setState({ 
-            modal: false, 
+        this.setState({ modal: false });
+        setTimeout(() => this.setState({ 
             confirmText: "", 
             currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
-        });
+        }), 250);
     }
 
     openModal = () => {
-        this.setState({ modal: true, confirmText: "" });
+        this.setState({ modal: true, confirmText: "", titleText: "" });
     }
 
-    refreshModal = confirmText => {
+    refreshModal = (confirmText, titleText) => {
         this.setState({ modal: false });
-        setTimeout(() => this.setState({ modal: true, confirmText }), 250);
+        setTimeout(() => this.setState({ modal: true, confirmText, titleText: (titleText ? titleText : "") }), 250);
     }
 
     handleAction = () => {
@@ -74,7 +75,7 @@ export default class SettingsButton extends Component {
 
         let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
 
-        this.refreshModal("Change <b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE)
+        this.refreshModal("Change folder<b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE, "Change Model");
     }
 
     renderModalBody = () => {
@@ -104,7 +105,7 @@ export default class SettingsButton extends Component {
                         <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
                             e.stopPropagation(); 
                             this.setState({ actionFlag: this.ACTION_REANALYSE })
-                            this.refreshModal("Reanalysing " + this.DELETE_MESSAGE) 
+                            this.refreshModal("Reanalysing " + this.DELETE_MESSAGE, "Reanalyse"); 
                         }}>Reanalyse</Button>
                     </Col>
                 </Row>
@@ -128,7 +129,7 @@ export default class SettingsButton extends Component {
             /> 
             <StyledModal show={this.state.modal} onHide={this.close} onClick={e => e.stopPropagation()}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Edit settings for <b>{matchPathName(this.props.path).fileName}</b></Modal.Title>
+                    <Modal.Title>{this.state.titleText ? this.state.titleText : <>Edit settings for <b>{matchPathName(this.props.path).fileName}</b></>}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     {this.renderModalBody()}
