@@ -71,7 +71,7 @@ export default class FolderView extends Component {
 			const formattedFolder = (folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder;
 			return (
 				<StyledFolderCard className="bg-light">
-					<StyledCardHeader onClick={() => this.props.toggleOpenFile(folder)}>
+					<StyledCardHeader onClick={e => { !e.target.className.includes("modal") && this.props.toggleOpenFile(folder) } }>
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${isActive ? '90' : '0'}deg)`}}/>
 							<TextPopup displayText={formattedFolder} popupText={folder} placement="top"/>
