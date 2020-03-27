@@ -178,16 +178,14 @@ export default class Thumbnail extends Component {
             this.fabricCanvas.dispose();
 
         let ext = Object.keys(file).find(key => key.match(/^.{0,4}Thumb$/));
-
-        const imageSize = sizeOf(this.getBuffer(file));
+        const buffer = this.getBuffer(file);
+        const imageSize = buffer && sizeOf(buffer);
 
         const baseVH = Math.round(window.innerHeight / 100);
-        const width = `${baseVH * 25}px`;
-        const height = `${imageSize.height / imageSize.width * (baseVH * 25)}px`;
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
             <StyledImageCard clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
-                <div style={{minWidth: width, minHeight: height}} ref={this.container}>
+                <div style={imageSize ? {minWidth: `${baseVH * 25}px`, minHeight: `${imageSize.height / imageSize.width * (baseVH * 25)}px`} : {}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
