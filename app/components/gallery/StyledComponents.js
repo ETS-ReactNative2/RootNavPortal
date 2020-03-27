@@ -51,9 +51,13 @@ export const StyledFolderCard = styled(Card)` && {
 
 export const StyledImageCard = styled(Card)` && {
     -webkit-transition: 0.2s;
+    width: auto;
+    height: fit-content;
+    border-radius: 5px;
+    overflow: hidden;
     &:hover {
         background-color: #e2e5ea !important;
-        filter: drop-shadow(6px 4px 4px #b4b7bb);
+        filter: ${props => (props.clickable ? 'drop-shadow(8px 8px 4px #b4b7bb)' : '0')};
     } 
 }`
 export const StyledCardHeader = styled(Card.Header)` && {
@@ -67,6 +71,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 export const StyledCardBody = styled(Card.Footer)` && {
     padding: 0.5em;
+    height: 100%;
 }`
 
 export const StyledCardText = styled.div` && {

@@ -8,6 +8,7 @@ import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
 import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
+import sizeOf from 'image-size';
 
 export default class Thumbnail extends Component {
     constructor(props)
@@ -40,14 +41,10 @@ export default class Thumbnail extends Component {
         margin: auto;
     }`;
 
-    StyledShadowDiv = styled.div` && {
-        min-height: 30vh;
-    }`;
-
     openViewer = e => 
     {
         const { folder, file, fileName } = this.props;
-        if (IMAGE_EXTS.some(ext => ext in file) && 'rsml' in file) 
+        if (IMAGE_EXTS.some(ext => ext in file) && this.hasRSML()) 
         {
             ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).filter(string => !string.includes("Thumb")).join("|"), () => {}) //| is the delimeter for file extensions in the URL bar
         }
@@ -75,20 +72,23 @@ export default class Thumbnail extends Component {
     setupCanvas = () => {
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: this.container.current.clientWidth, height: this.container.current.clientHeight });
         this.fabricCanvas.setDimensions({ width: this.container.current.clientWidth, height: this.container.current.clientHeight }, { backstoreOnly: true });
-        this.fabricCanvas.hoverCursor = 'pointer';
+        this.fabricCanvas.hoverCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
         //this.fabricCanvas.setDimensions({ width: '100%', height: '100%' }, { cssOnly: true }); 
     };
+
+    getBuffer = file => {
+        let ext;
+        Object.keys(file).forEach(key => { if (key.includes("Thumb")) ext = key });
+        return ext ? Buffer.from(file[ext]) : null;
+    }
 
     draw = () => {
         const { file, architecture } = this.props;
         const polylines = file.parsedRSML ? file.parsedRSML.polylines : null;
         let image = new Image();
-        let ext;
-
-        Object.keys(file).forEach(key => { if (key.includes("Thumb")) ext = key });
-        if (!ext) return;
-
-        image.src = 'data:image/png;base64,' + Buffer.from(file[ext]).toString('base64'); //Otherwise we can just ref the file path normally
+        const buffer = this.getBuffer(file);
+        if (!buffer) return;
+        image.src = 'data:image/png;base64,' + buffer.toString('base64'); //Otherwise we can just ref the file path normally
         image.onload = () => {
             let im = new fabric.Image(image, {
                 left: 0, top: 0, selectable: false
@@ -161,6 +161,8 @@ export default class Thumbnail extends Component {
         return <canvas id={this.canvasID}></canvas>
     };
 
+    hasRSML = () => "rsml" in this.props.file;
+
 	render() {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
@@ -177,15 +179,20 @@ export default class Thumbnail extends Component {
 
         let ext = Object.keys(file).find(key => key.match(/^.{0,4}Thumb$/));
 
+        const imageSize = sizeOf(this.getBuffer(file));
+
+        const baseVH = Math.round(window.innerHeight / 100);
+        const width = `${baseVH * 25}px`;
+        const height = `${imageSize.height / imageSize.width * (baseVH * 25)}px`;
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
-                <this.StyledShadowDiv ref={this.container}>
+            <StyledImageCard clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
+                <div style={{minWidth: width, minHeight: height}} ref={this.container}>
                     <this.FabricCanvas />
-                    <CollapsableLabel file={fileName}/>
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
-                </this.StyledShadowDiv>
+                </div>
+                <CollapsableLabel file={fileName}/>
             </StyledImageCard> 
 		);
 	}
