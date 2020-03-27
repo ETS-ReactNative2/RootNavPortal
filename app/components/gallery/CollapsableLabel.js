@@ -17,7 +17,7 @@ export default class CollapsableLabel extends Component {
         const { labels, file } = this.props;
         return (
             <Collapse in={labels} >
-                <span> {/* Important div do not remove. Causes lag due to rerendering child components unnecessarily */} 
+                <div> {/* Important div do not remove. Causes lag due to rerendering child components unnecessarily */} 
                     <StyledCardBody>
                         <StyledCardText>
                             <this.StyledTextOverflowContainer>
@@ -26,7 +26,7 @@ export default class CollapsableLabel extends Component {
                             </this.StyledTextOverflowContainer>
                         </StyledCardText>
                     </StyledCardBody>
-                </span>
+                </div>
             </Collapse>
         );
     }
