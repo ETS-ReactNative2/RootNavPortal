@@ -33,10 +33,6 @@ export default merge.smart(baseConfig, {
 
   module: {
     rules: [
-      { 
-        test: /node_modules\/axios/, 
-        resolve: { aliasFields: ["axios"] } 
-      },
       // Extract all .global.css to style.css as is
       {
         test: /\.global\.css$/,
