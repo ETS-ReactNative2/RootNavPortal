@@ -1,7 +1,7 @@
 // @flow
 import React, { Component } from 'react';
 import { StyledButton } from '../StyledComponents'; 
-import cloneDeep from 'lodash.cloneDeep';
+import cloneDeep from 'lodash.clonedeep';
 import { jsonOptions, matchPathName } from '../../../constants/globals';
 import Parser from 'xml2json';
 import { writeFileSync } from 'fs';
