@@ -30,7 +30,6 @@ let appIcon = null; //Orphan variable required so the icon doesn't get GC'd by V
 let mainWindow = null;
 let backendWindow = null;
 let iconClick = () => mainWindow ? mainWindow.focus() : openGallery();
-app.setAppUserModelId("rootnavportal"); //This may be needed for Win10/8 in dev, confirm this. It can be removed for release apparently.
 
 /**********************
 **  Open the Gallery
@@ -147,6 +146,7 @@ app.on('window-all-closed', () => {
 **  Electron Init Done - Startup
 ************************************/
 app.on('ready', async () => {
+    if (process.platform === 'win32') app.setAppUserModelId("com.uon.rootnavportal"); //This may be needed for Win10/8 in dev, confirm this. It can be removed for release apparently.
 
     if (process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true') 
         await installExtensions();

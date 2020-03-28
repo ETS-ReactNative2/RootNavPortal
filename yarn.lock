@@ -15682,7 +15682,7 @@ xml-name-validator@^3.0.0:
 
 "xml2json@https://github.com/chagrilled/node-xml2json":
   version "0.11.3"
-  resolved "https://github.com/chagrilled/node-xml2json#c186c5340c88238ee0a2e56ce721e82703066310"
+  resolved "https://github.com/chagrilled/node-xml2json#62709c3466345da4757a1454aa218510cd842a54"
   dependencies:
     hoek "^4.2.1"
     joi "^13.1.2"
