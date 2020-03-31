@@ -1,7 +1,7 @@
 {
   "name": "rootnav-portal",
   "productName": "RootNav-Portal",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Root system viewer",
   "scripts": {
     "build": "concurrently \"yarn build-main\" \"yarn build-renderer\"",
