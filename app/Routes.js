@@ -7,7 +7,7 @@ import routes from './constants/routes';
 import GalleryPage from './containers/GalleryPage';
 import ViewerPage from './containers/ViewerPage';
 import Backend from './containers/Backend';
-import { remote, ipcRenderer } from 'electron';
+import { remote } from 'electron';
 import { Button, Modal, InputGroup, Collapse } from 'react-bootstrap';
 import { writeConfig, _require } from './constants/globals';
 const { Menu } = remote;
@@ -17,7 +17,7 @@ export default class Routes extends Component {
     constructor(props)
     {
         super(props);
-        this.state = { modal: false, openCollapse: false, changeSaveAnimation: false };
+        this.state = { openCollapse: false, changeSaveAnimation: false };
 
         const menu = Menu.buildFromTemplate(this.menuTemplate);
         remote.getCurrentWindow().setMenu(menu);
@@ -26,12 +26,9 @@ export default class Routes extends Component {
         this.apiKey  = React.createRef();
     }
 
-    modalSettings = () => {
-        this.setState({ ...this.state, modal: true,  })
-    };
-
     closeModal = () => {
-        this.setState({ modal: false, openCollapse: false, changeSaveAnimation: false });
+        this.props.updateAPIModal(false);
+        this.setState({ openCollapse: false, changeSaveAnimation: false });
     };
 
     static Views(tag = "", exts = "") {
@@ -74,7 +71,7 @@ export default class Routes extends Component {
             <Router>
             <div>
                 <Route path='/' component={Routes.View}/>
-                <Modal show={true} show={this.state.modal} onHide={this.closeModal}>
+                <Modal show={true} show={this.props.apiModal} onHide={this.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Server Settings</Modal.Title>
                     </Modal.Header>
@@ -118,7 +115,7 @@ export default class Routes extends Component {
                 {
                     label: "&Server Settings",
                     accelerator: 'Ctrl+P',
-                    click: () => this.modalSettings()
+                    click: () => this.props.updateAPIModal(true)
                 }
             ]
         }

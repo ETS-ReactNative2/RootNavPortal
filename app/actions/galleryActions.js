@@ -20,6 +20,7 @@ export const TOGGLE_LABELS = 'TOGGLE_LABELS';
 export const TOGGLE_GALLERY_ARCH = 'TOGGLE_GALLERY_ARCH';
 export const SAVE_API_SETTINGS = 'SAVE_API_SETTINGS';
 export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
+export const UPDATE_API_MODAL = 'UPDATE_API_MODAL';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -43,3 +44,4 @@ export const toggleLabels = () => ({ type: TOGGLE_LABELS });
 export const toggleArch = () => ({ type: TOGGLE_GALLERY_ARCH });
 export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, address, key });
 export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });  
+export const updateAPIModal = bool => ({ type: UPDATE_API_MODAL, bool }); //This is in Redux so the indicator button and menus can open the modal

@@ -4,6 +4,8 @@ import AddButton from '../containers/gallery/AddButtonContainer';
 import RefreshButton from '../containers/gallery/RefreshButtonContainer';
 import FilterBar from '../containers/gallery/FilterBarContainer'
 import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
+import ServerIndicator from '../containers/gallery/ServerIndicatorContainer';
+
 import styled from 'styled-components';
 
 export default class TopBar extends Component {
@@ -26,6 +28,7 @@ export default class TopBar extends Component {
                         <input type="checkbox" className="custom-control-input" id="drawRsml" defaultChecked={true} onClick={this.props.toggleArch}/>
                         <label className="custom-control-label" htmlFor="drawRsml">Draw Architecture</label>
                     </this.labelDiv>
+                    <ServerIndicator />
                 </StyledTopBarDiv>
                 <StyledTopBarHR/>
             </div>
