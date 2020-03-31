@@ -2,7 +2,7 @@
 import React, { Component } from 'react';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import { DropdownButton, Dropdown, Button, Modal, Container, Col, Row } from 'react-bootstrap';
-import { API_MODELS, matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
+import { matchPathName, API_DELETE, writeConfig } from '../../../constants/globals';
 import { ipcRenderer } from 'electron';
 import { StyledIcon } from '../../CommonStyledComponents';
 import TooltipOverlay from '../../common/TooltipOverlay';
@@ -18,7 +18,7 @@ export default class SettingsButton extends Component {
 
     constructor(props) {
         super(props);
-        const { folders, path } = this.props;
+        const { folders, path, apiModels } = this.props;
         const modelApiName = folders.find(it => it.path == path).model; // Get current modelApiName
         this.state = {
             modal: false,
@@ -26,7 +26,7 @@ export default class SettingsButton extends Component {
             titleText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
-            currentModel: modelApiName ? API_MODELS.find(it => it.apiName == modelApiName) : this.defaultModel
+            currentModel: modelApiName ? apiModels.find(it => it.apiName == modelApiName) : this.defaultModel
         }
     }
 
@@ -38,11 +38,13 @@ export default class SettingsButton extends Component {
     }
 
     close = () => {
-        let reduxModel = this.props.folders.find(it => it.path == this.props.path).model;
+        const { folders, apiModels } = this.props;
+
+        let reduxModel = folders.find(it => it.path == this.props.path).model;
         this.setState({ modal: false });
         setTimeout(() => this.setState({ 
             confirmText: "", 
-            currentModel: API_MODELS.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
+            currentModel: apiModels.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
         }), 250);
     }
 
@@ -67,7 +69,7 @@ export default class SettingsButton extends Component {
     }
 
     selectDropdown = model => {
-        let oldModel = API_MODELS.find(model => model.apiName == this.state.currentModel.apiName);
+        let oldModel = this.props.apiModels.find(model => model.apiName == this.state.currentModel.apiName);
         this.setState({  
             actionFlag: this.ACTION_CHANGE_MODEL, 
             currentModel: model 
@@ -86,7 +88,7 @@ export default class SettingsButton extends Component {
                     <Col style={{display: "flex"}}>
                         <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
                             { 
-                                API_MODELS.map((model, i) => model.displayName != currentModel.displayName ? 
+                                this.props.apiModels.map((model, i) => model.displayName != currentModel.displayName ? 
                                     <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
                                     : "") 
                             }

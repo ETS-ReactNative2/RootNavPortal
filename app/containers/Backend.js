@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 import Backend from '../Backend';
 import { updateFile, resetFolder, updateParsedRSML, addThumb, updateAPIStatus} from '../actions/galleryActions';
-import { addQueue, removeQueue, addInflight, removeInflight } from '../actions/backendActions';
+import { addQueue, removeQueue, addInflight, removeInflight, updateModels } from '../actions/backendActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
     files: state.gallery.files,
@@ -9,7 +9,8 @@ const mapStateToProps = (state, ownProps) => ({
     folders: state.gallery.folders,
     apiAddress: state.gallery.apiAddress,
     apiKey: state.gallery.apiKey,
-    apiStatus: state.gallery.apiStatus
+    apiStatus: state.gallery.apiStatus,
+    apiModels: state.backend.apiModels
 });
 
 //Follows the form ("path/folder", "file_tag_flower", {rsml: true, seg_p: true, seg_l: true})
@@ -22,7 +23,8 @@ const mapDispatchToProps = dispatch => ({
     removeInflight: file => dispatch(removeInflight(file)),
     updateParsedRSML: (folder, file, parsedRSML) => dispatch(updateParsedRSML(folder, file, parsedRSML)),
     addThumb: (folder, fileName, thumb) => dispatch(addThumb(folder, fileName, thumb)),
-    updateAPIStatus: status => dispatch(updateAPIStatus(status))
+    updateAPIStatus: status => dispatch(updateAPIStatus(status)),
+    updateAPIModels: (apiModels, rootNavModel) => dispatch(updateModels(apiModels, rootNavModel))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Backend)

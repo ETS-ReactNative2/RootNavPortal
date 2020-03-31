@@ -1,6 +1,15 @@
-import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE } from '../actions/backendActions';
+import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE, UPDATE_MODELS } from '../actions/backendActions';
 
-const initialState = { queue: [], inFlight: {} };
+const initialState = { 
+    queue: [], 
+    inFlight: {}, 
+    apiModels: [
+        { apiName: "arabidopsis_plate", displayName: "Arabidopsis Plate Assay" }, 
+        { apiName: "osr_bluepaper",     displayName: "Oilseed Rape (Blue Paper)" }, 
+        { apiName: "wheat_bluepaper",   displayName: "Wheat (Blue Paper)" } 
+    ],
+    rootNavModel: -1
+};
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -26,6 +35,11 @@ export default (state = initialState, action) => {
                 ...state,
                 inFlight: files || {}
             }
+        }
+        case UPDATE_MODELS: return {
+            ...state,
+            apiModels: action.apiModels,
+            rootNavModel: action.rootNavModel
         }
         default: return state;
     }

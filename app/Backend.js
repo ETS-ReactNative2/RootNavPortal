@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, API_MODELS, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
@@ -68,12 +68,17 @@ export default class Backend extends Component {
         //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
         if ((nextProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != nextProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
         {
-            const { apiAddress, apiKey, updateAPIStatus } = nextProps;
+            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels } = nextProps;
             defaults.headers.common['key'] = apiKey; //Set the default header for every request.
+            let rootNavModel;
 
             get(apiAddress + "/model").then(res => { 
-                updateAPIStatus(true);
-                this.scanFiles();
+                res.data.forEach((model, index) => model.name.includes("rootnav") ? rootNavModel = index : {});
+                get(apiAddress + "/model/" + rootNavModel).then(res => {
+                    updateAPIModels(res.data.inputs, rootNavModel);
+                    updateAPIStatus(true);
+                    this.scanFiles();
+                });
             }).catch(err => { updateAPIStatus(false) });
         }
 
@@ -174,13 +179,13 @@ export default class Backend extends Component {
     //Send the job off to the server
     sendFile = () => {
         if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs) return;
-        const { removeQueue, folders, addInflight, apiKey, apiAddress } = this.props;
+        const { removeQueue, folders, addInflight, apiKey, apiAddress, apiModels } = this.props;
 
         let file = this.queue.shift();
         const { path, fileName, ext } = this.matchFileParts(file);
 
         let model = folders.find(folder => (folder.path + sep) == path).model;
-        if (!model || !API_MODELS.some(apiModel => apiModel.apiName == model)) return;
+        if (!model || !apiModels.some(apiModel => apiModel.apiName == model)) return;
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
         removeQueue(path + fileName + ext);
