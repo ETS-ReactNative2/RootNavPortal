@@ -14,7 +14,8 @@ import imageThumbail from 'image-thumbnail';
 export default class Backend extends Component {
     queue = [];
     inflightReqs = INFLIGHT_REQS; //Concurrency limit
-    
+    rootNavModel = -1; //HMR seems to break queues and class vars.
+
     //this.props.inflightfiles : Tracks requests with some data in case we need to ignore the response. { C:\path\file: {model: 'wheat_bluepaper', ext: '.png' }, ... }
 
     constructor(props)
@@ -68,18 +69,26 @@ export default class Backend extends Component {
         //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
         if ((nextProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != nextProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
         {
-            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels } = nextProps;
-            defaults.headers.common['key'] = apiKey; //Set the default header for every request.
-            let rootNavModel;
+            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = nextProps;
+            defaults.headers.common['X-Auth-Token'] = apiKey; //Set the default header for every request.
 
             get(apiAddress + "/model").then(res => { 
-                res.data.forEach((model, index) => model.name.includes("rootnav") ? rootNavModel = index : {});
-                get(apiAddress + "/model/" + rootNavModel).then(res => {
-                    updateAPIModels(res.data.inputs, rootNavModel);
+                updateAPIAuth(true);
+
+                res.data.forEach(model => model.jsonModelName.includes("rootnav2") ? this.rootNavModel = model.modelId : {});
+                if (this.rootNavModel == -1) updateAPIAuth(false); //If the user has no RN2 model, we say the API key is invalid.
+
+                else get(apiAddress + "/model/" + this.rootNavModel).then(res => { //Otherwise go fetch the RN2 input models, and report all good
+                    updateAPIModels(res.data.inputs[1].accepted_values);
                     updateAPIStatus(true);
                     this.scanFiles();
-                });
-            }).catch(err => { updateAPIStatus(false) });
+                }).catch(err => console.error(err));
+            }).catch(err => { 
+                console.log(err);
+                if (err.message.includes("401")) 
+                    updateAPIAuth(false); //If we get a 401, explicitly set in Redux that we did so the indicator can relay an error regarding the token
+                updateAPIStatus(false); 
+            });
         }
 
         //If the number of files in the new files array is larger than the amount of files we have, scan through and check for new ones lacking RSML
@@ -178,14 +187,14 @@ export default class Backend extends Component {
 
     //Send the job off to the server
     sendFile = () => {
-        if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs) return;
+        if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs || !this.props.apiAuth || this.rootNavModel < 0) return;
         const { removeQueue, folders, addInflight, apiKey, apiAddress, apiModels } = this.props;
 
         let file = this.queue.shift();
         const { path, fileName, ext } = this.matchFileParts(file);
 
         let model = folders.find(folder => (folder.path + sep) == path).model;
-        if (!model || !apiModels.some(apiModel => apiModel.apiName == model)) return;
+        if (!model || !apiModels.some(apiModel => apiModel.value == model)) return;
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
         removeQueue(path + fileName + ext);
@@ -195,7 +204,7 @@ export default class Backend extends Component {
         if (!existsSync(filePath)) return;
         
         formData.append('io_rgb', readFileSync(filePath), filePath);
-        formData.append('model_id', 3); //3 is rootnav, hardcoded. Unlikely to change.
+        formData.append('model_id', this.rootNavModel); //3 is rootnav, hardcoded. Unlikely to change.
         formData.append('key', apiKey);
         formData.append('io_id', fileName);
         formData.append('io_model', model);

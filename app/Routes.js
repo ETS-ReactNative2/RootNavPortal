@@ -10,14 +10,25 @@ import Backend from './containers/Backend';
 import { remote } from 'electron';
 import { Button, Modal, InputGroup, Collapse } from 'react-bootstrap';
 import { writeConfig, _require } from './constants/globals';
+import styled from 'styled-components';
 const { Menu } = remote;
-
 export default class Routes extends Component {
 
+    StyledPort = styled.input`
+        border-bottom-left-radius: 0;
+        border-top-left-radius: 0; 
+        width: 6.5vw; 
+    `;
+    StyledI = styled.i`
+        color: #5cb85c;
+        margin-right: 0.25em;
+        font-size: 1.2em;
+    `;
+    
     constructor(props)
     {
         super(props);
-        this.state = { openCollapse: false, changeSaveAnimation: false };
+        this.state = { openCollapse: false, changeSaveAnimation: false, validateWarning: false };
 
         const menu = Menu.buildFromTemplate(this.menuTemplate);
         remote.getCurrentWindow().setMenu(menu);
@@ -55,18 +66,21 @@ export default class Routes extends Component {
         let apiAddress = this.address.current.value;
         let port       = this.port.current.value;
         let apiKey     = this.apiKey.current.value;
-        if (!apiAddress || !port || !apiKey) return; //Maybe do some form validation here later 
+        if (!apiAddress || !apiKey) //Allow for port to be left empty in case it'll default to 80/443
+        {
+            this.setState({ validateWarning: true });
+            return; //Maybe do some form validation here later 
+        }
+        this.setState({ ...this.state, openCollapse: true, validateWarning: false });
+        this.props.saveAPISettings(apiAddress + (port ? ":" : "") + port, apiKey);
 
-        this.setState({ ...this.state, openCollapse: true });
-        this.props.saveAPISettings(apiAddress + ":" + port, apiKey);
-
-        writeConfig(JSON.stringify({ apiAddress: apiAddress + ":" + port, apiKey, folders: this.props.folders }, null, 4));
+        writeConfig(JSON.stringify({ apiAddress: apiAddress + (port ? ":" : "") + port, apiKey, folders: this.props.folders }, null, 4));
         setTimeout(() => this.setState({ ...this.state, changeSaveAnimation: true }), 225); //checkmark animation delay
     };
 
     render() {
         const { address, apiKey} = this.props;
-        const { serverIP = "", serverPort = "" } = address ? address.match(/(?<serverIP>.+):(?<serverPort>.+)/).groups : {}
+        const { proto = "", serverIP = "", serverPort = "" } = address ? address.match(/(?<proto>https?:\/\/)(?<serverIP>[^:]+)(?::(?<serverPort>.+))?/).groups : {}
         return (
             <Router>
             <div>
@@ -77,14 +91,13 @@ export default class Routes extends Component {
                     </Modal.Header>
                     <Modal.Body>
                         <InputGroup>
-                            <input key={0} type="text" defaultValue={serverIP} className="form-control" placeholder="https://server.location" ref={this.address}/>
+                            <input style={this.state.validateWarning ? { boxShadow: '0 0 10px red', borderRadius: '3px' } : {}} key={0} type="text" defaultValue={proto + serverIP} className="form-control" placeholder="https://server.location" ref={this.address}/>
                             <InputGroup.Append><InputGroup.Text><b>:</b></InputGroup.Text></InputGroup.Append> 
                             <InputGroup.Append>
-                                {/* Considering putting minWidth 7em on this input, so the URL is bigger and port is shorter, but I also like the symmetry as it is currently. */}
-                                <input key={1} type="text" defaultValue={serverPort} className="form-control" placeholder="port" ref={this.port} style={{ borderBottomLeftRadius: '0', borderTopLeftRadius: '0' }}/> 
+                                <this.StyledPort key={1} type="text" defaultValue={serverPort} className="form-control" placeholder="port" ref={this.port} /> 
                             </InputGroup.Append>
                         </InputGroup>
-                        <input key={0} type="text" defaultValue={apiKey} className="form-control" placeholder="Server Key" ref={this.apiKey} style={{marginTop: '1em'}}/>      
+                        <input key={0} type="text" defaultValue={apiKey} className="form-control" placeholder="Server Key" ref={this.apiKey} style={Object.assign(this.state.validateWarning ? { boxShadow: '0 0 10px red' } : {}, { marginTop: '1em' }) }/>      
                         <Collapse in={this.state.openCollapse}>
                             <div>
                                 <div style={{ display: 'flex' }} className={"circle-loader" + (this.state.changeSaveAnimation ? " load-complete" : "")}>
@@ -94,7 +107,7 @@ export default class Routes extends Component {
                         </Collapse>
                     </Modal.Body>
                     <Modal.Footer>
-                    { this.props.apiStatus ? <span>Server is available <i className="fas fa-check-circle" style={{color: '#5cb85c', marginRight: '0.25em', fontSize: '1.2em'}}/></span> : ""}
+                    { this.props.apiStatus ? <span>Server is available <this.StyledI className="fas fa-check-circle"/></span> : ""}
                     <Button variant={this.state.changeSaveAnimation ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
                         {this.state.changeSaveAnimation ? "Close" : "Cancel"}
                     </Button>

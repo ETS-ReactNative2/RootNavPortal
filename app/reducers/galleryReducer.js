@@ -1,10 +1,10 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
     UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
-    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL } from '../actions/galleryActions';
+    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH } from '../actions/galleryActions';
 
 const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
-    filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false, apiModal: false };
+    filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false, apiModal: false, apiAuth: true };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -149,6 +149,10 @@ export default (state = initialState, action) => {
             ...state,
             apiModal: action.bool
         }
+        case UPDATE_API_AUTH: return {
+            ...state,
+            apiAuth: action.auth
+        }
         default: return state;
     }
 }
@@ -165,6 +169,7 @@ export default (state = initialState, action) => {
 // apiAddress/Key = Address/port and key used for the API connection
 // apiStatus      = is the API up or not -- these are here due to the gallery reducer handling config, which also handles the API, so it's easier to keep them together in one reducer
 // apiModal       = determines if the API settings modal is open or not
+// apiAuth        = Is our authentication ok? Assumes yes. Used for the server indicator colours/text as well as a backend check.
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists

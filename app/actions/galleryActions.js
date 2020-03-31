@@ -21,6 +21,7 @@ export const TOGGLE_GALLERY_ARCH = 'TOGGLE_GALLERY_ARCH';
 export const SAVE_API_SETTINGS = 'SAVE_API_SETTINGS';
 export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
 export const UPDATE_API_MODAL = 'UPDATE_API_MODAL';
+export const UPDATE_API_AUTH = 'UPDATE_API_AUTH';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -42,6 +43,7 @@ export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, f
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions
 export const toggleLabels = () => ({ type: TOGGLE_LABELS });
 export const toggleArch = () => ({ type: TOGGLE_GALLERY_ARCH });
-export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, address, key });
+export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, address, key }); //These need to be in gallery because they need to be written to config with the other things
 export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });  
 export const updateAPIModal = bool => ({ type: UPDATE_API_MODAL, bool }); //This is in Redux so the indicator button and menus can open the modal
+export const updateAPIAuth = auth => ({ type: UPDATE_API_AUTH, auth });

@@ -14,7 +14,7 @@ export default class SettingsButton extends Component {
     ACTION_CHANGE_MODEL = 2;
 
     DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
-    defaultModel = { displayName: "Please select a model", apiName: "" };
+    defaultModel = { description: "Please select a model", value: "" };
 
     constructor(props) {
         super(props);
@@ -26,7 +26,7 @@ export default class SettingsButton extends Component {
             titleText: "",
             actionFlag: this.ACTION_NONE,
             // If there's no model selected, create a 'dummy' model to display at the top of the dropdown.
-            currentModel: modelApiName ? apiModels.find(it => it.apiName == modelApiName) : this.defaultModel
+            currentModel: modelApiName ? apiModels.find(it => it.value == modelApiName) : this.defaultModel
         }
     }
 
@@ -35,16 +35,20 @@ export default class SettingsButton extends Component {
         if (!path) return;
         const updatedFolders = folders.map(folder => folder.path === path ? {...folder, model: apiName } : folder);
         writeConfig(JSON.stringify({ apiAddress, apiKey, folders: updatedFolders }, null, 4));
-    }
+    };
+
+    cancelAction = () => {
+        const { folders, apiModels } = this.props;
+        //Reset our currentModel to that in Redux if cancel is clicked.
+        let reduxModel = folders.find(it => it.path == this.props.path).model;
+        this.setState({ currentModel: apiModels.find(apiModel => apiModel.value == reduxModel) || this.defaultModel });
+    };
 
     close = () => {
-        const { folders, apiModels } = this.props;
-
-        let reduxModel = folders.find(it => it.path == this.props.path).model;
         this.setState({ modal: false });
+        
         setTimeout(() => this.setState({ 
             confirmText: "", 
-            currentModel: apiModels.find(apiModel => apiModel.apiName == reduxModel) || this.defaultModel
         }), 250);
     }
 
@@ -54,29 +58,30 @@ export default class SettingsButton extends Component {
 
     refreshModal = (confirmText, titleText) => {
         this.setState({ modal: false });
-        setTimeout(() => this.setState({ modal: true, confirmText, titleText: (titleText ? titleText : "") }), 250);
+        setTimeout(() => this.setState({ modal: true, confirmText, titleText: (titleText || "") }), 250);
     }
 
     handleAction = () => {
-        const { path, updateFolderModel } = this.props; 
-        const { actionFlag, currentModel: { apiName } } = this.state;
+        const { path, updateFolderModel, apiModels }  = this.props; 
+        const { actionFlag, currentModel: { value } } = this.state;
+        this.setState({ currentModel: apiModels.find(apiModel => apiModel.value == value) || this.defaultModel });
         
         ipcRenderer.send(API_DELETE, { path });
         if (actionFlag == this.ACTION_CHANGE_MODEL) {
-            updateFolderModel(path, apiName); //Finish when model is in state
-            this.writeUpdatedModel(apiName);
+            updateFolderModel(path, value); //Finish when model is in state
+            this.writeUpdatedModel(value);
         }
     }
 
     selectDropdown = model => {
-        let oldModel = this.props.apiModels.find(model => model.apiName == this.state.currentModel.apiName);
+        let oldModel = this.props.apiModels.find(model => model.value == this.state.currentModel.value);
         this.setState({  
             actionFlag: this.ACTION_CHANGE_MODEL, 
             currentModel: model 
         });
 
-        let modelText = oldModel ? ` from <b>${oldModel.displayName}</b>` : "";
-        this.refreshModal("Change folder <b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.displayName + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE, "Change Model");
+        let modelText = oldModel ? ` from <b>${oldModel.description}</b>` : "";
+        this.refreshModal("Change folder <b>" + matchPathName(this.props.path).fileName + "</b>"+modelText+" to " + "<b>" + model.description + "</b>" + "?\n\nThis " + this.DELETE_MESSAGE, "Change Model");
     }
 
     renderModalBody = () => {
@@ -86,10 +91,10 @@ export default class SettingsButton extends Component {
             <Container>
                 <Row>
                     <Col style={{display: "flex"}}>
-                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.displayName} onClick={e => e.stopPropagation()}>
+                        <DropdownButton style={{'display': 'inline-block'}} id="model-button" title={currentModel.description} onClick={e => e.stopPropagation()}>
                             { 
-                                this.props.apiModels.map((model, i) => model.displayName != currentModel.displayName ? 
-                                    <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.displayName}</Dropdown.Item> 
+                                this.props.apiModels.map((model, i) => model.description != currentModel.description ? 
+                                    <Dropdown.Item key={i} onSelect={() => { this.selectDropdown(model) }}>{model.description}</Dropdown.Item> 
                                     : "") 
                             }
                         </DropdownButton>
@@ -146,6 +151,7 @@ export default class SettingsButton extends Component {
 
                     <Button variant="secondary" onClick={e => {         
                         e.stopPropagation();
+                        this.cancelAction();
                         this.close();
                     }}>
                         Cancel

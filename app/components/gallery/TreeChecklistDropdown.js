@@ -15,7 +15,7 @@ export default class TreeChecklistDropdown extends Component {
                 {checked ? 
                     <FormControl defaultValue={model} as='select' onChange={e => updateChecklistDropdown(path, e.target.value)} disabled={model || model == ""}>
                         <option value={''}>Select Model</option>
-                        { apiModels.map(model => <option key={model.apiName} value={model.apiName}>{model.displayName}</option>) }
+                        { apiModels.map(model => <option key={model.value} value={model.value}>{model.description}</option>) }
                     </FormControl> 
                     : ""}
             </FormGroup>

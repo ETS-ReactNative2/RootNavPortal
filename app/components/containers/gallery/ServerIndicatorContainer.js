@@ -6,7 +6,8 @@ const mapStateToProps = (state, ownProps) => (
     { 
         apiAddress: state.gallery.apiAddress,
         apiKey: state.gallery.apiKey,
-        apiStatus: state.gallery.apiStatus
+        apiStatus: state.gallery.apiStatus,
+        apiAuth: state.gallery.apiAuth
     }
 );
 

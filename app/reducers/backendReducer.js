@@ -4,11 +4,10 @@ const initialState = {
     queue: [], 
     inFlight: {}, 
     apiModels: [
-        { apiName: "arabidopsis_plate", displayName: "Arabidopsis Plate Assay" }, 
-        { apiName: "osr_bluepaper",     displayName: "Oilseed Rape (Blue Paper)" }, 
-        { apiName: "wheat_bluepaper",   displayName: "Wheat (Blue Paper)" } 
+        { value: "arabidopsis_plate", description: "Arabidopsis Plate Assay" }, 
+        { value: "osr_bluepaper",     description: "Oilseed Rape (Blue Paper)" }, 
+        { value: "wheat_bluepaper",   description: "Wheat (Blue Paper)" } 
     ],
-    rootNavModel: -1
 };
 
 export default (state = initialState, action) => {
@@ -39,7 +38,6 @@ export default (state = initialState, action) => {
         case UPDATE_MODELS: return {
             ...state,
             apiModels: action.apiModels,
-            rootNavModel: action.rootNavModel
         }
         default: return state;
     }

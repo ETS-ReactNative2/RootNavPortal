@@ -98,7 +98,6 @@ export default class Viewer extends Component {
 
     updatePath = newPath => {
         const folder = newPath.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
-        console.log(this.props.files);
         const files = Object.keys(this.props.files[folder]);
         if (files.length == 0) return; // Don't change the folder if there's no files in it!
         this.setState({path: folder + sep + files[0]});
