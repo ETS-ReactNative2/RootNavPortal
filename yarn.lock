@@ -10135,14 +10135,6 @@ node-addon-api@^2.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-2.0.0.tgz#f9afb8d777a91525244b01775ea0ddbe1125483b"
   integrity sha512-ASCL5U13as7HhOExbT6OlWJJUV/lLzL2voOSP1UVehpRD8FbSrSDjfScK/KwAvVTI5AS6r4VwbOMlIqtvRidnA==
 
-node-expat@^2.3.18:
-  version "2.3.18"
-  resolved "https://registry.yarnpkg.com/node-expat/-/node-expat-2.3.18.tgz#d9e6949cecda15e131f14259b73dc7b9ed7bc560"
-  integrity sha512-9dIrDxXePa9HSn+hhlAg1wXkvqOjxefEbMclGxk2cEnq/Y3U7Qo5HNNqeo3fQ4bVmLhcdt3YN1TZy7WMZy4MHw==
-  dependencies:
-    bindings "^1.5.0"
-    nan "^2.13.2"
-
 "node-expat@https://github.com/Chagrilled/node-expat":
   version "2.3.18"
   resolved "https://github.com/Chagrilled/node-expat#6eaf88033e9630c48e84ff20f3993d82d99f6667"

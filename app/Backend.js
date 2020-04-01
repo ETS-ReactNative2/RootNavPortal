@@ -63,18 +63,17 @@ export default class Backend extends Component {
         }
     };
 
-
-    shouldComponentUpdate(nextProps)
-    {
+    componentDidUpdate(prevProps)
+    {  
         //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
-        if ((nextProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != nextProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
+        if ((prevProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != prevProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
         {
-            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = nextProps;
+            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = this.props;
             defaults.headers.common['X-Auth-Token'] = apiKey; //Set the default header for every request.
 
             get(apiAddress + "/model").then(res => { 
                 updateAPIAuth(true);
-
+                this.rootNavModel = -1;
                 res.data.forEach(model => model.jsonModelName.includes("rootnav2") ? this.rootNavModel = model.modelId : {});
                 if (this.rootNavModel == -1) updateAPIAuth(false); //If the user has no RN2 model, we say the API key is invalid.
 
@@ -92,11 +91,8 @@ export default class Backend extends Component {
         }
 
         //If the number of files in the new files array is larger than the amount of files we have, scan through and check for new ones lacking RSML
-        if (Object.values(nextProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
+        if (Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(prevProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
             this.scanFiles(); //If files changes, scan it for queueing.
-        return false; //In theory, backend never needs to update, since it receives everything via IPC, and sends back to Redux when done. 
-        //Some collision checking will need to be done in reducer so it doesn't try write over a folder:file that may have been removed
-        //This theory is in caution of updating stopping functions and resetting some component vars like the queue. Props still get updated
     }
 
     genThumbnail = (folder, file, fileName) => {
@@ -291,5 +287,5 @@ export default class Backend extends Component {
         return ""
     }
 
-    matchFileParts = file => file.match(/(?<path>.+\\|\/)(?<fileName>.+)(?<ext>\..+)/).groups; //Matches the file path into the absolute directory path/, file name and .ext
+    matchFileParts = file => file.match(/(?<path>.+(?:\\|\/))(?<fileName>.+?)(?<ext>\..+)/).groups; //Matches the file path into the absolute directory path/, file name and .ext
 }

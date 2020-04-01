@@ -23,6 +23,7 @@ import { join } from 'path';
 //     autoUpdater.checkForUpdatesAndNotify();
 //   }
 // }
+
 const CLOSE = 0;
 const BACKGROUND = 1;
 let closeFlag; //Hack - app.quit causes the close event to fire again, so we need to terminate it early if the user wants to close the app
@@ -166,18 +167,15 @@ app.on('ready', async () => {
         skipTaskbar: true,
         devTools: process.env.NODE_ENV === 'production' ? false : true
     });
-  
+
     backendWindow.loadURL(`file://${__dirname}/app.html?backend`);
 
-    // @TODO: Use 'ready-to-show' event
-    //        https://github.com/electron/electron/blob/master/docs/api/browser-window.md#using-ready-to-show-event
-
-    backendWindow.on('ready-to-show', () => {
+    backendWindow.webContents.on('did-finish-load', () => {
         bBackendReady = true;
         backendWindow.webContents.send(API_PARSE, backendQueue.parse);
         backendWindow.webContents.send(API_THUMB, backendQueue.thumb);
     });
-
+    
     /**********************
     **  Icon Tray Settings
     ***********************/
