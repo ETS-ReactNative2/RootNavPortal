@@ -45,6 +45,7 @@ const openGallery = () => {
         minWidth: WINDOW_WIDTH,
         webPreferences: {
             nodeIntegration: true,
+            additionalArguments: [`--packaged=${app.isPackaged}`] //Zero latency way of ensuring renderers know they're packaged.
         },
         devTools: process.env.NODE_ENV === 'production' ? false : true
     });
@@ -162,7 +163,10 @@ app.on('ready', async () => {
         show: false,
         width: 0,
         height: 0,
-        webPreferences: { nodeIntegration: true },
+        webPreferences: { 
+            nodeIntegration: true,
+            additionalArguments: [`--packaged=${app.isPackaged}`]
+        },
         frame: false,
         skipTaskbar: true,
         devTools: process.env.NODE_ENV === 'production' ? false : true
@@ -227,10 +231,10 @@ ipcMain.on('openViewer', (event, path) => {
         minWidth: WINDOW_WIDTH,
         webPreferences: {
             nodeIntegration: true,
+            additionalArguments: [`--packaged=${app.isPackaged}`]
         },
         devTools: process.env.NODE_ENV === 'production' ? false : true
     }); 
-
     subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
 
     subWindow.webContents.on('did-finish-load', () => {

@@ -1,13 +1,13 @@
 import os from 'os'
-import path from 'path'
+import { sep }  from 'path'
 import { writeFile, existsSync, mkdirSync } from 'fs';
 
-export const APPHOME    = `${os.homedir()}${path.sep}.rootnav${path.sep}`;
-export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.cwd()}${path.sep}plugins${path.sep}`;
+export const APPHOME    = `${os.homedir()}${sep}.rootnav${sep}`;
+export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
 export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
-export const API_THUMB = 'api-thumb';
+export const API_THUMB  = 'api-thumb';
 export const CLOSE_VIEWER = 'close-viewer';
 
 export const WINDOW_HEIGHT = 800;

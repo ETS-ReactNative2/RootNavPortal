@@ -10,7 +10,8 @@ export default class ServerIndicator extends Component {
         const { apiAddress, apiKey, apiStatus, apiAuth } = this.props;
 
         if (!navigator.onLine || !apiAuth) return "danger";
-        if (!apiAddress || !apiKey || !apiStatus) return "warning";
+        if (!apiAddress || !apiKey) return "secondary";
+        if (!apiStatus) return "warning";
         if (apiStatus) return "success";
     }
 

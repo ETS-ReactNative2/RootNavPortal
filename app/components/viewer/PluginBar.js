@@ -251,13 +251,14 @@ export default class PluginBar extends Component {
         // If there are no plugins, then make the plugin directory.
         if (!existsSync(PLUGINDIR)) { 
             console.log("No plugin directory found at '" + PLUGINDIR + "', creating!");
-            mkdirSync(PLUGINDIR);
+            if (process.platform != 'darwin') mkdirSync(PLUGINDIR); //Mac runs apps in /Applications/.. in a read-only FS, so we can't write a plugin dir there.
         }
         else 
         {
             console.log("Plugin directory found at '" + PLUGINDIR + "', reading plugins!");
             const pluginFilenames = readdirSync(PLUGINDIR); // Get all plugin filenames
             pluginFilenames.forEach(filename => {
+                if (!filename.match(/.+?(?:js|ts|jsx)$/)) return; //if it's not a js file, we don't want to use it.
                 const plugin = _require(`${PLUGINDIR}${filename.replace('.js', '')}`); // For each filename, import the plugin
                 
                 if (["name", "group", "function", "description"].every(param => param in plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
