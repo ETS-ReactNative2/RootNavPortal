@@ -30,7 +30,7 @@ export default class Gallery extends Component {
                         try {
                             config = JSON.parse(data);
                         } catch (e) {
-                            console.log("Error parsing config! Setting to empty.");
+                            console.error("Error parsing config! Setting to empty.");
                             writeConfig(JSON.stringify(DEFAULT_CONFIG));
                             config = DEFAULT_CONFIG;
                         }
@@ -38,7 +38,10 @@ export default class Gallery extends Component {
                     }
                 }); 
             }
-            else console.error("doesn't exist: " + APPHOME + CONFIG);     
+            else {
+                console.error("Error parsing config! Appears to be missing, setting to empty.");
+                writeConfig(JSON.stringify(DEFAULT_CONFIG));
+            }   
         }
 
         return (
