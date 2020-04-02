@@ -36,7 +36,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 export const StyledCard = styled(Card).attrs({border:"dark"})` && {
     width: 20vw;
-    min-width: 240px;
+    min-width: 270px;
     border-color: ${props => props.redborder ? "red !important" : "inherit"};
     transition: 0.4s;
 }`

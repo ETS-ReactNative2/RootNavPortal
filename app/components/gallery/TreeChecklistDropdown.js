@@ -7,7 +7,7 @@ export default class TreeChecklistDropdown extends Component {
         const { name, path, checked, updateChecklistDropdown, model, apiModels } = this.props;
         return (
             <FormGroup as={Row}>
-                <div style={{width: "auto", paddingRight: "2em"}}>
+                <div style={{width: "auto", paddingRight: "8em"}}>
                     <span title={path}>
                         {name}
                     </span>
