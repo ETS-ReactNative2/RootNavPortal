@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import TopBar from '../containers/gallery/TopBarContainer';
 import GalleryView from '../containers/gallery/GalleryViewContainer';
 import { existsSync, readFile } from 'fs';
-import { writeConfig, APPHOME, CONFIG } from '../../constants/globals';
+import { writeConfig, APPHOME, CONFIG, DEFAULT_CONFIG } from '../../constants/globals';
 import { remote } from 'electron';
 
 export default class Gallery extends Component {
@@ -26,13 +26,15 @@ export default class Gallery extends Component {
                     if (err) console.error(err); 
                     else 
                     {
+                        let config = null;
                         try {
-                            let config = JSON.parse(data);
-                            this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path)), config.apiAddress, config.apiKey);
+                            config = JSON.parse(data);
                         } catch (e) {
                             console.log("Error parsing config! Setting to empty.");
-                            writeConfig("[]");
+                            writeConfig(JSON.stringify(DEFAULT_CONFIG));
+                            config = DEFAULT_CONFIG;
                         }
+                        this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path)), config.apiAddress, config.apiKey);
                     }
                 }); 
             }

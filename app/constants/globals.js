@@ -30,6 +30,8 @@ export const API_POLLTIME  = 1000 * 5; //API poll interval in milliseconds
 export const THUMB_PERCENTAGE = 20
 export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
+export const DEFAULT_CONFIG = { apiAdrdress: "", apiKey: "", folders: [] };
+
 export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups; //Matches the file's dir path and actual name. no trailing slash on the path
 
 export const writeConfig = config => {
