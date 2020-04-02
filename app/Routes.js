@@ -80,7 +80,7 @@ export default class Routes extends Component {
 
     render() {
         const { address, apiKey} = this.props;
-        const { proto = "", serverIP = "", serverPort = "" } = address ? address.match(/(?<proto>https?:\/\/)(?<serverIP>[^:]+)(?::(?<serverPort>.+))?/).groups : {}
+        const { proto = "", serverIP = "", serverPort = "" } = address ? address.match(/(?<proto>https?:\/\/)?(?<serverIP>[^:]+)(?::(?<serverPort>.+))?/).groups : {}
         return (
             <Router>
             <div>
