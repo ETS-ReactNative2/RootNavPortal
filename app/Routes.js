@@ -18,6 +18,9 @@ export default class Routes extends Component {
         border-bottom-left-radius: 0;
         border-top-left-radius: 0; 
         width: 6.5vw; 
+        &::-webkit-inner-spin-button, &::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+        }
     `;
     StyledI = styled.i`
         color: #5cb85c;
@@ -94,7 +97,7 @@ export default class Routes extends Component {
                             <input style={this.state.validateWarning ? { boxShadow: '0 0 10px red', borderRadius: '3px' } : {}} key={0} type="text" defaultValue={proto + serverIP} className="form-control" placeholder="https://server.location" ref={this.address}/>
                             <InputGroup.Append><InputGroup.Text><b>:</b></InputGroup.Text></InputGroup.Append> 
                             <InputGroup.Append>
-                                <this.StyledPort key={1} type="text" defaultValue={serverPort} className="form-control" placeholder="port" ref={this.port} /> 
+                                <this.StyledPort key={1} type="number" defaultValue={serverPort} className="form-control" placeholder="port" ref={this.port} /> 
                             </InputGroup.Append>
                         </InputGroup>
                         <input key={0} type="text" defaultValue={apiKey} className="form-control" placeholder="Server Key" ref={this.apiKey} style={Object.assign(this.state.validateWarning ? { boxShadow: '0 0 10px red' } : {}, { marginTop: '1em' }) }/>      
