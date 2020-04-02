@@ -184,8 +184,8 @@ export default class Thumbnail extends Component {
         const baseVH = Math.round(window.innerHeight / 100);
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
-                <div style={imageSize ? {minWidth: `${baseVH * 25}px`, minHeight: `${imageSize.height / imageSize.width * (baseVH * 25)}px`} : {}} ref={this.container}>
+            <StyledImageCard style={imageSize ? {width: `${baseVH * 25}px`, height: `fit-content`} : {}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}}>
+                <div style={imageSize ? {width: `${baseVH * 25}px`, height: `${imageSize.height / imageSize.width * (baseVH * 25)}px`} : {}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
                     { !ext ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }

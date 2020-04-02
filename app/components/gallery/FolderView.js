@@ -87,7 +87,7 @@ export default class FolderView extends Component {
 									<StyledRow> {filesList
 										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
 										.map((file, index) => (
-											<div key={index} className="col-lg-3 col-xl-2 col-md-4 col-sm-6" style={{paddingBottom: '1em'}}>
+											<div key={index} className="col-lg-3 col-xl-2" style={{paddingBottom: '1em', textAlign: '-webkit-center'}}>
 												<Thumbnail folder={folder} fileName={file}/>
 											</div>
 										))} 

@@ -34,7 +34,7 @@ export default class Gallery extends Component {
                             writeConfig(JSON.stringify(DEFAULT_CONFIG));
                             config = DEFAULT_CONFIG;
                         }
-                        this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path)), config.apiAddress, config.apiKey);
+                        this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path).filter(it => existsSync(it.path))), config.apiAddress, config.apiKey);
                     }
                 }); 
             }
