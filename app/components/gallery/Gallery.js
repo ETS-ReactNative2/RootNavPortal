@@ -26,8 +26,13 @@ export default class Gallery extends Component {
                     if (err) console.error(err); 
                     else 
                     {
-                        let config = JSON.parse(data);
-                        this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path)), config.apiAddress, config.apiKey);
+                        try {
+                            let config = JSON.parse(data);
+                            this.props.importConfig(config.folders.sort((a, b) => a.path.localeCompare(b.path)), config.apiAddress, config.apiKey);
+                        } catch (e) {
+                            console.log("Error parsing config! Setting to empty.");
+                            writeConfig("[]");
+                        }
                     }
                 }); 
             }

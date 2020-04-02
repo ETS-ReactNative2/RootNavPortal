@@ -1,6 +1,6 @@
 import os from 'os'
 import { sep }  from 'path'
-import { writeFile, existsSync, mkdirSync } from 'fs';
+import { writeFile, writeFileSync, existsSync, mkdirSync } from 'fs';
 
 export const APPHOME    = `${os.homedir()}${sep}.rootnav${sep}`;
 export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
@@ -34,12 +34,8 @@ export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName
 
 export const writeConfig = config => {
     if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-        mkdirSync(APPHOME, '0777', true, err => { //0777 HMMMM change later
-            if (err) console.error(err);
-        });
-    writeFile(APPHOME + CONFIG , config, err => { //Perhaps we add a callback as an argument if needed
-        if (err) console.error(err); //idk do some handling here
-    });;
+        mkdirSync(APPHOME, {mode: '0777', recursive: true});
+    writeFileSync(APPHOME + CONFIG , config);
 };
 
 export const xmlOptions = {
