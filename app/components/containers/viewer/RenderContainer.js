@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Render from '../../viewer/Render';
-import { updateParsedRSML, updateFile } from '../../../actions/galleryActions'; //still in the gallery state since we're building on the file cache, owned by that reducer. :hmm:
+import { updateFile } from '../../../actions/galleryActions'; //still in the gallery state since we're building on the file cache, owned by that reducer. :hmm:
 import { matchPathName } from '../../../constants/globals';
 import { pushEditStack } from '../../../actions/viewerActions';
 
@@ -18,9 +18,7 @@ const mapStateToProps = (state, ownProps) => {
 
 const mapDispatchToProps = dispatch => ({
     updateFile: (folder, fileName, newExts) => dispatch(updateFile(folder, fileName, newExts)),
-    updateParsedRSML: (folder, fileName, parsedRSML) => dispatch(updateParsedRSML(folder, fileName, parsedRSML)),
     pushEditStack: lines => dispatch(pushEditStack(process.pid, lines))
-    //This expects parsedRSML as {JSON_RSML, polyLine_RSML}
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Render)

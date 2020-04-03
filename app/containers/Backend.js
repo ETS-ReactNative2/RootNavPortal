@@ -22,8 +22,8 @@ const mapDispatchToProps = dispatch => ({
     removeQueue: path => dispatch(removeQueue(path)),
     addInflight: file => dispatch(addInflight(file)),
     removeInflight: file => dispatch(removeInflight(file)),
-    updateParsedRSML: (folder, file, parsedRSML) => dispatch(updateParsedRSML(folder, file, parsedRSML)),
-    addThumb: (folder, fileName, thumb) => dispatch(addThumb(folder, fileName, thumb)),
+    updateParsedRSML: newFiles => dispatch(updateParsedRSML(newFiles)),
+    addThumb: thumbs => dispatch(addThumb(thumbs)),
     updateAPIStatus: status => dispatch(updateAPIStatus(status)),
     updateAPIModels: apiModels => dispatch(updateModels(apiModels)),
     updateAPIAuth: auth => dispatch(updateAPIAuth(auth))

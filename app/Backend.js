@@ -27,13 +27,24 @@ export default class Backend extends Component {
         ipcRenderer.on(API_DELETE, (event, data) => {
             this.handleDelete(data.path);
         });
-
+        //RSML and thumb actions are not getting IPC'd back to other reduxes because they're getting lumped in with the -incoming- IPC-sync payload from addFiles.
+        //Resulting in when the real RSML action fires, there's no diff because they've already been added to the file structure somehow, and thus have no diff, thus never synced.
+        //Basically find out why the parsedRSML keys are sneaking into the incoming payloads and thus the backend store, before the action that actually reduces them ever fires.
         ipcRenderer.on(API_PARSE, (event, data) => {
-            data.forEach(path => this.parseRSML(path));
+            if (!data.length) return;
+            console.log("hello IPC received");
+            let files = data.map(path => this.parseRSML(path));
+            // this.props.addQueue("Hello this is a file"); //<- gets fired and synced properly
+            this.props.updateParsedRSML(files); //RSML is batch-sent back to Redux to avoid spamming with actions, and killing performance. This does mean thumbs will be able to load all at once, or not at all.
         });
 
         ipcRenderer.on(API_THUMB, (event, data) => {
-            data.forEach(args => this.genThumbnail(args.folder, args.file, args.fileName));
+            if (!data.length) return;
+            console.log(data);
+            Promise.all(data.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
+                console.log(results);
+                this.props.addThumb(results);
+            }).catch(error => console.error(error));
         });
 
         setInterval(this.sendFile, API_POLLTIME);
@@ -96,18 +107,21 @@ export default class Backend extends Component {
     }
 
     genThumbnail = (folder, file, fileName) => {
-        const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+        return new Promise((resolve, reject) => {
+            const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
-        imageThumbail.thumb(folder + sep + fileName + "." + ext, { percentage: THUMB_PERCENTAGE, pngOptions: { force: true } }).then(thumb => 
-        {
-            this.props.addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
-        }).catch(err => console.error(err));
+            imageThumbail.thumb(folder + sep + fileName + "." + ext, { percentage: THUMB_PERCENTAGE, pngOptions: { force: true } }).then(thumb => 
+            {
+                resolve({ folder, fileName, ext, thumb });
+                //this.props.addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
+            }).catch(err => console.error(err));
+        });
     };
 
     parseRSML = filePath => {
         const { path, fileName } = matchPathName(filePath);
         //Ingest the RSML here if it's not cached in state
-        this.structurePolylines(path, fileName, readFileSync(path + sep + fileName + ".rsml", 'utf8'));
+        return this.structurePolylines(path, fileName, readFileSync(path + sep + fileName + ".rsml", 'utf8'));
     };
 
     structurePolylines = (path, fileName, rsml) => {
@@ -117,7 +131,7 @@ export default class Backend extends Component {
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
         plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
-        this.props.updateParsedRSML(path, fileName, { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+        return { path, fileName, rsmlJson, polylines };
     };
     
     formatPoints = (rsml, plantID, polylines) => {

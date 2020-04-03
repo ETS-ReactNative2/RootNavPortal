@@ -105,7 +105,7 @@ export default class Thumbnail extends Component {
     drawRSML = (polylines, scaling) => {
 
         polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-            let polyline = new fabric.Polyline(line.points.map(point => ({ x: point.x * THUMB_PERCENTAGE * scaling.scaleX / 100, y: point.y * THUMB_PERCENTAGE * scaling.scaleY/ 100 }) ), {
+            let polyline = new fabric.Polyline(line.points.map(point => ({ x: point.x * THUMB_PERCENTAGE * scaling.scaleX / 100, y: point.y * THUMB_PERCENTAGE * scaling.scaleY / 100 })), {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
                 strokeWidth: 2,
@@ -167,11 +167,7 @@ export default class Thumbnail extends Component {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
-        const { folder, file, fileName } = this.props;
-        if (IMAGE_EXTS.some(ext => ext in file && !(ext + "Thumb" in file))) 
-        {
-            ipcRenderer.send(API_THUMB, [{folder, file, fileName }]); //Array so it's easier for DLQ
-        }
+        const { file, fileName } = this.props;
 
         // Dispose of the canvas and redraw
         if (this.fabricCanvas)
