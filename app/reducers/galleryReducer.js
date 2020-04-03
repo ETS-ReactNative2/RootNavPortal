@@ -56,28 +56,31 @@ export default (state = initialState, action) => {
             ...state,
             checked: action.checked
         }
-        case ADD_FILES: {
-            console.log("Adding files");
-                return {
-                ...state,
-                files: {
-                    ...state.files,
-                    [action.folder]: action.files
-                }
+        case ADD_FILES: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: action.files
             }
         }
-        //Adds a thumbnail to a specific file object
-        //action.thumb = { ext: "png", thumb: {type: "Buffer", data: [x, x, x,]} }
-        case ADD_THUMB: {
-            console.log("Adding thumbnails");
-            let newFiles = {
-                ...state.files
-            };
-            action.thumbs.forEach(obj => newFiles[obj.folder][obj.fileName][obj.ext+"Thumb"] = obj.thumb);
-
-            return {
-                ...state,
-                files: newFiles
+        //Adds a batch of thumbnails to the file structure
+        //action.thumb = [{ folder: "C:\Andrew\Desktop\rsml", fileName: "wheat_1", ext: "png", thumb: {type: "Buffer", data: [x, x, x,]}, {...}}
+        case ADD_THUMB: return {
+            ...state,
+            files: {
+                ...state.files,
+                ...action.thumbs.reduce((acc, obj) => ({
+                    ...acc, 
+                    [obj.folder]: {
+                        ...state.files[obj.folder],
+                        ...(acc[obj.folder] || {}),
+                        [obj.fileName]: {
+                            ...state.files[obj.folder][obj.fileName],
+                            ...((acc[obj.path] || {})[obj.fileName] || {}),
+                            [obj.ext + "Thumb"]: obj.thumb
+                        }
+                    }
+                }), {})
             }
         }
         case UPDATE_FILTER_TEXT: return {
@@ -96,25 +99,17 @@ export default (state = initialState, action) => {
                 ...action.newFiles.reduce((acc, obj) => ({
                     ...acc, 
                     [obj.path]: {
-                        ...(acc[obj.path] || {}),
                         ...state.files[obj.path],
+                        ...(acc[obj.path] || {}),
                         [obj.fileName]: {
-                            ...((acc[obj.path] || {})[obj.fileName] || {}),
                             ...state.files[obj.path][obj.fileName],
+                            ...((acc[obj.path] || {})[obj.fileName] || {}),
                             parsedRSML: { rsmlJson: obj.rsmlJson, polylines: obj.polylines }
                         }
                     }
-                    // newState[obj.path][obj.fileName].parsedRSML: { rsmlJson: obj.rsmlJson, polylines: obj.polylines }
                 }), {})
             }
-        }        /*
-        {
-            "folder": {
-                "file": { ...statestuff, parsedRSML: {} }
-            },
-            "folder2": {...}
         }
-        */
         case UPDATE_CHECKLIST_DROPDOWN: return {
             ...state,
             checked: state.checked.map(folder => action.path != folder.path ? folder : {...folder, model: action.model})

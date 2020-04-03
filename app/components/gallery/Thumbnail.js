@@ -83,6 +83,7 @@ export default class Thumbnail extends Component {
     }
 
     draw = () => {
+        console.log("I am drawing a thumbnail");
         const { file, architecture } = this.props;
         const polylines = file.parsedRSML ? file.parsedRSML.polylines : null;
         let image = new Image();

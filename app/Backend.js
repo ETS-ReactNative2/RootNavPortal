@@ -32,9 +32,7 @@ export default class Backend extends Component {
         //Basically find out why the parsedRSML keys are sneaking into the incoming payloads and thus the backend store, before the action that actually reduces them ever fires.
         ipcRenderer.on(API_PARSE, (event, data) => {
             if (!data.length) return;
-            console.log("hello IPC received");
             let files = data.map(path => this.parseRSML(path));
-            // this.props.addQueue("Hello this is a file"); //<- gets fired and synced properly
             this.props.updateParsedRSML(files); //RSML is batch-sent back to Redux to avoid spamming with actions, and killing performance. This does mean thumbs will be able to load all at once, or not at all.
         });
 
@@ -42,7 +40,6 @@ export default class Backend extends Component {
             if (!data.length) return;
             console.log(data);
             Promise.all(data.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
-                console.log(results);
                 this.props.addThumb(results);
             }).catch(error => console.error(error));
         });
@@ -107,6 +104,7 @@ export default class Backend extends Component {
     }
 
     genThumbnail = (folder, file, fileName) => {
+        console.log("generating thumbnails");
         return new Promise((resolve, reject) => {
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
