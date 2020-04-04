@@ -7,6 +7,7 @@ import { createLogger } from 'redux-logger';
 import createRootReducer from '../reducers';
 import * as galleryActions from '../actions/galleryActions';
 import { electronEnhancer } from 'redux-electron-store';
+import { reduxActionFilter } from '../constants/globals';
 
 let history;
 //Some notes about the Redux changes:
@@ -52,7 +53,7 @@ const configureStore = (initialState, scope) => {
 
   // Apply Middleware & Compose Enhancers
   // enhancers.push(applyMiddleware(...middleware));
-  const enhancer = composeEnhancers(applyMiddleware(...middleware), electronEnhancer({dispatchProxy: a => store.dispatch(a)}));
+  const enhancer = composeEnhancers(applyMiddleware(...middleware), electronEnhancer({dispatchProxy: a => store.dispatch(a), actionFilter: reduxActionFilter }));
 
   // Create Store
   const store = createStore(rootReducer, initialState, enhancer);

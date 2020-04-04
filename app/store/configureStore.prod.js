@@ -5,6 +5,7 @@ import { createHashHistory, createMemoryHistory } from 'history';
 import { routerMiddleware } from 'connected-react-router';
 import createRootReducer from '../reducers';
 import { electronEnhancer } from 'redux-electron-store';
+import { reduxActionFilter } from '../constants/globals';
 
 let history;
 
@@ -14,7 +15,7 @@ function configureStore(initialState, scope) {
     const router      = routerMiddleware(history);
     const middleware  = [thunk, router];
 
-    const enhancer = compose(applyMiddleware(...middleware), electronEnhancer({ dispatchProxy: a => store.dispatch(a)})); 
+    const enhancer = compose(applyMiddleware(...middleware), electronEnhancer({ dispatchProxy: a => store.dispatch(a), actionFilter: reduxActionFilter })); 
     const store    = createStore(rootReducer, initialState, enhancer); //Don't shorten this. It can be one lined, yes, but ^this^ requires the variable hoisting from const to work, else it's undefined
     return store;
 }
