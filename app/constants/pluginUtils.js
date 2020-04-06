@@ -16,7 +16,7 @@ module.exports = {
     getParentOfLateral: (lateral, polylines) => polylines.find(line => line.id == lateral.id.match(/(\d+\-\d+)/)[1]),
     getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"],
     isMultiplePlants: json => json.rsml[0].scene[0].plant.length > 1,
-    getAngle: (anchor, point) => Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180 / Math.PI,
+    getAngle: (anchor, point) => Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180 / Math.PI, //Does this get used?
     getNearestPoint: (points, point) => {
         let closestPoint, closestDistance = Infinity;
 
@@ -76,8 +76,9 @@ module.exports = {
                             );
         // Determine if there's more closer to the positive or the negative control point, to determine if the line moves in the positive or negative direction.
         const numberOfPositive = directions.filter(direction => direction == 1).length;
-        // Use this direction to calculate 
+        // Use this direction to calculate the angle using arctan
         const angle = numberOfPositive > points.length - numberOfPositive ? Math.atan2(gradient, 1) : Math.atan2(-gradient, -1);
+        // Convert to degrees, and subtract from 90 degrees to make with respect to the y axis instead of the x axis.
         return 90 - (angle * 180 / Math.PI);
     },
     groupLinesByPlantID: lines => lines.reduce((acc, line) => {
