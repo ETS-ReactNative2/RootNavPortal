@@ -2,7 +2,7 @@
 const group = "Plant Measurements";
 const name = "Average Length - All Roots";
 const id = 'plantAverageLengthAll';
-const description = "Average length of all roots per plant";
+const description = "Mean length of all roots per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {

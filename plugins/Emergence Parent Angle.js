@@ -2,7 +2,7 @@
 const group = "Root Measurements";
 const name = "Emergence Parent Angle";
 const id = 'emergenceParentAngle';
-const description = "text";
+const description = "Angle of emergence in degrees between a primary root and vertical";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {

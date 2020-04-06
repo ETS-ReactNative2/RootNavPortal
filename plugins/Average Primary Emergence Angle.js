@@ -1,7 +1,7 @@
 const group = "Plant Measurements";
 const name = "Average Primary Emergence Angle";
 const id = 'primEmergenceAngle';
-const description = "text";
+const description = "The mean emergence angle in degrees of all primary roots relative to vertical, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
