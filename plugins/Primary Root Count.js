@@ -1,17 +1,22 @@
-const group = "Plant Measurements";
-const name = "Primary Root Count";
-const id = 'primaries';
-const description = "Total primary roots per plant";
+const group = "Plant Measurements"; //The dropdown within which a plugin will be displayed in. Usually Plant measurements or Root Measurements. A new group will create a new dropdown category.
+const name = "Primary Root Count"; //Name the plugin will be displayed as in the list
+const id = 'primaries'; //This key must be unique among all plugins
+const description = "Total primary roots per plant"; //This is used as the plugin's tooltip text in the side bar.
 
+//This plugin serves as a fully documented example describing how the plugin interface is structured
 //Each function is responsible for calculating the measurement on all data for a whole image
-//So for plant measurements, this is for each plant, and root measurements, for all roots of all plants
-//The entire dataset for the image is provided below, in both raw JSON and accessible polylines:
-//rsmlJson - A JSON representation of RSML
-//Polylines - an array of objects representing all the parsed points. Contains an ID formatted plantID-primaryID.lateralID, a type: 'primary' or 'lateral'
-//and points: an array of objects: { x: ..., y: ... } representing the polyline.
-//utils - an object containing an API of potentially common, useful functions for plugin writing
-//Convention for plant measurements is to label each row as `tag` or `tag:plantID` if there are multiple
+//So for plant measurements, this is for each plant, and root measurements, for all roots of all plants within an image
+//The entire dataset for the image is provided below, in both raw JSON and unstructured polylines:
+//  rsmlJson  - A JSON representation of RSML
+//  polylines - an array of objects representing all the parsed points. Contains an ID formatted plantID-primaryID.lateralID, a type: 'primary' or 'lateral'
+//      and points: an array of objects: { x: ..., y: ... } representing the polyline.
+//      polylines = { id: "1-2.1", type: "lateral", points: [ {x: 334.23, y: 35.76}, {x:, y:}, {}, ...] }
+//  utils - an object containing an API of potentially common, useful functions for plugin writing
+//Convention for plant measurements is to label each row as `tag` for single plant images, or `tag:plantID` if there are multiple
+//And for root measurements, full convention is `tag:plantID-primaryID.lateralID`
 //Each plugin must be able to handle the possibility of having multiple plants in an image's dataset.
+//A plugin must return a promise, which resolves with an object containing a header array, results array, and the group variable.
+//A plugin must export its name, group, description, and function.
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {

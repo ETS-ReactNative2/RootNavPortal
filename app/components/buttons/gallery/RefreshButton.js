@@ -46,7 +46,8 @@ export default class RefreshButton extends Component {
                             if (structuredFiles[folder][fileName].rsml && !structuredFiles[folder][fileName].parsedRSML) 
                                 filesToParse.push(folder + sep + fileName); // Only parse if the folder has RSML, and it hasn't already been parsed!
                         });
-                        if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);    
+                        if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse); 
+                        //Put thumbnails here for any new files   
                     });
                 }
             }

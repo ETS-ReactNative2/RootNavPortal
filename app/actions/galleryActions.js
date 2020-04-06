@@ -33,10 +33,10 @@ export const updateModal   = tree  => ({ type: UPDATE_MODAL, tree });
 export const importConfig  = (folders, apiAddress, apiKey)  => ({ type: IMPORT_CONFIG, folders, apiAddress, apiKey });
 export const updateChecked = checked => ({ type: UPDATE_CHECKED, checked });
 export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
-export const addThumb      = (folder, fileName, thumb) => ({ type: ADD_THUMB, folder, fileName, thumb }) //folder: full folder path string, fileName: file string, no ext
+export const addThumb      = thumbs => ({ type: ADD_THUMB, thumbs }) //folder: full folder path string, fileName: file string, no ext
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
 export const updateFilterAnalysed = checked => ({ type: UPDATE_FILTER_ANALYSED, checked });
-export const updateParsedRSML = (folder, fileName, rsml) => ({ type: UPDATE_PARSED_RSML, folder, fileName, rsml });
+export const updateParsedRSML = newFiles => ({ type: UPDATE_PARSED_RSML, newFiles });
 export const updateChecklistDropdown = (path, model) => ({ type: UPDATE_CHECKLIST_DROPDOWN, path, model });
 export const updateFolderModel = (path, model) => ({ type: UPDATE_FOLDER_MODEL, path, model });
 export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, folder, fileName, newExts });

@@ -1,12 +1,12 @@
-import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE, UPDATE_MODELS } from '../actions/backendActions';
+import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE, UPDATE_MODELS, RESET_QUEUES } from '../actions/backendActions';
 
 const initialState = { 
     queue: [], 
     inFlight: {}, 
     apiModels: [
-        { value: "arabidopsis_plate", description: "Arabidopsis Plate Assay" }, 
-        { value: "osr_bluepaper",     description: "Oilseed Rape (Blue Paper)" }, 
-        { value: "wheat_bluepaper",   description: "Wheat (Blue Paper)" } 
+        { value: "arabidopsis_plate", description: "Arabidopsis IR Plate" }, 
+        { value: "osr_bluepaper",     description: "Rapeseed Bluepaper" }, 
+        { value: "wheat_bluepaper",   description: "Wheat Bluepaper" } 
     ],
 };
 
@@ -38,6 +38,11 @@ export default (state = initialState, action) => {
         case UPDATE_MODELS: return {
             ...state,
             apiModels: action.apiModels,
+        }
+        case RESET_QUEUES: return {
+            ...state,
+            queue: [],
+            inFlight: {}
         }
         default: return state;
     }

@@ -1,14 +1,20 @@
 import os from 'os'
 import { sep }  from 'path'
-import { writeFile, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
+import { remote } from 'electron';
+
+import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
+    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB } from '../actions/galleryActions';
+import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
+
 
 export const APPHOME    = `${os.homedir()}${sep}.rootnav${sep}`;
 export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
 export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
-export const API_THUMB  = 'api-thumb';
 export const CLOSE_VIEWER = 'close-viewer';
+export const HTTP_PORT = 9000;
 
 export const WINDOW_HEIGHT = 800;
 export const WINDOW_WIDTH  = 1200;
@@ -34,6 +40,11 @@ export const DEFAULT_CONFIG = { apiAdrdress: "", apiKey: "", folders: [] };
 
 export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups; //Matches the file's dir path and actual name. no trailing slash on the path
 
+export const getProcessTypeFromURL = url => {
+    const groups = url.match(/\/app.html\?(?<name>[a-z]*)/).groups;
+    return groups ? groups.name || "" : "";
+}
+
 export const writeConfig = config => {
     if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
         mkdirSync(APPHOME, {mode: '0777', recursive: true});
@@ -54,3 +65,17 @@ export const jsonOptions = {
     sanitize: false,
     ignoreNull: true
 };
+
+// Any redux that only needs to be in one process gets filtered here!
+export const reduxActionFilter = action => {
+    const process = getProcessTypeFromURL(remote.getCurrentWindow().webContents.getURL());
+    switch (process) {
+        case "gallery":
+            return ![SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
+                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB].includes(action.type);
+        case "viewer":
+            return ![TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED_VIEWER].includes(action.type);
+        default:
+            return true;
+    }
+}

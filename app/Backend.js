@@ -1,44 +1,125 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import parser from 'xml2json';
 import imageThumbail from 'image-thumbnail';
+import fastifyServer from 'fastify';
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
 //Clean everything up once models have been added to state and we're not in debugging
+//https://github.com/axios/axios/pull/2874
+//When Axios sorts out the socket hang up error on slow responses, update the package back to the main repo
 export default class Backend extends Component {
     queue = [];
     inflightReqs = INFLIGHT_REQS; //Concurrency limit
     rootNavModel = -1; //HMR seems to break queues and class vars.
-
-    //this.props.inflightfiles : Tracks requests with some data in case we need to ignore the response. { C:\path\file: {model: 'wheat_bluepaper', ext: '.png' }, ... }
+    fastify;
+    bForced; //Set by navigator events to force an API check if connectivity changes
 
     constructor(props)
     {
         super(props)
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
-
+        defaults.timeout = 0;
+        this.fastify = fastifyServer({ logger: process.argv.includes('--packaged=true') ? false : true });
+        this.setupHTTPServer();
+        
         //A single directory path {path: ""}
         ipcRenderer.on(API_DELETE, (event, data) => {
             this.handleDelete(data.path);
         });
-
+        
         ipcRenderer.on(API_PARSE, (event, data) => {
-            data.forEach(path => this.parseRSML(path));
+            if (!data.length) return;
+            let files = data.map(path => this.parseRSML(path));
+            this.props.updateParsedRSML(files); //RSML is batch-sent back to Redux to avoid spamming with actions, and killing performance. This does mean thumbs will be able to load all at once, or not at all.
         });
-
-        ipcRenderer.on(API_THUMB, (event, data) => {
-            data.forEach(args => this.genThumbnail(args.folder, args.file, args.fileName));
-        });
-
+        window.addEventListener('online', this.updateOnlineStatus);
+        window.addEventListener('offline', this.updateOnlineStatus);
         setInterval(this.sendFile, API_POLLTIME);
     }
 
+    //It's worth noting that navigator.onLine will always return true if it succeeds to connect to local adapters such as loopback LANs for Virtualbox, or NPcap for Wireshark etc.
+    updateOnlineStatus = event => {
+        if (navigator.onLine) //If we get connectivity back, force check for an API connection, which will pickup files for scanning
+        { 
+            this.bForced = true;
+            this.forceUpdate();
+        }
+        else //If we drop connection, reset all queues and set connection to false.
+        {
+            this.props.resetQueues();
+            this.props.updateAPIStatus(false);
+        }
+    }
+
+    componentDidUpdate(prevProps)
+    {  
+        //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
+        if ((prevProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != prevProps.apiKey) || this.bForced) //On settings change, poll the API and add missing files to queue if it's up
+        {
+            this.bForced = false;
+            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = this.props;
+            defaults.headers.common['X-Auth-Token'] = apiKey; //Set the default header for every request.
+
+            get(apiAddress + "/model").then(res => { 
+                updateAPIAuth(true);
+                this.rootNavModel = -1;
+                res.data.forEach(model => model.jsonModelName.includes("rootnav2") ? this.rootNavModel = model.modelId : {});
+                if (this.rootNavModel == -1) updateAPIAuth(false); //If the user has no RN2 model, we say the API key is invalid.
+
+                else get(apiAddress + "/model/" + this.rootNavModel).then(res => { //Otherwise go fetch the RN2 input models, and report all good
+                    updateAPIModels(res.data.inputs[1].accepted_values);
+                    updateAPIStatus(true);
+                    this.scanFiles();
+                }).catch(err => console.error(err));
+            }).catch(err => { 
+                if (err.message.includes("401")) 
+                    updateAPIAuth(false); //If we get a 401, explicitly set in Redux that we did so the indicator can relay an error regarding the token
+                updateAPIStatus(false); 
+            });
+        }
+
+        //If the number of files in the new files array is larger than the amount of files we have, scan through and check for new ones lacking RSML
+        if (Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(prevProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
+            this.scanFiles(); //If files changes, scan it for queueing.
+    }
+
+    /**********************
+    **  HTTP
+    ***********************/
+    //Sets up Fastify as the HTTP server used for thumbnailing, avoiding sending huge packets through IPC and blocking main.
+    setupHTTPServer = () => {
+        this.fastify.post('/thumb', async (request, reply) => {
+            reply.type('application/json').code(200)
+            return Promise.all(request.body.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
+                return results;
+            }).catch(error => console.error(error));
+        });
+
+        //Polled before sending thumbs, to check if the backend process has started the server yet
+        this.fastify.get('/health', (request, reply) => {
+            reply.type('application/json').code(200).send({ up: "y" });
+        });
+
+        this.fastify.listen(HTTP_PORT, (err, address) => {
+            if (err) 
+            {
+                this.fastify.log.error(`server listening on ${address}`)
+            }
+            this.fastify.log.info(`server listening on ${address}`)
+        });
+    }
+
+
+    /**********************
+    **  File Rescanning
+    ***********************/
     //This is called on any file addition, or API update. No IPC is used anymore for queueing files. Even if backend late loads, we should still just pick up all the missed ones
     //On any next iteration. There is a minor risk that if all files are added, and no more get added, and no API settings change, it won't add them to the queue. Very small edge case
     //And the user can always reanalyse anyway. We could make the refresh button also trigger a full scan manually too.
@@ -63,51 +144,28 @@ export default class Backend extends Component {
         }
     };
 
-    componentDidUpdate(prevProps)
-    {  
-        //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
-        if ((prevProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != prevProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
-        {
-            const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = this.props;
-            defaults.headers.common['X-Auth-Token'] = apiKey; //Set the default header for every request.
-
-            get(apiAddress + "/model").then(res => { 
-                updateAPIAuth(true);
-                this.rootNavModel = -1;
-                res.data.forEach(model => model.jsonModelName.includes("rootnav2") ? this.rootNavModel = model.modelId : {});
-                if (this.rootNavModel == -1) updateAPIAuth(false); //If the user has no RN2 model, we say the API key is invalid.
-
-                else get(apiAddress + "/model/" + this.rootNavModel).then(res => { //Otherwise go fetch the RN2 input models, and report all good
-                    updateAPIModels(res.data.inputs[1].accepted_values);
-                    updateAPIStatus(true);
-                    this.scanFiles();
-                }).catch(err => console.error(err));
-            }).catch(err => { 
-                console.log(err);
-                if (err.message.includes("401")) 
-                    updateAPIAuth(false); //If we get a 401, explicitly set in Redux that we did so the indicator can relay an error regarding the token
-                updateAPIStatus(false); 
-            });
-        }
-
-        //If the number of files in the new files array is larger than the amount of files we have, scan through and check for new ones lacking RSML
-        if (Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(prevProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
-            this.scanFiles(); //If files changes, scan it for queueing.
-    }
-
+    /**********************
+    **  Thumbnailing
+    ***********************/
     genThumbnail = (folder, file, fileName) => {
-        const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+        return new Promise((resolve, reject) => {
+            const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
-        imageThumbail.thumb(folder + sep + fileName + "." + ext, { percentage: THUMB_PERCENTAGE, pngOptions: { force: true } }).then(thumb => 
-        {
-            this.props.addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
-        }).catch(err => console.error(err));
+            imageThumbail.thumb(folder + sep + fileName + "." + ext, { percentage: THUMB_PERCENTAGE, pngOptions: { force: true } }).then(thumb => 
+            {
+                resolve({ folder, fileName, ext, thumb });
+                //this.props.addThumb(folder, fileName, { ext, thumb }) //Bundle the thumbnail with the extension so we can label them pngThumb or similar accordingly in case there are multiple thumbs for a file name
+            }).catch(err => console.error(err));
+        });
     };
 
+    /**********************
+    **  Parsing RSML
+    ***********************/
     parseRSML = filePath => {
         const { path, fileName } = matchPathName(filePath);
         //Ingest the RSML here if it's not cached in state
-        this.structurePolylines(path, fileName, readFileSync(path + sep + fileName + ".rsml", 'utf8'));
+        return this.structurePolylines(path, fileName, readFileSync(path + sep + fileName + ".rsml", 'utf8'));
     };
 
     structurePolylines = (path, fileName, rsml) => {
@@ -117,7 +175,7 @@ export default class Backend extends Component {
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
         plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
-        this.props.updateParsedRSML(path, fileName, { rsmlJson, polylines }); //Send it to state, with {JSONParsedXML, and simplifiedPoints}
+        return { path, fileName, rsmlJson, polylines };
     };
     
     formatPoints = (rsml, plantID, polylines) => {
@@ -139,6 +197,9 @@ export default class Backend extends Component {
         }
     };
     
+    /**********************
+    **  Reanalysing Folder
+    ***********************/
     //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
@@ -181,6 +242,9 @@ export default class Backend extends Component {
         addQueue(queuedFiles);
     };
 
+    /**********************
+    **  API Comms
+    ***********************/
     //Send the job off to the server
     sendFile = () => {
         if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs || !this.props.apiAuth || this.rootNavModel < 0) return;
@@ -260,7 +324,7 @@ export default class Backend extends Component {
                 else 
                 {
                     writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary
-                    this.structurePolylines(path, fileName, res.data);
+                    this.props.updateParsedRSML([this.structurePolylines(path, fileName, res.data)]);
                 }
                 exts[type] = true; 
             });

@@ -7,18 +7,20 @@ import TextPopup from '../common/TextPopup';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader, StyledCardBody, StyledCardText  } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, API_PARSE } from '../../constants/globals'
+import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, _require, HTTP_PORT } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import { Collapse } from 'react-bootstrap';
-
+import { post, get, defaults } from 'axios';
 
 export default class FolderView extends Component {
 	constructor(props)
 	{
+		defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
 		super(props);
 		this.state = { read: false };
 	}
+
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.labels != this.props.labels) return true;
@@ -26,7 +28,14 @@ export default class FolderView extends Component {
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}	  
-		
+
+	sendThumbs = thumbs => {
+		get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
+			post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => this.props.addThumbs(res.data));
+		}).catch(err => setTimeout(() => this.sendThumbs(thumbs), 5000)) //If backend isn't up yet, wait 5s and try again.
+		//Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+	};
+
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -47,27 +56,35 @@ export default class FolderView extends Component {
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}
 				});
-				if (Object.keys(structuredFiles).length) 
+				let fileKeys = Object.keys(structuredFiles);
+				if (fileKeys.length) 
 				{
 					//Evaluates all files with rsml and sends them to parse in the backend. This is so all the data is available at all times, and not on demand
 					//Else exporting measurements won't have any data unless the user has looked at them all in Render, where it gets JiT parsed
 					//"Parse on demand upon exporting" - we need the polylines available on gallery for the thumbnails to render RSML when that gets written
 					let filesToParse = [];
-					Object.keys(structuredFiles).forEach(fileName => {
+					fileKeys.forEach(fileName => {
 						if (structuredFiles[fileName].rsml) filesToParse.push(folder + sep + fileName);
 					});
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
 					if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);
+
+					let thumbs = fileKeys.map(fileName => {
+						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName] && !(ext + "Thumb" in structuredFiles[fileName]))) 
+							return { folder, file: structuredFiles[fileName], fileName };
+					}).filter(item => item !== undefined);
+					this.sendThumbs(thumbs);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.
 			});		
 		}
+
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
 		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
-			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1]
+			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1];
 			const formattedFolder = (folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder;
 			return (
 				<StyledFolderCard className="bg-light">

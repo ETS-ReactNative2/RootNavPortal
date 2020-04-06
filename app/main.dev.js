@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, API_THUMB, CLOSE_VIEWER } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER } from './constants/globals';
 import { join } from 'path';
 
 // export default class AppUpdater {
@@ -111,7 +111,7 @@ const openGallery = () => {
 ***********************/
 const store = configureStore({}, 'main');
 let bBackendReady = false;
-let backendQueue = { parse: [], thumb: [] }; //Backend dead letter queue for late loading
+let backendQueue = []; //Backend dead letter queue for late loading
 //Hot reload reducers in main process
 ipcMain.on('renderer-reload', (event, action) => {
     delete require.cache[require.resolve('./reducers')];
@@ -176,8 +176,7 @@ app.on('ready', async () => {
 
     backendWindow.webContents.on('did-finish-load', () => {
         bBackendReady = true;
-        backendWindow.webContents.send(API_PARSE, backendQueue.parse);
-        backendWindow.webContents.send(API_THUMB, backendQueue.thumb);
+        backendWindow.webContents.send(API_PARSE, backendQueue);
     });
     
     /**********************
@@ -256,11 +255,6 @@ ipcMain.on(API_DELETE, (event, path) => { //path = { path: "C:\folder\stuff" }
 });
 
 ipcMain.on(API_PARSE, (event, paths) => { // paths = [ "C:\folder\plant", "C:\folder\otherplant"] - a .rsml is appended in backend
-    if (!bBackendReady) backendQueue.parse.push(...paths); //Suddenly the backend starting opening slower (or gallery faster) causing early IPCs to miss.
+    if (!bBackendReady) backendQueue.push(...paths); //Suddenly the backend starting opening slower (or gallery faster) causing early IPCs to miss.
     else backendWindow.webContents.send(API_PARSE, paths); //Storing and sending a small dead letter queue until it's ready solves this potential issue.
-});
-
-ipcMain.on(API_THUMB, (event, data) => {  // data = { folder: "C:\blala", file: { rsml: true, png: true }, fileName: "plant" }
-    if (!bBackendReady) backendQueue.thumb.push(...data); 
-    else backendWindow.webContents.send(API_THUMB, data);
 });
