@@ -44,6 +44,7 @@ export default class Backend extends Component {
         setInterval(this.sendFile, API_POLLTIME);
     }
 
+    //It's worth noting that navigator.onLine will always return true if it succeeds to connect to local adapters such as loopback LANs for Virtualbox, or NPcap for Wireshark etc.
     updateOnlineStatus = event => {
         if (navigator.onLine) //If we get connectivity back, force check for an API connection, which will pickup files for scanning
         { 
