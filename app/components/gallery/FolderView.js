@@ -1,22 +1,20 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
+import React, { Component } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
 import TextPopup from '../common/TextPopup';
 import { readdir } from 'fs';
-import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader, StyledCardBody, StyledCardText  } from './StyledComponents'
+import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, _require, HTTP_PORT } from '../../constants/globals'
+import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, _require, sendThumbs } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import { Collapse } from 'react-bootstrap';
-import { post, get, defaults } from 'axios';
 
 export default class FolderView extends Component {
 	constructor(props)
 	{
-		defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
 		super(props);
 		this.state = { read: false };
 	}
@@ -29,17 +27,10 @@ export default class FolderView extends Component {
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}	  
 
-	sendThumbs = thumbs => {
-		get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
-			post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => this.props.addThumbs(res.data));
-		}).catch(err => setTimeout(() => this.sendThumbs(thumbs), 5000)) //If backend isn't up yet, wait 5s and try again.
-		//Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
-	};
-
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder, filterText, filterAnalysed, files, addFiles } = this.props; 
+		const { isActive, folder, filterText, filterAnalysed, files, addFiles, addThumbs } = this.props; 
 		if (!files && !this.state.read) {
 			let structuredFiles = {};
 			readdir(folder, (err, folderFiles) => {
@@ -70,10 +61,10 @@ export default class FolderView extends Component {
 					if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);
 
 					let thumbs = fileKeys.map(fileName => {
-						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName] && !(ext + "Thumb" in structuredFiles[fileName]))) 
+						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName])) 
 							return { folder, file: structuredFiles[fileName], fileName };
 					}).filter(item => item !== undefined);
-					this.sendThumbs(thumbs);
+					sendThumbs(thumbs, addThumbs);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.

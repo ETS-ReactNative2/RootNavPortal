@@ -2,9 +2,10 @@ import os from 'os'
 import { sep }  from 'path'
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { remote } from 'electron';
+import { post, get, defaults } from 'axios';
 
 import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB } from '../actions/galleryActions';
+    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, addThumb } from '../actions/galleryActions';
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
@@ -79,3 +80,11 @@ export const reduxActionFilter = action => {
             return true;
     }
 }
+
+export const sendThumbs = (thumbs, addThumbs) => {
+    get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
+        post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => addThumbs(res.data)).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 2000)); //If Axios hangs up, try again.
+    }).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 5000)); //If backend isn't up yet, wait 5s and try again.
+    //Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+};
+defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
