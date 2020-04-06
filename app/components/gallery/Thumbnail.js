@@ -153,11 +153,11 @@ export default class Thumbnail extends Component {
     spinner = () => {
         const [show, setShow] = useState(false);
         const target = useRef(null);
-        const { folder, fileName, queue, inFlight, model, apiStatus } = this.props;
+        const { folder, fileName, queue, inFlight, model, apiStatus, file } = this.props;
         if (!apiStatus) return "";  //Disable all spinner notifications if no API connection - red model alert might still be relevant, but I don't think it's worth showing.
 
         let spinner, tooltipText;
-        if (!model)
+        if (!model && !file.rsml)
         {
             spinner = <this.StyledSpinner ref={target} animation="grow" variant="danger" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
             tooltipText = "Please select a model from the folder settings to process these files";

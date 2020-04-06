@@ -19,9 +19,11 @@ export default (state = initialState, action) => {
             files: action.files
         }
         case REMOVE_DIR: {
-            const { [action.path]: omit, ...files } = state.files // Remove the files relating to this path.
+            const { [action.path]: omit, ...files } = state.files; // Remove the files relating to this path.
+            const { [action.path]: omitThumbs, ...thumbs } = state.thumbs;
             return {
                 ...state,
+                thumbs: thumbs || {},
                 folders: state.folders.filter(folder => folder.path !== action.path),
                 files: files ? files: {},
                 checked: state.checked.filter(path => path !== action.path)
@@ -66,7 +68,6 @@ export default (state = initialState, action) => {
         //Adds a batch of thumbnails to the file structure
         //action.thumb = [{ folder: "C:\Andrew\Desktop\rsml", fileName: "wheat_1", ext: "png", thumb: {type: "Buffer", data: [x, x, x,]}, {...}}
         case ADD_THUMB: {
-            console.log("Adding to redux")
             return {
             ...state,
             thumbs: {

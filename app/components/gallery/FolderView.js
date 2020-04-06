@@ -72,7 +72,7 @@ export default class FolderView extends Component {
 					let thumbs = fileKeys.map(fileName => {
 						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName] && !(ext + "Thumb" in structuredFiles[fileName]))) 
 							return { folder, file: structuredFiles[fileName], fileName };
-					});
+					}).filter(item => item !== undefined);
 					this.sendThumbs(thumbs);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet

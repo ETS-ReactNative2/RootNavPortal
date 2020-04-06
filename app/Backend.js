@@ -62,7 +62,6 @@ export default class Backend extends Component {
                     this.scanFiles();
                 }).catch(err => console.error(err));
             }).catch(err => { 
-                console.log(err);
                 if (err.message.includes("401")) 
                     updateAPIAuth(false); //If we get a 401, explicitly set in Redux that we did so the indicator can relay an error regarding the token
                 updateAPIStatus(false); 
@@ -73,7 +72,7 @@ export default class Backend extends Component {
         if (Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(prevProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
             this.scanFiles(); //If files changes, scan it for queueing.
     }
-    
+
     /**********************
     **  HTTP
     ***********************/
@@ -82,25 +81,19 @@ export default class Backend extends Component {
         this.fastify.post('/thumb', async (request, reply) => {
             reply.type('application/json').code(200)
             return Promise.all(request.body.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
-                console.log(results);
-
                 return results;
             }).catch(error => console.error(error));
         });
 
         //Polled before sending thumbs, to check if the backend process has started the server yet
         this.fastify.get('/health', (request, reply) => {
-            console.log("Received healthcheck!")
             reply.type('application/json').code(200).send({ up: "y" });
-            return({ up: "y" });
         });
 
         this.fastify.listen(HTTP_PORT, (err, address) => {
-            console.log("Listening at " + address);
             if (err) 
             {
-                console.log(err);
-                this.fastify.log.error(err)
+                this.fastify.log.error(`server listening on ${address}`)
             }
             this.fastify.log.info(`server listening on ${address}`)
         });
@@ -138,7 +131,6 @@ export default class Backend extends Component {
     **  Thumbnailing
     ***********************/
     genThumbnail = (folder, file, fileName) => {
-        console.log("generating thumbnails");
         return new Promise((resolve, reject) => {
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
@@ -315,7 +307,7 @@ export default class Backend extends Component {
                 else 
                 {
                     writeFileSync(filePath + '.rsml', res.data); //sync just for safety here. Maybe not necessary
-                    this.structurePolylines(path, fileName, res.data);
+                    this.props.updateParsedRSML([this.structurePolylines(path, fileName, res.data)]);
                 }
                 exts[type] = true; 
             });
