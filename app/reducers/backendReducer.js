@@ -1,4 +1,4 @@
-import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE, UPDATE_MODELS } from '../actions/backendActions';
+import { ADD_INFLIGHT, ADD_QUEUE, REMOVE_INFLIGHT, REMOVE_QUEUE, UPDATE_MODELS, RESET_QUEUES } from '../actions/backendActions';
 
 const initialState = { 
     queue: [], 
@@ -38,6 +38,11 @@ export default (state = initialState, action) => {
         case UPDATE_MODELS: return {
             ...state,
             apiModels: action.apiModels,
+        }
+        case RESET_QUEUES: return {
+            ...state,
+            queue: [],
+            inFlight: {}
         }
         default: return state;
     }

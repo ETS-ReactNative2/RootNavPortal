@@ -19,6 +19,7 @@ export default class Backend extends Component {
     inflightReqs = INFLIGHT_REQS; //Concurrency limit
     rootNavModel = -1; //HMR seems to break queues and class vars.
     fastify;
+    bForced; //Set by navigator events to force an API check if connectivity changes
 
     constructor(props)
     {
@@ -38,15 +39,30 @@ export default class Backend extends Component {
             let files = data.map(path => this.parseRSML(path));
             this.props.updateParsedRSML(files); //RSML is batch-sent back to Redux to avoid spamming with actions, and killing performance. This does mean thumbs will be able to load all at once, or not at all.
         });
-
+        window.addEventListener('online', this.updateOnlineStatus);
+        window.addEventListener('offline', this.updateOnlineStatus);
         setInterval(this.sendFile, API_POLLTIME);
+    }
+
+    updateOnlineStatus = event => {
+        if (navigator.onLine) //If we get connectivity back, force check for an API connection, which will pickup files for scanning
+        { 
+            this.bForced = true;
+            this.forceUpdate();
+        }
+        else //If we drop connection, reset all queues and set connection to false.
+        {
+            this.props.resetQueues();
+            this.props.updateAPIStatus(false);
+        }
     }
 
     componentDidUpdate(prevProps)
     {  
         //This will fire once the config gets imported by the gallery, initialising the API values. Only then can we poll for status.
-        if ((prevProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != prevProps.apiKey)) //On settings change, poll the API and add missing files to queue if it's up
+        if ((prevProps.apiAddress != this.props.apiAddress) || (this.props.apiKey != prevProps.apiKey) || this.bForced) //On settings change, poll the API and add missing files to queue if it's up
         {
+            this.bForced = false;
             const { apiAddress, apiKey, updateAPIStatus, updateAPIModels, updateAPIAuth } = this.props;
             defaults.headers.common['X-Auth-Token'] = apiKey; //Set the default header for every request.
 
