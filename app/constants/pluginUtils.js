@@ -21,7 +21,7 @@ module.exports = {
         let closestPoint, closestDistance = Infinity;
 
         points.forEach(coord => {
-            let distance = module.exports.pointDistance(point, coord);
+            const distance = module.exports.pointDistance(point, coord);
             if (distance < closestDistance) 
             {
                 closestDistance = distance;
@@ -30,8 +30,20 @@ module.exports = {
         });
         return closestPoint;
     },
+    getNearestPoints: (points, point, count) => {
+        count = Math.min(count, points.length);
+        let closest = Array.from(Array(count), () => ({ distance: Infinity, point: null }));
+        points.forEach(coord => {
+            const distance = module.exports.pointDistance(point, coord);
+            const maxDistance = Math.max.apply(Math, closest.map(function(o) { return o.distance; }))
+            if (distance < maxDistance)
+                closest[closest.findIndex(it => it.distance == maxDistance)] = {distance, point: coord};
+        });
+        return closest.map(it => it.point);
+    },
     getDistanceUntilPoint: (points, breakPoint) => {
         let distance = 0;
+        if (points.length == 1) return 0;
         for (let i = 0; i < points.length - 1; i++)
         {
             let p1 = points[i];
@@ -40,6 +52,34 @@ module.exports = {
             if (p2.x == breakPoint.x && p2.y == breakPoint.y) break;
         }
         return distance;
+    },
+    linearRegressionGradient: points => {
+        let sumX = 0, sumY = 0; sumXSquared = 0; sumXY = 0;
+        points.forEach(coord => {
+            sumX += coord.x;
+            sumY += coord.y;
+            sumXSquared += Math.pow(coord.x, 2);
+            sumXY += coord.x * coord.y;
+        });
+        const gradient = (points.length * sumXY - sumX * sumY) / (points.length * sumXSquared - Math.pow(sumX, 2));
+        return gradient;
+    },
+    gradientToAngle: (points, gradient) => { // Points are used to calculate direction.
+        const firstPoint = points[0];
+        // Calculate two control points, one moving in each direction along the line.
+        const controlPoints = [{x: firstPoint.x + 1, y: firstPoint.x + gradient}, {x: firstPoint.x - 1, y: firstPoint.x - gradient}];
+        // See which of the check points is closer to each point on the line, to determine the direction. (+x or -x).
+        const directions = points
+                            .slice(1) // Remove the first element from the array as that was used to calculate the check points
+                            .map(point => // See which of the control points it's closer to, 1 for +x, -1 for -x
+                                module.exports.pointDistance(point, controlPoints[0]) < module.exports.pointDistance(point, controlPoints[1]) ? 1 : -1
+                            );
+        // Determine if there's more closer to the positive or the negative control point, to determine if the line moves in the positive or negative direction.
+        const numberOfPositive = directions.filter(direction => direction == 1).length;
+        // Use this direction to calculate the angle using arctan
+        const angle = numberOfPositive > points.length - numberOfPositive ? Math.atan2(gradient, 1) : Math.atan2(-gradient, -1);
+        // Convert to degrees, and subtract from 90 degrees to make with respect to the y axis instead of the x axis.
+        return 90 - (angle * 180 / Math.PI);
     },
     groupLinesByPlantID: lines => lines.reduce((acc, line) => {
         const id = module.exports.getPlantID(line);
