@@ -2,7 +2,7 @@
 const group = "Plant Measurements";
 const name = "Centroid X";
 const id = 'centroidX';
-const description = "text";
+const description = "The mean X position relative to the seed location calculated per plant across all roots.";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
