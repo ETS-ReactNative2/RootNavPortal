@@ -1,10 +1,10 @@
 import os from 'os'
 import { sep }  from 'path'
-import { writeFile, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { remote } from 'electron';
 
 import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR } from '../actions/galleryActions';
+    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB } from '../actions/galleryActions';
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
@@ -13,8 +13,8 @@ export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv
 export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
-export const API_THUMB  = 'api-thumb';
 export const CLOSE_VIEWER = 'close-viewer';
+export const HTTP_PORT = 9000;
 
 export const WINDOW_HEIGHT = 800;
 export const WINDOW_WIDTH  = 1200;
@@ -70,7 +70,7 @@ export const reduxActionFilter = action => {
     switch (process) {
         case "gallery":
             return ![SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH].includes(action.type);
+                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB].includes(action.type);
         case "viewer":
             return ![TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED_VIEWER].includes(action.type);
         default:

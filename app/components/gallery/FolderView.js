@@ -7,18 +7,20 @@ import TextPopup from '../common/TextPopup';
 import { readdir } from 'fs';
 import { StyledFolderViewDiv, StyledFolderCard, StyledRow, StyledCardHeader, StyledCardBody, StyledCardText  } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
-import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, API_THUMB } from '../../constants/globals'
+import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, _require, HTTP_PORT } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import { Collapse } from 'react-bootstrap';
-
+import { post, get, defaults } from 'axios';
 
 export default class FolderView extends Component {
 	constructor(props)
 	{
+		defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
 		super(props);
 		this.state = { read: false };
 	}
+
 	shouldComponentUpdate(nextProps, nextState) 
 	{
 		if (nextProps.labels != this.props.labels) return true;
@@ -26,6 +28,13 @@ export default class FolderView extends Component {
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}	  
+
+	sendThumbs = thumbs => {
+		get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
+			post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => this.props.addThumbs(res.data));
+		}).catch(err => setTimeout(() => this.sendThumbs(thumbs), 5000)) //If backend isn't up yet, wait 5s and try again.
+		//Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+	};
 
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
@@ -64,7 +73,7 @@ export default class FolderView extends Component {
 						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName] && !(ext + "Thumb" in structuredFiles[fileName]))) 
 							return { folder, file: structuredFiles[fileName], fileName };
 					});
-					ipcRenderer.send(API_THUMB, thumbs.filter(item => item !== undefined));
+					this.sendThumbs(thumbs);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.
@@ -75,7 +84,7 @@ export default class FolderView extends Component {
 		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
-			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1]
+			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1];
 			const formattedFolder = (folder.localeCompare(shortFolder) == 0 ? "" : `..${sep}`) + shortFolder;
 			return (
 				<StyledFolderCard className="bg-light">

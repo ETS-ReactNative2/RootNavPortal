@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import FolderView from '../../gallery/FolderView';
-import { addFiles, toggleOpenFile } from '../../../actions/galleryActions';
+import { addFiles, toggleOpenFile, addThumb } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
         files: state.gallery.files[ownProps.folder],
@@ -17,6 +17,7 @@ const mapStateToProps = (state, ownProps) => ({
 const mapDispatchToProps = dispatch => (
     { 
         addFiles: (folder, files) => dispatch(addFiles(folder, files)),
+        addThumbs: thumbs => dispatch(addThumb(thumbs)),
         toggleOpenFile: (file) => dispatch(toggleOpenFile(file))
     }
 );

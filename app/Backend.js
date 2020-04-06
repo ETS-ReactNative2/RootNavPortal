@@ -1,75 +1,46 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, API_THUMB, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
 import parser from 'xml2json';
 import imageThumbail from 'image-thumbnail';
+import fastifyServer from 'fastify';
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
 //Clean everything up once models have been added to state and we're not in debugging
+//https://github.com/axios/axios/pull/2874
+//When Axios sorts out the socket hang up error on slow responses, update the package back to the main repo
 export default class Backend extends Component {
     queue = [];
     inflightReqs = INFLIGHT_REQS; //Concurrency limit
     rootNavModel = -1; //HMR seems to break queues and class vars.
-
-    //this.props.inflightfiles : Tracks requests with some data in case we need to ignore the response. { C:\path\file: {model: 'wheat_bluepaper', ext: '.png' }, ... }
+    fastify;
 
     constructor(props)
     {
         super(props)
         defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
-
+        defaults.timeout = 0;
+        this.fastify = fastifyServer({ logger: process.argv.includes('--packaged=true') ? false : true });
+        this.setupHTTPServer();
+        
         //A single directory path {path: ""}
         ipcRenderer.on(API_DELETE, (event, data) => {
             this.handleDelete(data.path);
         });
-        //RSML and thumb actions are not getting IPC'd back to other reduxes because they're getting lumped in with the -incoming- IPC-sync payload from addFiles.
-        //Resulting in when the real RSML action fires, there's no diff because they've already been added to the file structure somehow, and thus have no diff, thus never synced.
-        //Basically find out why the parsedRSML keys are sneaking into the incoming payloads and thus the backend store, before the action that actually reduces them ever fires.
+        
         ipcRenderer.on(API_PARSE, (event, data) => {
             if (!data.length) return;
             let files = data.map(path => this.parseRSML(path));
             this.props.updateParsedRSML(files); //RSML is batch-sent back to Redux to avoid spamming with actions, and killing performance. This does mean thumbs will be able to load all at once, or not at all.
         });
 
-        ipcRenderer.on(API_THUMB, (event, data) => {
-            if (!data.length) return;
-            console.log(data);
-            Promise.all(data.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
-                this.props.addThumb(results);
-            }).catch(error => console.error(error));
-        });
-
         setInterval(this.sendFile, API_POLLTIME);
     }
-
-    //This is called on any file addition, or API update. No IPC is used anymore for queueing files. Even if backend late loads, we should still just pick up all the missed ones
-    //On any next iteration. There is a minor risk that if all files are added, and no more get added, and no API settings change, it won't add them to the queue. Very small edge case
-    //And the user can always reanalyse anyway. We could make the refresh button also trigger a full scan manually too.
-    scanFiles = () => {
-        let apiFiles = []; //search through the file structure for anything imported without RSML
-        const { files, addQueue, inflightFiles } = this.props;
-
-        Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
-            if (!files[folder][file].rsml)
-            {
-                let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
-                let filePath = folder + sep + file + "." + imageExt;
-
-                const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
-                if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
-            }
-        }));
-        if (apiFiles.length && this.props.apiStatus) //cautiously adding this here so queue doesn't get updated if there's no connection. Any API config change will rescan
-        {
-            this.queue.push(...apiFiles);
-            addQueue(apiFiles);
-        }
-    };
 
     componentDidUpdate(prevProps)
     {  
@@ -102,7 +73,70 @@ export default class Backend extends Component {
         if (Object.values(this.props.files).reduce((acc, value) => acc += Object.keys(value).length, 0) > Object.values(prevProps.files).reduce((acc, value) => acc += Object.keys(value).length, 0)) 
             this.scanFiles(); //If files changes, scan it for queueing.
     }
+    
+    /**********************
+    **  HTTP
+    ***********************/
+    //Sets up Fastify as the HTTP server used for thumbnailing, avoiding sending huge packets through IPC and blocking main.
+    setupHTTPServer = () => {
+        this.fastify.post('/thumb', async (request, reply) => {
+            reply.type('application/json').code(200)
+            return Promise.all(request.body.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
+                console.log(results);
 
+                return results;
+            }).catch(error => console.error(error));
+        });
+
+        //Polled before sending thumbs, to check if the backend process has started the server yet
+        this.fastify.get('/health', (request, reply) => {
+            console.log("Received healthcheck!")
+            reply.type('application/json').code(200).send({ up: "y" });
+            return({ up: "y" });
+        });
+
+        this.fastify.listen(HTTP_PORT, (err, address) => {
+            console.log("Listening at " + address);
+            if (err) 
+            {
+                console.log(err);
+                this.fastify.log.error(err)
+            }
+            this.fastify.log.info(`server listening on ${address}`)
+        });
+    }
+
+
+    /**********************
+    **  File Rescanning
+    ***********************/
+    //This is called on any file addition, or API update. No IPC is used anymore for queueing files. Even if backend late loads, we should still just pick up all the missed ones
+    //On any next iteration. There is a minor risk that if all files are added, and no more get added, and no API settings change, it won't add them to the queue. Very small edge case
+    //And the user can always reanalyse anyway. We could make the refresh button also trigger a full scan manually too.
+    scanFiles = () => {
+        let apiFiles = []; //search through the file structure for anything imported without RSML
+        const { files, addQueue, inflightFiles } = this.props;
+
+        Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
+            if (!files[folder][file].rsml)
+            {
+                let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
+                let filePath = folder + sep + file + "." + imageExt;
+
+                const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
+                if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
+            }
+        }));
+        if (apiFiles.length && this.props.apiStatus) //cautiously adding this here so queue doesn't get updated if there's no connection. Any API config change will rescan
+        {
+            this.queue.push(...apiFiles);
+            addQueue(apiFiles);
+        }
+    };
+
+    /**********************
+    **  Thumbnailing
+    ***********************/
     genThumbnail = (folder, file, fileName) => {
         console.log("generating thumbnails");
         return new Promise((resolve, reject) => {
@@ -116,6 +150,9 @@ export default class Backend extends Component {
         });
     };
 
+    /**********************
+    **  Parsing RSML
+    ***********************/
     parseRSML = filePath => {
         const { path, fileName } = matchPathName(filePath);
         //Ingest the RSML here if it's not cached in state
@@ -151,6 +188,9 @@ export default class Backend extends Component {
         }
     };
     
+    /**********************
+    **  Reanalysing Folder
+    ***********************/
     //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
@@ -193,6 +233,9 @@ export default class Backend extends Component {
         addQueue(queuedFiles);
     };
 
+    /**********************
+    **  API Comms
+    ***********************/
     //Send the job off to the server
     sendFile = () => {
         if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs || !this.props.apiAuth || this.rootNavModel < 0) return;

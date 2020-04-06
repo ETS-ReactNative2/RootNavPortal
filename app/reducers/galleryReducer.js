@@ -3,7 +3,7 @@ import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL
     UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
     TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH } from '../actions/galleryActions';
 
-const initialState = { folders: [], files: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
+const initialState = { folders: [], files: {}, thumbs: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
     filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false, apiModal: false, apiAuth: true };
 
 export default (state = initialState, action) => {
@@ -65,23 +65,22 @@ export default (state = initialState, action) => {
         }
         //Adds a batch of thumbnails to the file structure
         //action.thumb = [{ folder: "C:\Andrew\Desktop\rsml", fileName: "wheat_1", ext: "png", thumb: {type: "Buffer", data: [x, x, x,]}, {...}}
-        case ADD_THUMB: return {
+        case ADD_THUMB: {
+            console.log("Adding to redux")
+            return {
             ...state,
-            files: {
-                ...state.files,
+            thumbs: {
+                ...state.thumbs,
                 ...action.thumbs.reduce((acc, obj) => ({
                     ...acc, 
                     [obj.folder]: {
-                        ...state.files[obj.folder],
+                        ...(state.thumbs[obj.folder] || {}),
                         ...(acc[obj.folder] || {}),
-                        [obj.fileName]: {
-                            ...state.files[obj.folder][obj.fileName],
-                            ...((acc[obj.path] || {})[obj.fileName] || {}),
-                            [obj.ext + "Thumb"]: obj.thumb
-                        }
+                        [obj.fileName]: obj.thumb
                     }
                 }), {})
             }
+        }
         }
         case UPDATE_FILTER_TEXT: return {
             ...state,

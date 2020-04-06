@@ -4,9 +4,9 @@ const initialState = {
     queue: [], 
     inFlight: {}, 
     apiModels: [
-        { value: "arabidopsis_plate", description: "Arabidopsis Plate Assay" }, 
-        { value: "osr_bluepaper",     description: "Oilseed Rape (Blue Paper)" }, 
-        { value: "wheat_bluepaper",   description: "Wheat (Blue Paper)" } 
+        { value: "arabidopsis_plate", description: "Arabidopsis IR Plate" }, 
+        { value: "osr_bluepaper",     description: "Rapeseed Bluepaper" }, 
+        { value: "wheat_bluepaper",   description: "Wheat Bluepaper" } 
     ],
 };
 
