@@ -1,5 +1,6 @@
 // @flow
 import { existsSync, readdirSync, mkdirSync } from 'fs';
+import { shell } from 'electron';
 import React, { Component } from 'react';
 import { Button, Row, Modal, InputGroup, Collapse, Toast, Spinner } from 'react-bootstrap'
 import { PLUGINDIR, _require } from '../../constants/globals'
@@ -120,6 +121,12 @@ export default class PluginBar extends Component {
                 </Modal.Body>
                 <Modal.Footer>
                     { this.checkAPIQueues() ? <span> <Spinner animation="border" variant="warning" style={{height: '1.5rem', width: '1.5rem', border: '0.2em solid currentColor', borderRightColor: 'transparent'}}/> Images in selected folders are still processing </span> : ""}
+                    <Button
+                        className="float-left" variant="secondary" onClick={this.openContainingDirectory} 
+                        style={{opacity: this.state.measuresComplete ? 1 : 0, transition: '0.2s ease-in-out', marginRight: 'auto'}                        }
+                    >
+                        Open<StyledIcon className={"fas fa-external-link-alt"}/>
+                    </Button>
                     <Button variant={this.state.measuresComplete ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
                         {this.state.measuresComplete ? "Close" : "Cancel"}
                     </Button>
@@ -235,7 +242,10 @@ export default class PluginBar extends Component {
     }, {}));
 
     closeModal = () => {
-        this.setState({...this.state, modal: false, measuresComplete: false, measuring: false });
+        this.setState({ modal: false });
+        setTimeout(() => this.setState({ 
+            measuresComplete: false, measuring: false
+        }), 250);
     };
 
     //Plugin measure clicked, opens modal
@@ -297,4 +307,8 @@ export default class PluginBar extends Component {
             [groupName]: !this.state[groupName]
         });
     };
+
+    openContainingDirectory = () => {
+        shell.showItemInFolder(this.exportDest.current.value);
+    }
 }
