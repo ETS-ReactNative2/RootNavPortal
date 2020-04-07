@@ -6,7 +6,7 @@ _put some pictures and banners in here for better styling later_
 
 ## Install
 ### For users
-Releases are on the GitHub [releases page](https://github.com/Chagrilled/RootNavPortal/releases]. Preference should be given to the installed application for Windows, over portable, for performance.
+Releases are on the GitHub [releases page](https://github.com/Chagrilled/RootNavPortal/releases). Preference should be given to the installed application for Windows, over portable, for performance.
 
 ### For developers:
 First, clone the repo via git:
