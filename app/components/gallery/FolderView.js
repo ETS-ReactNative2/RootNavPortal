@@ -22,7 +22,7 @@ export default class FolderView extends Component {
 
 	StyledSpinner = styled(Spinner)` && {
 		margin-left: auto;
-		margin-right: 0;
+		margin-right: 0.7em;
 	}`;
 	
 	shouldComponentUpdate(nextProps, nextState) 
@@ -55,7 +55,7 @@ export default class FolderView extends Component {
                 {spinner}
             </>
         )
-	}
+	};
 	
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
@@ -97,8 +97,6 @@ export default class FolderView extends Component {
 
 					if (thumbs.length)
 					{
-						console.log(thumbs);
-						console.log("Setting state to false")
 						this.setState({ thumbsGenerating: true });
 						sendThumbs(thumbs, addThumbs).then(() => this.setState({ thumbsGenerating: false }));
 					}
