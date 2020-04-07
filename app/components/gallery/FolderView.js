@@ -1,5 +1,5 @@
 // @flow
-import React, { Component } from 'react';
+import React, { Component, useState, useRef } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
@@ -10,23 +10,53 @@ import { StyledIcon } from '../CommonStyledComponents'
 import { ALL_EXTS_REGEX, API_PARSE, IMAGE_EXTS, _require, sendThumbs } from '../../constants/globals'
 import { ipcRenderer } from 'electron';
 import { sep } from 'path';
-import { Collapse } from 'react-bootstrap';
+import { Collapse, Overlay, Tooltip, Spinner } from 'react-bootstrap';
+import styled from 'styled-components';
 
 export default class FolderView extends Component {
 	constructor(props)
 	{
 		super(props);
-		this.state = { read: false };
+		this.state = { read: false, thumbsGenerating: false };
 	}
 
+	StyledSpinner = styled(Spinner)` && {
+		margin-left: auto;
+		margin-right: 0;
+	}`;
+	
 	shouldComponentUpdate(nextProps, nextState) 
 	{
+		if (this.state.thumbsGenerating != nextState.thumbsGenerating) return true;
 		if (nextProps.labels != this.props.labels) return true;
 		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
 		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
-	}	  
+	}
 
+	spinner = () => {
+        const [show, setShow] = useState(false);
+        const target = useRef(null);
+
+        let spinner, tooltipText;
+        if (this.state.thumbsGenerating)
+        {
+            spinner = <this.StyledSpinner ref={target} animation="border" variant="primary" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            tooltipText = "Processing thumbnails";
+        }
+
+        return (
+            <>
+                <Overlay target={target.current} show={show} placement="top">
+                {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
+                    <Tooltip placement={top} {...props}> {tooltipText} </Tooltip>
+                )}
+                </Overlay>
+                {spinner}
+            </>
+        )
+	}
+	
 	render() {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
@@ -64,7 +94,14 @@ export default class FolderView extends Component {
 						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName])) 
 							return { folder, file: structuredFiles[fileName], fileName };
 					}).filter(item => item !== undefined);
-					sendThumbs(thumbs, addThumbs);
+
+					if (thumbs.length)
+					{
+						console.log(thumbs);
+						console.log("Setting state to false")
+						this.setState({ thumbsGenerating: true });
+						sendThumbs(thumbs, addThumbs).then(() => this.setState({ thumbsGenerating: false }));
+					}
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.
@@ -83,10 +120,11 @@ export default class FolderView extends Component {
 						<StyledFolderViewDiv>
 							<StyledIcon className={"fas fa-chevron-right fa-lg"} style={{transitionDuration: '0.5s', transform: `rotate(${isActive ? '90' : '0'}deg)`}}/>
 							<TextPopup displayText={formattedFolder} popupText={folder} placement="top"/>
-							<div style={{marginLeft: "auto", marginRight: "0"}}>
+							<this.spinner />
+							<div style={{marginLeft: this.state.thumbsGenerating ? "0" : "auto", marginRight: "0"}}>
 								<SettingsButton path={folder}/>
 								<RemoveButton path={folder}/>
-							</div>
+							</div> 
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
 						<Collapse in={!!(isActive && files && folder)}>

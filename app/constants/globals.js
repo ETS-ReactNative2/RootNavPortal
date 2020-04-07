@@ -82,9 +82,11 @@ export const reduxActionFilter = action => {
 }
 
 export const sendThumbs = (thumbs, addThumbs) => {
-    get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
-        post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => addThumbs(res.data)).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 2000)); //If Axios hangs up, try again.
-    }).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 5000)); //If backend isn't up yet, wait 5s and try again.
-    //Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+    return new Promise((resolve, reject) => {
+        get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
+            post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => resolve(addThumbs(res.data))).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 2000)); //If Axios hangs up, try again.
+        }).catch(err => setTimeout(() => sendThumbs(thumbs, addThumbs), 5000)); //If backend isn't up yet, wait 5s and try again.
+        //Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+    });
 };
 defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
