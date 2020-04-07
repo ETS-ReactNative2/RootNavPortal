@@ -123,9 +123,9 @@ export default class PluginBar extends Component {
                     { this.checkAPIQueues() ? <span> <Spinner animation="border" variant="warning" style={{height: '1.5rem', width: '1.5rem', border: '0.2em solid currentColor', borderRightColor: 'transparent'}}/> Images in selected folders are still processing </span> : ""}
                     <Button
                         className="float-left" variant="secondary" onClick={this.openContainingDirectory} 
-                        style={{opacity: this.state.measuresComplete ? 1 : 0, transition: '0.2s ease-in-out', marginRight: 'auto'}                        }
+                        style={{opacity: this.state.measuresComplete ? 1 : 0, transition: '0.2s ease-in-out', marginRight: 'auto'}}
                     >
-                        Open<StyledIcon className={"fas fa-external-link-alt"}/>
+                        Open <StyledIcon className={"fas fa-external-link-alt"}/>
                     </Button>
                     <Button variant={this.state.measuresComplete ? "success" : "danger"} onClick={this.closeModal} style={{transition: '0.2s ease-in-out'}}>
                         {this.state.measuresComplete ? "Close" : "Cancel"}
