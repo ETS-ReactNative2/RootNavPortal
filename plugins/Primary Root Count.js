@@ -3,6 +3,8 @@ const name = "Primary Root Count"; //Name the plugin will be displayed as in the
 const id = 'primaries'; //This key must be unique among all plugins
 const description = "Total primary roots per plant"; //This is used as the plugin's tooltip text in the side bar.
 
+// API Documentation for pluginUtils and the structures can be found here: https://github.com/Chagrilled/RootNavPortal/wiki/Plugin-Utilities
+
 //This plugin serves as a fully documented example describing how the plugin interface is structured
 //Each function is responsible for calculating the measurement on all data for a whole image
 //So for plant measurements, this is for each plant, and root measurements, for all roots of all plants within an image
