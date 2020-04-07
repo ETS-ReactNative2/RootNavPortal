@@ -2209,7 +2209,7 @@ aws4@^1.8.0:
 
 axios@^0.19.0, "axios@https://github.com/mooyoul/axios#read-timeout":
   version "0.19.2"
-  resolved "https://github.com/mooyoul/axios#05bb25398b1382389770f9231c09fb194d7fb71a"
+  resolved "https://github.com/mooyoul/axios#536e3adf9cc0e5b435d5bee3039b7e65987b3cdb"
   dependencies:
     follow-redirects "^1.10.0"
 
