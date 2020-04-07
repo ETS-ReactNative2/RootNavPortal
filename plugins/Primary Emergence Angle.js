@@ -15,7 +15,7 @@ const plugin = (rsmlJson, polylines, utils) => {
                 const { plantID, primaryID } = utils.getPlantPrimaryID(line);
                 const points = line.points.slice(0, 20); // Take first 20 points of array
                 const gradient = utils.linearRegressionGradient(points);
-                const angle = utils.gradientToAngle(points, gradient);
+                const angle = utils.boundAngle(utils.gradientToAngle(points, gradient));
                 results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: angle });
             }
         });

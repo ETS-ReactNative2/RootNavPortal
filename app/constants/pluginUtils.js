@@ -41,6 +41,12 @@ module.exports = {
         });
         return closest.map(it => it.point);
     },
+    getNearestPointsOrdered: (points, point, count) => {
+        return module.exports.getNearestPoints(points, point, count)
+            .map(nearPoint => [nearPoint, points.indexOf(nearPoint)])
+            .sort((a, b) => a[1] - b[1])
+            .map(it => it[0]);
+    },
     getDistanceUntilPoint: (points, breakPoint) => {
         let distance = 0;
         if (points.length == 1) return 0;
@@ -53,7 +59,7 @@ module.exports = {
         }
         return distance;
     },
-    linearRegressionGradient: points => {
+    linearRegressionGradient: points => { // Can return NaN for infinite gradient
         let sumX = 0, sumY = 0; sumXSquared = 0; sumXY = 0;
         points.forEach(coord => {
             sumX += coord.x;
@@ -67,7 +73,9 @@ module.exports = {
     gradientToAngle: (points, gradient) => { // Points are used to calculate direction.
         const firstPoint = points[0];
         // Calculate two control points, one moving in each direction along the line.
-        const controlPoints = [{x: firstPoint.x + 1, y: firstPoint.x + gradient}, {x: firstPoint.x - 1, y: firstPoint.x - gradient}];
+        const controlPoints = gradient ? // Special case for infinite gradient
+                                [{x: firstPoint.x + 1, y: firstPoint.y + gradient}, {x: firstPoint.x - 1, y: firstPoint.y - gradient}] : 
+                                [{x: firstPoint.x, y: firstPoint.y + 1}, {x: firstPoint.x, y: firstPoint.y - 1}];
         // See which of the check points is closer to each point on the line, to determine the direction. (+x or -x).
         const directions = points
                             .slice(1) // Remove the first element from the array as that was used to calculate the check points
@@ -77,9 +85,11 @@ module.exports = {
         // Determine if there's more closer to the positive or the negative control point, to determine if the line moves in the positive or negative direction.
         const numberOfPositive = directions.filter(direction => direction == 1).length;
         // Use this direction to calculate the angle using arctan
-        const angle = numberOfPositive > points.length - numberOfPositive ? Math.atan2(gradient, 1) : Math.atan2(-gradient, -1);
-        // Convert to degrees, and subtract from 90 degrees to make with respect to the y axis instead of the x axis.
-        return 90 - (angle * 180 / Math.PI);
+        const multiplier = numberOfPositive > points.length - numberOfPositive ? 1 : -1;
+        let angle = gradient ? Math.atan2(-gradient * multiplier, multiplier) : Math.atan2(multiplier, 0);
+        // Convert to degrees, and add 90 degrees to make with respect to the 'negative' y axis instead of the x axis.
+        angle = 90 - angle * 180 / Math.PI;
+        return angle;
     },
     groupLinesByPlantID: lines => lines.reduce((acc, line) => {
         const id = module.exports.getPlantID(line);
@@ -101,7 +111,8 @@ module.exports = {
         let newPoints = points.slice();
         newPoints.sort(pointComparator);
         return makeHullPresorted(newPoints);
-    }
+    },
+    boundAngle: angle => angle > 180 ? angle - 360 : angle <= -180 ? angle + 360 : angle
 };
 
 // Returns the convex hull, assuming that each points[i] <= points[i + 1]. Runs in O(n) time.

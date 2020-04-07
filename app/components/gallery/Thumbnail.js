@@ -202,10 +202,11 @@ export default class Thumbnail extends Component {
         const buffer = this.getBuffer(thumb);
         const imageSize = buffer && sizeOf(buffer);
         const baseVH = Math.round(window.innerHeight / 100);
+        const heightRatio = imageSize ? imageSize.height / imageSize.width : 1.3;
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard style={imageSize ? {width: `${baseVH * 25}px`, height: `fit-content`} : {}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element}>
-                <div style={imageSize ? {width: `${baseVH * 25}px`, height: `${imageSize.height / imageSize.width * (baseVH * 25)}px`} : {}} ref={this.container}>
+            <StyledImageCard style={{width: `${baseVH * 25}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element}>
+                <div style={{width: `${baseVH * 25}px`, height: `${heightRatio * (baseVH * 25)}px`}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
                     { (!thumb || !this.state.visible) ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
