@@ -16,7 +16,6 @@ module.exports = {
     getParentOfLateral: (lateral, polylines) => polylines.find(line => line.id == lateral.id.match(/(\d+\-\d+)/)[1]),
     getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"],
     isMultiplePlants: json => json.rsml[0].scene[0].plant.length > 1,
-    getAngle: (anchor, point) => Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180 / Math.PI, //Does this get used?
     getNearestPoint: (points, point) => {
         let closestPoint, closestDistance = Infinity;
 
