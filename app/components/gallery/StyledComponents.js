@@ -65,6 +65,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
     -webkit-transition: 0.2s;
     &:hover {
         background-color: #e2e5ea !important;
+        cursor: pointer;
     }        
 }`
 

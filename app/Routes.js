@@ -88,7 +88,7 @@ export default class Routes extends Component {
             <Router>
             <div>
                 <Route path='/' component={Routes.View}/>
-                <Modal show={true} show={this.props.apiModal} onHide={this.closeModal}>
+                <Modal show={this.props.apiModal} onHide={this.closeModal}>
                     <Modal.Header closeButton>
                         <Modal.Title>Server Settings</Modal.Title>
                     </Modal.Header>
