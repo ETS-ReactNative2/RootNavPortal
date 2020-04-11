@@ -14,7 +14,8 @@ const mapStateToProps = (state, ownProps) => {
         architecture: state.gallery.architecture,
         active: folder.active,
         model: folder.model,
-        apiStatus: state.gallery.apiStatus
+        apiStatus: state.gallery.apiStatus,
+        filterText: state.gallery.filterText
     };
 };
 
