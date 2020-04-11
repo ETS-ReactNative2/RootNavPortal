@@ -66,6 +66,7 @@ export default class Routes extends Component {
     }
 
     saveSettings = () => {
+        this.setState({ changeSaveAnimation: false }); // Reset save checkbox so it repeats the tick animation each time.
         let apiAddress = this.address.current.value;
         let port       = this.port.current.value;
         let apiKey     = this.apiKey.current.value;

@@ -175,7 +175,7 @@ export default class PluginBar extends Component {
     //Modal's measure button clicked
     export = () => {
         if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
-        this.setState({ ...this.state, measuring: true });
+        this.setState({ ...this.state, measuring: true, measuresComplete: false });
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
