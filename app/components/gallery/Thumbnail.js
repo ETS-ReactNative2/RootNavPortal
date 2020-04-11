@@ -55,7 +55,7 @@ export default class Thumbnail extends Component {
     }
 
     isVisible = active => { //Returns true if the image is currently on screen. Cannot be used before render()
-        if (!active || !this.element) return false;
+        if (!active || !this.element.current) return false;
         let rect = this.element.current.getBoundingClientRect();
         return !(rect.bottom < 0 || rect.top - Math.max(document.documentElement.clientHeight, window.innerHeight) >= 0);
     };
@@ -99,6 +99,9 @@ export default class Thumbnail extends Component {
     };
 
     setupCanvas = () => {
+        if (!this.container.current) {
+            this.fabricCanvas.initialize(document.getElementById(this.canvasID));
+        };
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: this.container.current.clientWidth, height: this.container.current.clientHeight });
         this.fabricCanvas.setDimensions({ width: this.container.current.clientWidth, height: this.container.current.clientHeight }, { backstoreOnly: true });
         this.fabricCanvas.hoverCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
