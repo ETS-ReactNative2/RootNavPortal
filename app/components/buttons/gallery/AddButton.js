@@ -3,24 +3,29 @@ import React, { Component } from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { ipcRenderer } from 'electron';
 import TreeChecklist from '../../containers/gallery/TreeChecklistContainer';
-import { writeConfig } from '../../../constants/globals';
+import { writeConfig, _require, HTTP_PORT } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import TooltipOverlay from '../../common/TooltipOverlay';
-const dree = require('dree');  
+import { post } from 'axios';
 
 export default class AddButton extends Component {
     constructor(props)
     {
         super(props);
+        this.state = { pending: false };
         ipcRenderer.on('folderData', (event, data) => {
-            let tree = data.map((item, i) => dree.scan(item, { depth: 5, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this. Need to make an exclude regex for things like system folders and node_modules in case
-            this.props.updateModalBody(tree);
-            this.props.showModal();
+            this.setState({ pending: true });
+            post(`http://127.0.0.1:${HTTP_PORT}/import`, data).then(res => {
+                this.setState({ pending: false });
+                this.props.updateModalBody(res.data);
+                this.props.showModal();
+            });
         });
     }
 
     shouldComponentUpdate(nextProps, nextState)
     {   //Stops this component re-rendering (thus re-rendering the checklist) whenever state changes (by the checklist)
+        if (this.state.pending != nextState.pending) return true;
         return nextProps.modal !== this.props.modal //Only re-render when modal state changes. 
         //Other state is for data passing and internals
     }
@@ -35,6 +40,7 @@ export default class AddButton extends Component {
     }
 
     openFileDialog = () => {
+        if (this.state.pending) return;
         ipcRenderer.send('openFolder')
     }
 
@@ -42,12 +48,12 @@ export default class AddButton extends Component {
         return (
             <>
                 <TooltipOverlay  component={ props => <StyledButton
-                        variant="success" 
+                        variant={this.state.pending ? "warning" : "success"} 
                         onClick={this.openFileDialog} 
                         className={`btn btn-default fas fa-plus button`} 
                         {...props}
                     />} 
-                    text={"Import Folders"}
+                    text={this.state.pending ? "Scanning folders for import, please wait" : "Import Folders"}
                     placement={"bottom"}
                 /> 
                 <StyledModal show={this.props.modal} onHide={this.props.closeModal}>

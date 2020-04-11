@@ -9,6 +9,7 @@ import { sep } from 'path';
 import parser from 'xml2json';
 import imageThumbail from 'image-thumbnail';
 import fastifyServer from 'fastify';
+const dree = require('dree');  
 
 //arabidopsis_plate, osr_bluepaper, wheat_bluepaper
 //Clean everything up once models have been added to state and we're not in debugging
@@ -24,7 +25,6 @@ export default class Backend extends Component {
     constructor(props)
     {
         super(props)
-        defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
         defaults.timeout = 0;
         this.fastify = fastifyServer({ logger: process.argv.includes('--packaged=true') ? false : true });
         this.setupHTTPServer();
@@ -96,10 +96,15 @@ export default class Backend extends Component {
     //Sets up Fastify as the HTTP server used for thumbnailing, avoiding sending huge packets through IPC and blocking main.
     setupHTTPServer = () => {
         this.fastify.post('/thumb', async (request, reply) => {
-            reply.type('application/json').code(200)
+            reply.type('application/json').code(200);
             return Promise.all(request.body.map(args => this.genThumbnail(args.folder, args.file, args.fileName))).then(results => {
                 return results;
             }).catch(error => console.error(error));
+        });
+
+        this.fastify.post('/import', async (request, reply) => {
+            reply.type('application/json').code(200);
+            return request.body.map((item, i) => dree.scan(item, { depth: 5, exclude: /node_modules|system32|Windows|boot|etc|dev|bin|proc$/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
         });
 
         //Polled before sending thumbs, to check if the backend process has started the server yet
