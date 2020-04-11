@@ -1,8 +1,8 @@
 
 const group = "Root Measurements";
-const name = "Total Primary Angle";
+const name = "Complete Primary Angle";
 const id = 'totalPrimaryAngle';
-const description = "text";
+const description = "The angle between the vertical axis and the vector of the start and the tip of the root.";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
