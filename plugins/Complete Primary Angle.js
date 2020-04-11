@@ -9,7 +9,15 @@ const plugin = (rsmlJson, polylines, utils) => {
         let tag = utils.getTag(rsmlJson); 
         let multiplePlants = utils.isMultiplePlants(rsmlJson); 
         let results = [];
-        
+
+        polylines.forEach(line => {
+            if (line.type == "primary") {
+                const { plantID, primaryID } = utils.getPlantPrimaryID(line);
+                const angle = utils.boundAngle(utils.getAngleBetweenPoints(line.points[line.points.length-1], line.points[0]));
+                results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: angle });
+            }
+        });
+
 		resolve({
             header: [
                 { id, title: name }
