@@ -56,6 +56,7 @@ export default class Thumbnail extends Component {
 
     isVisible = active => { //Returns true if the image is currently on screen. Cannot be used before render()
         if (!active || !this.element) return false;
+        if (!this.element.current) return false;
         let rect = this.element.current.getBoundingClientRect();
         return !(rect.bottom < 0 || rect.top - Math.max(document.documentElement.clientHeight, window.innerHeight) >= 0);
     };
@@ -64,6 +65,11 @@ export default class Thumbnail extends Component {
     {   
         //There may be some merit to prevent re-renders while thumbnails are offscreen, but I'm not sure if we have any calls that cause them all to reload.
         if (this.props.active && !nextProps.active) this.setState({ visible: false }); //Reset visibility if folder is closed
+        if (this.props.filterText != nextProps.filterText) 
+        {
+            this.setState({ visible: false });
+            return false;
+        }
         // if (this.props.architecture != nextProps.architecture) this.setState({ visible: false }); //Reset lazy loading for redrawing architectures <- still displays the spinner, verify later if this offers any performance gain
         if (!nextProps.active) return false; //Don't rerender if the parent folder is closed
         if (nextProps.labels != this.props.labels) return false; //If the label changes, we don't want to update with the rest of the container
