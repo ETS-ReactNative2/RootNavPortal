@@ -5,7 +5,7 @@ import { remote } from 'electron';
 import { post, get, defaults } from 'axios';
 
 import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, addThumb } from '../actions/galleryActions';
+    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, addThumb, UPDATE_API_MODAL } from '../actions/galleryActions';
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
@@ -73,9 +73,9 @@ export const reduxActionFilter = action => {
     switch (process) {
         case "gallery":
             return ![SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB].includes(action.type);
+                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB, UPDATE_API_MODAL].includes(action.type);
         case "viewer":
-            return ![TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED_VIEWER].includes(action.type);
+            return ![TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED_VIEWER, UPDATE_API_MODAL].includes(action.type);
         default:
             return true;
     }

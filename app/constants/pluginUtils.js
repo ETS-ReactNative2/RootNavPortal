@@ -90,6 +90,7 @@ module.exports = {
         angle = 90 - angle * 180 / Math.PI;
         return angle;
     },
+    getAngleBetweenPoints: (anchor, point) => 90 - Math.atan2(anchor.y - point.y, anchor.x - point.x) * 180 / Math.PI,
     groupLinesByPlantID: lines => lines.reduce((acc, line) => {
         const id = module.exports.getPlantID(line);
         if (!acc[id]) acc[id] = [line];

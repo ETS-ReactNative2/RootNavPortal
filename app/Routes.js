@@ -66,6 +66,7 @@ export default class Routes extends Component {
     }
 
     saveSettings = () => {
+        this.setState({ changeSaveAnimation: false }); // Reset save checkbox so it repeats the tick animation each time.
         let apiAddress = this.address.current.value;
         let port       = this.port.current.value;
         let apiKey     = this.apiKey.current.value;
@@ -74,11 +75,11 @@ export default class Routes extends Component {
             this.setState({ validateWarning: true });
             return; //Maybe do some form validation here later 
         }
-        this.setState({ ...this.state, openCollapse: true, validateWarning: false });
+        this.setState({ openCollapse: true, validateWarning: false });
         this.props.saveAPISettings(apiAddress + (port ? ":" : "") + port, apiKey);
 
         writeConfig(JSON.stringify({ apiAddress: apiAddress + (port ? ":" : "") + port, apiKey, folders: this.props.folders }, null, 4));
-        setTimeout(() => this.setState({ ...this.state, changeSaveAnimation: true }), 225); //checkmark animation delay
+        setTimeout(() => this.setState({ changeSaveAnimation: true }), 225); //checkmark animation delay
     };
 
     render() {
