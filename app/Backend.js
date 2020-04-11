@@ -174,17 +174,17 @@ export default class Backend extends Component {
         let rsmlJson = parser.toJson(rsml, xmlOptions);
 
         let plant = rsmlJson.rsml[0].scene[0].plant; 
-        plant.forEach(plantItem => this.formatPoints(plantItem, plantItem.id, polylines));
+        plant.forEach((plantItem, index) => this.formatPoints(plantItem, index + 1, polylines));
         return { path, fileName, rsmlJson, polylines };
     };
     
-    formatPoints = (rsml, plantID, polylines) => {
+    formatPoints = (rsml, plantID, polylines, primaryCount, lateralCount) => {
         if (rsml.geometry) //If the node has geometry, extract it into an array of simplified points
         {
             // polylines: [ {type: "lat", id: "5.3", points: [{x, y}] }]
-            polylines.push({ //To test alts, change rootnavspline to polyline
-                type: rsml.label,
-                id: plantID + "-" + rsml.id, //This structure may not be useful for plugins, so they might need to do organising of RSML themselves
+            polylines.push({ //Creates a flatten array of objects each representing a root.
+                type: lateralCount ? "lateral" : "primary",
+                id: `${plantID}-${primaryCount}${(lateralCount ? `.${lateralCount}` : "")}`,
                 points: rsml.geometry[0].polyline[0].point.map(p => ({ 
                     x: parseFloat(p.x), //Floats still need to be transformed so Fabric can draw them right => but only in the line array, these never end up in the RSML/JSON
                     y: parseFloat(p.y)
@@ -193,7 +193,10 @@ export default class Backend extends Component {
         }
         if (rsml.root)
         {
-           rsml.root.forEach(root => this.formatPoints(root, plantID, polylines));
+            rsml.root.forEach((root, index) => this.formatPoints(root, plantID, polylines, 
+                primaryCount || (index + 1),  //Pass the indexes through the recursion
+                lateralCount || (primaryCount ? (index + 1) : undefined) //Only pass a lateral ID if we're in the second level of recursion of a root tree
+            ));
         }
     };
     
