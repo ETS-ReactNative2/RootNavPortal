@@ -55,7 +55,7 @@ export default class Thumbnail extends Component {
     }
 
     isVisible = active => { //Returns true if the image is currently on screen. Cannot be used before render()
-        if (!active) return false;
+        if (!active || !this.element) return false;
         let rect = this.element.current.getBoundingClientRect();
         return !(rect.bottom < 0 || rect.top - Math.max(document.documentElement.clientHeight, window.innerHeight) >= 0);
     };
