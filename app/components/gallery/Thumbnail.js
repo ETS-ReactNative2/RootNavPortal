@@ -62,6 +62,7 @@ export default class Thumbnail extends Component {
 
     shouldComponentUpdate(nextProps, nextState) 
     {   
+        const { folder, fileName } = nextProps;
         //There may be some merit to prevent re-renders while thumbnails are offscreen, but I'm not sure if we have any calls that cause them all to reload.
         if (this.props.active && !nextProps.active) this.setState({ visible: false }); //Reset visibility if folder is closed
         if (this.props.filterText != nextProps.filterText) 
@@ -72,6 +73,15 @@ export default class Thumbnail extends Component {
         // if (this.props.architecture != nextProps.architecture) this.setState({ visible: false }); //Reset lazy loading for redrawing architectures <- still displays the spinner, verify later if this offers any performance gain
         if (!nextProps.active) return false; //Don't rerender if the parent folder is closed
         if (nextProps.labels != this.props.labels) return false; //If the label changes, we don't want to update with the rest of the container
+        if ((JSON.stringify(this.props.inFlight) != JSON.stringify(nextProps.inFlight)) && (this.props.inFlight[folder + sep + fileName] == nextProps.inFlight[folder + sep + fileName]))
+        {
+            return false; //Prevent all thumbs reloading when the inflight queue changes
+        }
+        if ((JSON.stringify(this.props.queue) != JSON.stringify(nextProps.queue))
+            && (this.props.queue.some(file => file.includes(folder + sep + fileName + ".")) == nextProps.queue.some(file => file.includes(folder + sep + fileName + "."))))
+        {
+            return false; //Prevent thumbs reloading when queue changes
+        }
         return true; //so the label collapse animation is still smooth as the canvas won't redraw unnecessarily
     }
 

@@ -34,7 +34,7 @@ export const _require = typeof __webpack_require__ === "function" ? __non_webpac
 export const INFLIGHT_REQS = 5;
 export const API_POLLTIME  = 1000 * 5; //API poll interval in milliseconds
 
-export const THUMB_PERCENTAGE = 20
+export const THUMB_PERCENTAGE = 15;
 export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
 export const DEFAULT_CONFIG = { apiAdrdress: "", apiKey: "", folders: [] };
