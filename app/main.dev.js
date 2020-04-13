@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED } from './constants/globals';
 import { join } from 'path';
 
 // export default class AppUpdater {
@@ -258,3 +258,5 @@ ipcMain.on(API_PARSE, (event, paths) => { // paths = [ "C:\folder\plant", "C:\fo
     if (!bBackendReady) backendQueue.push(...paths); //Suddenly the backend starting opening slower (or gallery faster) causing early IPCs to miss.
     else backendWindow.webContents.send(API_PARSE, paths); //Storing and sending a small dead letter queue until it's ready solves this potential issue.
 });
+
+ipcMain.on(NOTIFICATION_CLICKED, (event, paths) => iconClick());

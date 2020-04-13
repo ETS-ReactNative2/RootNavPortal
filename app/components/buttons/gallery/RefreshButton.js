@@ -52,8 +52,11 @@ export default class RefreshButton extends Component {
                         if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse); 
                         
                         newThumbs = newThumbs.concat(Object.keys(files).map(fileName => {
-                            if (IMAGE_EXTS.some(ext => ext in structuredFiles[folder][fileName]) && !thumbs[folder][fileName]) 
-                                return { folder, file: structuredFiles[folder][fileName], fileName };
+                            if (IMAGE_EXTS.some(ext => ext in structuredFiles[folder][fileName]) && !thumbs[folder][fileName])
+                            {
+                                const { parsedRSML, _C1, _C2, rsml, ...exts } = structuredFiles[folder][fileName];
+                                return { folder, file: exts, fileName };
+                            }
                         }));
                     });
                     sendThumbs(newThumbs.filter(item => item !== undefined), addThumbs);

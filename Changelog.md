@@ -5,6 +5,12 @@
 - Added small blacklist of folders to never scan - such as operating system folders and development library folders
 - Fixed thumbnails re-rendering when the queue/inflight files changed
 - Implemented angle measure plugins
+- Added desktop notification for when all queued files are returned from API, can be clicked to reopen the gallery
+- Fixed a bug where thumbnails wouldn't be generated upon opening gallery after backgrounding
+- Fixed a bug where the RSML results would be sent along with thumbnail HTTP request
+- Moved operations from FolderView's render to componentDidMount now we know how React works
+- Increased API concurrency to 10 files
+- Updated Electron to 8.2.2
 
 # 0.4.0
 

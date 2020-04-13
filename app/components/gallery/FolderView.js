@@ -29,9 +29,9 @@ export default class FolderView extends Component {
 	{
 		if (this.state.thumbsGenerating != nextState.thumbsGenerating) return true;
 		if (nextProps.labels != this.props.labels) return true;
-		if (nextProps.filterText !== this.props.filterText || nextProps.filterAnalysed !== this.props.filterAnalysed) return true;
+		if ((nextProps.filterText !== this.props.filterText) || (nextProps.filterAnalysed !== this.props.filterAnalysed)) return true;
 		if (!this.props.files) return true;	//If the folder has no files, don't re-render
-		return nextProps.isActive !== this.props.isActive || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
+		return (nextProps.isActive !== this.props.isActive) || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
 	spinner = () => {
@@ -57,18 +57,36 @@ export default class FolderView extends Component {
         )
 	};
 	
-	render() {
-		//folder - the full path to this folder - in state.gallery.folders
-		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
-		const { isActive, folder, filterText, filterAnalysed, files, addFiles, addThumbs } = this.props; 
-		if (!files && !this.state.read) {
+	generateThumbs = (structuredFiles, fileKeys) => {
+		const { folder, addThumbs } = this.props; 
+		let thumbFiles = fileKeys.map(fileName => {
+			if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName])) 
+			{
+				const { parsedRSML, _C1, _C2, rsml, ...exts } = structuredFiles[fileName];
+				return { folder, file: exts, fileName };
+			}
+		}).filter(item => item !== undefined);
+
+		if (thumbFiles.length)
+		{
+			this.setState({ thumbsGenerating: true });
+			sendThumbs(thumbFiles, addThumbs).then(() => this.setState({ thumbsGenerating: false }));
+		}
+	};
+
+	componentDidMount()
+	{
+		const { folder, files, addFiles, thumbs } = this.props; 
+		if (!files && !this.state.read) 
+		{
 			let structuredFiles = {};
 			readdir(folder, (err, folderFiles) => {
 
 				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX))
 					.filter(match => match) // Filter out null values, failed regex match.
 					.map(match => match.groups); //Scan for file types we use
-				matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
+				
+					matched.forEach(regex => { //Structure of this array will be [original string, file name, file extension, some other stuff]
 					if (Object.keys(regex).length) 
 					{
 						let name = regex.fileName; //Each file has an object with the key as the file name
@@ -77,6 +95,7 @@ export default class FolderView extends Component {
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}
 				});
+
 				let fileKeys = Object.keys(structuredFiles);
 				if (fileKeys.length) 
 				{
@@ -90,21 +109,22 @@ export default class FolderView extends Component {
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
 					if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);
 
-					let thumbs = fileKeys.map(fileName => {
-						if (IMAGE_EXTS.some(ext => ext in structuredFiles[fileName])) 
-							return { folder, file: structuredFiles[fileName], fileName };
-					}).filter(item => item !== undefined);
-
-					if (thumbs.length)
-					{
-						this.setState({ thumbsGenerating: true });
-						sendThumbs(thumbs, addThumbs).then(() => this.setState({ thumbsGenerating: false }));
-					}
+					this.generateThumbs(structuredFiles, fileKeys);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.
 			});		
 		}
+		else if (!thumbs && files && !this.state.thumbsGenerating)
+		{
+			this.generateThumbs(files, Object.keys(files))
+		}
+	}
+
+	render() {
+		//folder - the full path to this folder - in state.gallery.folders
+		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
+		const { isActive, folder, filterText, filterAnalysed, files } = this.props; 
 
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
 		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text

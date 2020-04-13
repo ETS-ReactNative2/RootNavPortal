@@ -5,7 +5,6 @@ import { addQueue, removeQueue, addInflight, removeInflight, updateModels, reset
 
 const mapStateToProps = (state, ownProps) => ({ 
     files: state.gallery.files,
-    inflightFiles: state.backend.inFlight,
     folders: state.gallery.folders,
     apiAddress: state.gallery.apiAddress,
     apiKey: state.gallery.apiKey,

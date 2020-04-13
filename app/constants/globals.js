@@ -5,7 +5,7 @@ import { remote } from 'electron';
 import { post, get, defaults } from 'axios';
 
 import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, addThumb, UPDATE_API_MODAL } from '../actions/galleryActions';
+    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, UPDATE_API_MODAL } from '../actions/galleryActions';
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
@@ -15,6 +15,7 @@ export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
 export const CLOSE_VIEWER = 'close-viewer';
+export const NOTIFICATION_CLICKED = 'NOTIFICATION_CLOSED';
 export const HTTP_PORT = 9000;
 
 export const WINDOW_HEIGHT = 800;
@@ -31,7 +32,7 @@ export const ALL_EXTS_REGEX   = new RegExp(`(?<fileName>.+?)(?<segMask>_C(?:1|2)
 export const _require = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require
 
 //Backend
-export const INFLIGHT_REQS = 5;
+export const INFLIGHT_REQS = 10;
 export const API_POLLTIME  = 1000 * 5; //API poll interval in milliseconds
 
 export const THUMB_PERCENTAGE = 15;

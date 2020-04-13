@@ -1,11 +1,11 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT, NOTIFICATION_CLICKED } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
-import { sep } from 'path';
+import { sep, join } from 'path';
 import parser from 'xml2json';
 import imageThumbail from 'image-thumbnail';
 import fastifyServer from 'fastify';
@@ -21,12 +21,16 @@ export default class Backend extends Component {
     rootNavModel = -1; //HMR seems to break queues and class vars.
     fastify;
     bForced; //Set by navigator events to force an API check if connectivity changes
+    inflightFiles = {}; //This is used instead of Redux's copy because the Redux action doesn't update in time for any requests in callbacks to know if neighboring requests have also finished
 
     constructor(props)
     {
         super(props)
         defaults.timeout = 0;
-        this.fastify = fastifyServer({ logger: process.argv.includes('--packaged=true') ? false : true });
+        this.fastify = fastifyServer({ 
+            logger: process.argv.includes('--packaged=true') ? false : true,
+            bodyLimit: 1048576 * 8 //1MiB * X
+        });
         this.setupHTTPServer();
         
         //A single directory path {path: ""}
@@ -56,7 +60,7 @@ export default class Backend extends Component {
             this.props.resetQueues();
             this.props.updateAPIStatus(false);
         }
-    }
+    };
 
     componentDidUpdate(prevProps)
     {  
@@ -104,7 +108,7 @@ export default class Backend extends Component {
 
         this.fastify.post('/import', async (request, reply) => {
             reply.type('application/json').code(200);
-            return request.body.map((item, i) => dree.scan(item, { depth: 5, exclude: /node_modules|system32|Windows|boot|etc|dev|bin|proc$/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
+            return request.body.map((item, i) => dree.scan(item, { depth: 5, exclude: /node_modules|system32|Windows|boot|etc|dev|bin/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
         });
 
         //Polled before sending thumbs, to check if the backend process has started the server yet
@@ -119,7 +123,7 @@ export default class Backend extends Component {
             }
             this.fastify.log.info(`server listening on ${address}`)
         });
-    }
+    };
 
 
     /**********************
@@ -130,7 +134,7 @@ export default class Backend extends Component {
     //And the user can always reanalyse anyway. We could make the refresh button also trigger a full scan manually too.
     scanFiles = () => {
         let apiFiles = []; //search through the file structure for anything imported without RSML
-        const { files, addQueue, inflightFiles } = this.props;
+        const { files, addQueue } = this.props;
 
         Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
             if (!files[folder][file].rsml)
@@ -139,7 +143,7 @@ export default class Backend extends Component {
                 let filePath = folder + sep + file + "." + imageExt;
 
                 const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
-                if (imageExt && this.queue.indexOf(filePath) == -1 && !inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
+                if (imageExt && this.queue.indexOf(filePath) == -1 && !this.inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
         }));
         if (apiFiles.length && this.props.apiStatus) //cautiously adding this here so queue doesn't get updated if there's no connection. Any API config change will rescan
@@ -211,7 +215,7 @@ export default class Backend extends Component {
     //Iterate over state and for each file in the folder, delete the relevant files denoted by existing keys, and add to queue
     //A new object is constructed to be sent to Redux to completely write over that folder. It should contain everything already present bar segmasks and rsml exts
     handleDelete = path => {
-        const { files, resetFolder, addQueue, inflightFiles } = this.props;
+        const { files, resetFolder, addQueue } = this.props;
         let newState = {}; //This will need to have an object for each file with the remaining extensions + thumbnails/removed extensions
         let queuedFiles = [];
 
@@ -236,7 +240,7 @@ export default class Backend extends Component {
                 }
                 else newState[fileName][extension] = files[path][fileName][extension]; //Otherwise copy the value for that ext to our reset state
 
-                if (!queued && !inflightFiles[path + sep + fileName]) //If the file is inflight, don't queue, since model detection/requeueing is done on job receiving
+                if (!queued && !this.inflightFiles[path + sep + fileName]) //If the file is inflight, don't queue, since model detection/requeueing is done on job receiving
                 {
                     let file = path + sep + fileName + "." + Object.keys(files[path][fileName]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                     this.queue.push(file); //Readd it to the queue
@@ -250,13 +254,23 @@ export default class Backend extends Component {
         addQueue(queuedFiles);
     };
 
+    addInflight = file => {
+        this.inflightFiles[file.name] = {  model: file.model, ext: file.ext };
+        this.props.addInflight(file);
+    };
+
+    removeInflight = filePath => {
+        delete this.inflightFiles[filePath];
+        this.props.removeInflight(filePath);
+    }
+
     /**********************
     **  API Comms
     ***********************/
     //Send the job off to the server
     sendFile = () => {
         if (!this.props.apiStatus || !this.queue.length || !this.inflightReqs || !this.props.apiAuth || this.rootNavModel < 0) return;
-        const { removeQueue, folders, addInflight, apiKey, apiAddress, apiModels } = this.props;
+        const { removeQueue, folders, apiKey, apiAddress, apiModels } = this.props;
 
         let file = this.queue.shift();
         const { path, fileName, ext } = this.matchFileParts(file);
@@ -279,7 +293,7 @@ export default class Backend extends Component {
         const config = { headers: formData.getHeaders() };
 
         //Add file to inflight object with the model it's been processed with, and its ext, so we can requeue later if needed
-        addInflight({ //Relay inflight change to frontend
+        this.addInflight({ //Relay inflight change to frontend
             name: path + fileName,
             model,
             ext
@@ -292,7 +306,7 @@ export default class Backend extends Component {
         .catch(err => {
             console.error(err);
         });
-    }
+    };
 
     pollJob = (jobID, filePath) => {
         get(this.props.apiAddress + "/job/" + jobID).then(res => {
@@ -300,7 +314,7 @@ export default class Backend extends Component {
             else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME); 
         })
         .catch(err => console.error(err))
-    }
+    };
 
     getOutput = (jobID, filePath) => {
 
@@ -309,17 +323,17 @@ export default class Backend extends Component {
             get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
             get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
         ]
-        const { updateFile, removeInflight, inflightFiles, folders, addQueue } = this.props;
+        const { updateFile, folders, addQueue } = this.props;
 
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
             let exts = {};
             const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
 
-            if (inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
+            if (this.inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
-                addQueue([path + sep + fileName + inflightFiles[filePath].ext]);
-                this.queue.push(path + sep + fileName + inflightFiles[filePath].ext); //Readd to queue
+                addQueue([path + sep + fileName + this.inflightFiles[filePath].ext]);
+                this.queue.push(path + sep + fileName + this.inflightFiles[filePath].ext); //Readd to queue
             }
             
             else responses.forEach(res => {
@@ -337,22 +351,22 @@ export default class Backend extends Component {
                 exts[type] = true; 
             });
 
-            removeInflight(filePath);
+            this.removeInflight(filePath);
             updateFile(path, fileName, exts); //there isn't really any proof checking here :think:
+            if (Object.keys(this.inflightFiles).length == 0 && this.queue.length == 0)
+            {
+                let notification = new Notification("RootNav Portal", { //Check this in Win8/10
+                    title: "RootNav Portal",
+                    body: "Images finished processing",
+                    icon: process.argv.includes('--packaged=true') ? join(process.resourcesPath, 'icon.png') : join(process.cwd(), 'resources', 'icon.png')
+                });
+                notification.onclick = e => ipcRenderer.send(NOTIFICATION_CLICKED);
+            }
         })
-        .catch(err => { removeInflight(filePath); console.error(err) });
+        .catch(err => { this.removeInflight(filePath); console.error(err) });
 
-        //This doesn't work in Win7, needs testing in Win10.
-        if (Object.keys(inflightFiles).length == 0 && this.queue.length == 0)
-        {
-            new Notification("RootNav Portal", {
-                title: "Content-Image Notification",
-                body: "Images finished processing",
-                icon: path.join(__dirname, 'resources', 'icons', '16x16.png')
-            });
-        }
         this.inflightReqs++;
-    }
+    };
 
     render()
     {
