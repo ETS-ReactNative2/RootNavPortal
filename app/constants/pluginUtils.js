@@ -1,6 +1,7 @@
 module.exports = {
     lineDistance: points => {
         let distance = 0;
+        if (points.length <= 1) return distance;
         for (let i = 0; i < points.length - 1; i++)
         {
             let p1 = points[i];
@@ -72,7 +73,7 @@ module.exports = {
     gradientToAngle: (points, gradient) => { // Points are used to calculate direction.
         const firstPoint = points[0];
         // Calculate two control points, one moving in each direction along the line.
-        const controlPoints = gradient ? // Special case for infinite gradient
+        const controlPoints = gradient || gradient == 0 ? // Special case for infinite gradient
                                 [{x: firstPoint.x + 1, y: firstPoint.y + gradient}, {x: firstPoint.x - 1, y: firstPoint.y - gradient}] : 
                                 [{x: firstPoint.x, y: firstPoint.y + 1}, {x: firstPoint.x, y: firstPoint.y - 1}];
         // See which of the check points is closer to each point on the line, to determine the direction. (+x or -x).
@@ -84,8 +85,8 @@ module.exports = {
         // Determine if there's more closer to the positive or the negative control point, to determine if the line moves in the positive or negative direction.
         const numberOfPositive = directions.filter(direction => direction == 1).length;
         // Use this direction to calculate the angle using arctan
-        const multiplier = numberOfPositive > points.length - numberOfPositive ? 1 : -1;
-        let angle = gradient ? Math.atan2(-gradient * multiplier, multiplier) : Math.atan2(multiplier, 0);
+        const multiplier = numberOfPositive > directions.length - numberOfPositive ? 1 : -1;
+        let angle = gradient || gradient == 0 ? Math.atan2(gradient * multiplier, multiplier) : Math.atan2(multiplier, 0);
         // Convert to degrees, and add 90 degrees to make with respect to the 'negative' y axis instead of the x axis.
         angle = 90 - angle * 180 / Math.PI;
         return angle;
@@ -112,7 +113,25 @@ module.exports = {
         newPoints.sort(pointComparator);
         return makeHullPresorted(newPoints);
     },
-    boundAngle: angle => angle > 180 ? angle - 360 : angle <= -180 ? angle + 360 : angle
+    boundAngle: angle => angle > 180 ? angle - 360 : angle <= -180 ? angle + 360 : angle,
+    pointsSublistFromDistance: (points, distance) => {
+        let subPoints = [];
+        for (let i = 0; i < points.length; ++i) {
+            if (subPoints.length >= 2 && module.exports.lineDistance(subPoints) > distance) break;
+            subPoints.push(points[i]);
+        }
+        return subPoints;
+    },
+    pointsSublistFromDistanceReverse: (points, distance) => {
+        let subPoints = [];
+        for (let i = points.length - 1; i >= 0; --i) {
+            console.log(subPoints);
+            console.log(i);
+            if (subPoints.length >= 2 && module.exports.lineDistance(subPoints) > distance) break;
+            subPoints.unshift(points[i]);
+        }
+        return subPoints;
+    }
 };
 
 // Returns the convex hull, assuming that each points[i] <= points[i + 1]. Runs in O(n) time.

@@ -14,7 +14,7 @@ export default class Thumbnail extends Component {
     constructor(props)
     {
         super(props);
-        this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
+        this.canvasID = [...Array(8)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
         this.container = React.createRef();
         this.element = React.createRef();
         this.resizeTimer = null;

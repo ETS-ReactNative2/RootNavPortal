@@ -107,10 +107,10 @@ export default class Render extends Component {
                 this.lastPosX = opt.clientX;
                 this.lastPosY = opt.clientY;
             }
-            if (e.target && this.fabricCache.selectedID) 
+            if (e.target && this.fabricCache.selectedID)
             {
                 let line = this.getObjectByName(this.fabricCache.selectedID)
-                line.set('stroke', line.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
+                if (line) line.set('stroke', line.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
                 this.fabricCache.selectedID = null;
                 this.fabricCanvas.renderAll();
             }
@@ -265,7 +265,7 @@ export default class Render extends Component {
             let polyline = new fabric.Polyline(line.points, {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
-                strokeWidth: 8,
+                strokeWidth: 4,
                 perPixelTargetFind: true,
                 name: line.id,
                 lockMovementX: true,

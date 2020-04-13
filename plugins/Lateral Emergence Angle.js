@@ -14,8 +14,10 @@ const plugin = (rsmlJson, polylines, utils) => {
             if (line.type == "lateral") {
                 const { plantID, primaryID, lateralID } = utils.getAllIDs(line);
                 const primary = utils.getParentOfLateral(line, polylines);
-                const lateralPoints = line.points.slice(0, 20); // Take first 20 points of array
-                const primaryPoints = utils.getNearestPointsOrdered(primary.points, line.points[0], 20);
+                let lateralPoints = line.points.slice(0, 20); // Take first 20 points of array
+                lateralPoints = utils.pointsSublistFromDistance(lateralPoints, 5); // Cut off points that make length > 5px.
+                let primaryPoints = utils.getNearestPointsOrdered(primary.points, line.points[0], 20);
+                primaryPoints = utils.pointsSublistFromDistance(primaryPoints, 5); // Cut off points that make length > 5px.
 
                 const lateralGradient = utils.linearRegressionGradient(lateralPoints);
                 const primaryGradient = utils.linearRegressionGradient(primaryPoints);
@@ -24,7 +26,7 @@ const plugin = (rsmlJson, polylines, utils) => {
                 const primaryAngle = utils.boundAngle(utils.gradientToAngle(primaryPoints, primaryGradient));
 
                 const angle = utils.boundAngle(lateralAngle - primaryAngle);
-                results.push({ tag: `${tag}:${plantID}-${primaryID}-${lateralID}`, [id]: angle });
+                results.push({ tag: `${tag}:${plantID}.${primaryID}.${lateralID}`, [id]: angle });
             }
         });
 

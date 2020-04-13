@@ -13,10 +13,11 @@ const plugin = (rsmlJson, polylines, utils) => {
         polylines.forEach(line => {
             if (line.type == "primary") {
                 const { plantID, primaryID } = utils.getPlantPrimaryID(line);
-                const points = line.points.slice(0, 20); // Take first 20 points of array
+                let points = line.points.slice(0, 20); // Take first 20 points of array
+                points = utils.pointsSublistFromDistance(points, 5); // Cut off points that make length > 5px.
                 const gradient = utils.linearRegressionGradient(points);
                 const angle = utils.boundAngle(utils.gradientToAngle(points, gradient));
-                results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: angle });
+                results.push({ tag: `${tag}:${plantID}.${primaryID}`, [id]: angle });
             }
         });
 
