@@ -1,6 +1,7 @@
 # 0.5.1
 - Modified message dialog when closing the gallery while images are still processing.
 - Added separator to icon menu.
+- Re-added missing util function `splitLinesAsPlants`.
 
 # 0.5.0
 

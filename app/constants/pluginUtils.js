@@ -17,6 +17,12 @@ module.exports = {
     getParentOfLateral: (lateral, polylines) => polylines.find(line => line.id == lateral.id.match(/(\d+\-\d+)/)[1]),
     getTag: json => json.rsml[0].metadata[0]['file-key'][0]["$t"],
     isMultiplePlants: json => json.rsml[0].scene[0].plant.length > 1,
+    splitLinesAsPlants: lines => lines.reduce((acc, line) => {
+        const id = module.exports.getPlantID(line);
+        if (!acc[id]) acc[id] = [line];
+        else acc[id].push(line);
+        return acc;
+    }, {}),
     getNearestPoint: (points, point) => {
         let closestPoint, closestDistance = Infinity;
 
