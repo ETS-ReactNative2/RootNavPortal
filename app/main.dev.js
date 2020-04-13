@@ -82,7 +82,7 @@ const openGallery = () => {
             buttons: ['Close App', 'Background App'], 
             title: 'Close RootNav Portal', 
             cancelId: 2,
-            message: 'There are currently files being, or waiting to be processed, would you like to close RootNav or background it to continue processing? It can be reopened or closed from the app icon.'
+            message: 'There are currently files being, or waiting to be processed. Would you like to close RootNav or background it to continue processing? \n\nIt can be reopened or closed from the app icon.'
         }).then(response => {
             switch (response.response)
             {
@@ -189,8 +189,9 @@ app.on('ready', async () => {
         appIcon.setToolTip('RootNav Portal');
 
         appIcon.setContextMenu(Menu.buildFromTemplate([
+            { label: 'Open Gallery', click: iconClick },
+            { type: 'separator' },
             { label: 'Close', click: () => app.quit() }, //Icon tray close will close the whole app
-            { label: 'Open Gallery', click: iconClick }
         ]));
 
         appIcon.on('right-click', () => appIcon.popUpContextMenu());

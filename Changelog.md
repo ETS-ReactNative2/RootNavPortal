@@ -1,3 +1,7 @@
+# 0.5.1
+- Modified message dialog when closing the gallery while images are still processing.
+- Added separator to icon menu.
+
 # 0.5.0
 
 - Changed RSML parsing to no longer rely on keys being present in the RSML tags, supporting older RSML
