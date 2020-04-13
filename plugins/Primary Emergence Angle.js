@@ -17,7 +17,7 @@ const plugin = (rsmlJson, polylines, utils) => {
                 points = utils.pointsSublistFromDistance(points, 5); // Cut off points that make length > 5px.
                 const gradient = utils.linearRegressionGradient(points);
                 const angle = utils.boundAngle(utils.gradientToAngle(points, gradient));
-                results.push({ tag: `${tag}:${plantID}.${primaryID}`, [id]: angle });
+                results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: angle });
             }
         });
 

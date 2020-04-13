@@ -18,7 +18,7 @@ const plugin = (rsmlJson, polylines, utils) => {
             if (line.type == "primary") 
             {
                 const { plantID, primaryID } = utils.getPlantPrimaryID(line);
-                results.push({ tag: `${tag}:${plantID}.${primaryID}`, [id]: angle });
+                results.push({ tag: `${tag}:${plantID}-${primaryID}`, [id]: angle });
             }
             else if (line.type == "lateral")
             {
@@ -29,7 +29,7 @@ const plugin = (rsmlJson, polylines, utils) => {
                     console.log(utils.gradientToAngle(points, gradient));
                     console.log(utils.boundAngle(utils.gradientToAngle(points, gradient)));
                 }
-                results.push({ tag: `${tag}:${plantID}.${primaryID}.${lateralID}`, [id]: angle }); 
+                results.push({ tag: `${tag}:${plantID}-${primaryID}-${lateralID}`, [id]: angle }); 
             }
         });
 
