@@ -29,7 +29,7 @@ const plugin = (rsmlJson, polylines, utils) => {
                     console.log(utils.gradientToAngle(points, gradient));
                     console.log(utils.boundAngle(utils.gradientToAngle(points, gradient)));
                 }
-                results.push({ tag: `${tag}:${plantID}-${primaryID}-${lateralID}`, [id]: angle }); 
+                results.push({ tag: `${tag}:${plantID}-${primaryID}.${lateralID}`, [id]: angle }); 
             }
         });
 
