@@ -125,8 +125,6 @@ module.exports = {
     pointsSublistFromDistanceReverse: (points, distance) => {
         let subPoints = [];
         for (let i = points.length - 1; i >= 0; --i) {
-            console.log(subPoints);
-            console.log(i);
             if (subPoints.length >= 2 && module.exports.lineDistance(subPoints) > distance) break;
             subPoints.unshift(points[i]);
         }

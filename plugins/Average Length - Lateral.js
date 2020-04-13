@@ -20,7 +20,6 @@ const plugin = (rsmlJson, polylines, utils) => {
             {
                 let plantID = utils.getPlantID(line);
                 if (!plantCounts[plantID]) plantCounts[plantID] = 0;
-                let count = plantCounts[plantID];
 
                 let object = results.find(record => record.tag == `${tag}:${plantID}`); 
                 object ? object[id] = utils.addToAverage(object[id], distance, ++plantCounts[plantID]) 
