@@ -13,7 +13,7 @@ export default class SettingsButton extends Component {
     ACTION_REANALYSE    = 1;
     ACTION_CHANGE_MODEL = 2;
 
-    DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
+    DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working server connection.\n\nAre you sure you want to do this?"
     defaultModel = { description: "Please select a model", value: "" };
 
     constructor(props) {
