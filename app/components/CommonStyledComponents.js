@@ -9,9 +9,11 @@ export const StyledTopBarHR = styled.hr` && {
   
 export const StyledTopBarDiv = styled.div` && {
     padding-top: 1rem;
-    margin-left: 70px;
+    width: 100%;
+    padding-left: 70px;
+    padding-right: 70px;
   }`;
 
 export const StyledIcon = styled.i` && {
-    width: 1.3em;
+    margin: 0 0.3em;
 }`

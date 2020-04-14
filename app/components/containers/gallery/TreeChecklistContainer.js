@@ -3,11 +3,15 @@ import TreeChecklist from '../../gallery/TreeChecklist';
 import { updateChecked } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
-    { tree: state.gallery.modalBody }
+    { 
+        tree: state.gallery.modalBody,
+        importedFolders: state.gallery.folders,
+        checked: state.gallery.checked
+    }
 );
 
 const mapDispatchToProps = dispatch => (
     { updateChecked: paths => dispatch(updateChecked(paths)) }
 );
 
-export default connect(mapStateToProps, mapDispatchToProps, null, {forwardRef: true})(TreeChecklist)
+export default connect(mapStateToProps, mapDispatchToProps)(TreeChecklist)

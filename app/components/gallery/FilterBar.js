@@ -1,51 +1,66 @@
 // @flow
 import React, { Component } from 'react';
 import { StyledFilterBarSpan } from './StyledComponents'
+import { StyledIcon } from '../CommonStyledComponents'
+import { InputGroup } from 'react-bootstrap'
 
-type Props = {};
+export default class FilterBar extends Component{
+    typingTimeout = 0;
+    text = "";
 
-export default class FilterBar extends Component<Props> {
-  props: Props;
-  constructor(props)
-  {
-      super(props);
-      this.ref = React.createRef();
-  }
+    constructor(props)
+    {
+        super(props);
+        this.textref = React.createRef();
+        this.checkboxref = React.createRef();
+    }
 
-  typingTimeout = 0;
-  typing = false;
-  text = "";
+    componentDidMount() 
+    {
+        this.clear();
+    }
 
-  update = e =>
-  {
-      if (this.typingTimeout) clearTimeout(this.typingTimeout);
-      this.text   = e.target.value,
-      this.typing = false,
-      this.typingTimeout = setTimeout(() => this.props.updateFilterText(this.text), 250);
-  }
 
-  render() {
-    const { updateFilterText } = this.props;
+    updateFilterText = e =>
+    {
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.text = e.target.value,
+        this.typingTimeout = setTimeout(() => this.props.updateFilterText(this.text), 200);
+    }
 
-    const clear  = () => { updateFilterText(""); this.ref.current.value = "" }; 
+    updateFilterAnalysed = e =>
+    {
+        this.props.updateFilterAnalysed(e.target.checked);
+    }
 
-    return (
-      <StyledFilterBarSpan>
-        <div className="input-group">
-          <input key={0} type="text" className="form-control" placeholder="Filter images..." onChange={this.update} ref={this.ref}/>
-          <button key={1} className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={clear}>
-            <i className="fa fa-times"></i>
-          </button>
-          <div className="input-group-append">
-            <div className="input-group-text">
-              <div className="custom-control custom-checkbox">
-                <input type="checkbox" className="custom-control-input" id="analysed"/>
-                <label className="custom-control-label" htmlFor="analysed">Analysed</label>
-              </div>
-            </div>
-          </div>
-        </div>
-      </StyledFilterBarSpan>
-    );
-  }
+    clear = () => { 
+        this.props.updateFilterText(""); 
+        this.textref.current.value = ""; 
+        this.props.updateFilterAnalysed(false);
+        this.checkboxref.current.checked = false;
+    }; 
+
+    render() {
+        return (
+            <StyledFilterBarSpan>
+                <InputGroup>
+                <InputGroup.Prepend>
+                    <InputGroup.Text><StyledIcon className={"fas fa-search fa-lg"}/></InputGroup.Text> 
+                </InputGroup.Prepend>
+                <input key={0} type="text" className="form-control" placeholder="Filter images..." onChange={this.updateFilterText} ref={this.textref}/>
+                <button key={1} className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={this.clear}>
+                    <i className="fa fa-times"></i>
+                </button>
+                <InputGroup.Append>
+                    <InputGroup.Text>
+                    <div className="custom-control custom-checkbox">
+                        <input type="checkbox" className="custom-control-input" id="analysed" onClick={this.updateFilterAnalysed} ref={this.checkboxref}/>
+                        <label className="custom-control-label" htmlFor="analysed">Analysed</label>
+                    </div>
+                    </InputGroup.Text>
+                </InputGroup.Append>
+                </InputGroup>
+            </StyledFilterBarSpan>
+        );
+    }
 }

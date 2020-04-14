@@ -1,18 +1,28 @@
 // @flow
 import React, { Component } from 'react';
-import { StyledListGroupItem } from './StyledComponents'
+import { StyledListGroupItem, } from './StyledComponents'
+import { StyledIcon } from '../CommonStyledComponents';
+import TooltipOverlay from '../common/TooltipOverlay';
+import { Row } from 'react-bootstrap';
 
-type Props = {};
-
-export default class Plugin extends Component<Props> {
-  props: Props;
-
-  render() {
-    const { name, func, active } = this.props;
-    return (
-        <StyledListGroupItem action variant={active ? 'success' : 'light'} onClick={func}>
-          {name}
-      </StyledListGroupItem>
-    );
-  }
+export default class Plugin extends Component {
+    render() {
+        const { name, active, description } = this.props;
+        return (
+            <StyledListGroupItem action variant={active ? 'success' : 'light'}>
+                <Row>
+                    <div className="col-1" style={{ display: "flex", alignItems: "center" }}>
+                        <TooltipOverlay  component={ props => <StyledIcon
+                                className={"fas fa-info-circle"}
+                                {...props}
+                            />} 
+                            text={description}
+                            placement={"top"}
+                        /> 
+                    </div>
+                    <div className="col-10" style={{textAlign: "center"}}>{name}</div>
+                </Row>
+            </StyledListGroupItem>
+        );
+    }
 }

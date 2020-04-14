@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import { StyledButton } from '../StyledComponents'; 
+import TooltipOverlay from '../../common/TooltipOverlay';
 
-class RemoveButton extends Component {
+export default class RightButton extends Component {
 
     render() {    
         return (
-            <StyledButton
-                variant="secondary" 
-                onClick={""} 
-                className={`btn btn-default fas fa-arrow-right button`} 
+            <TooltipOverlay  component={ props => <StyledButton
+                    variant="secondary" 
+                    onClick={() => this.props.click(1)} 
+                    className={`btn btn-default fas fa-arrow-right button`} 
+                    {...props}
+                />} 
+                text={"Next Image"}
             />    
         )
     }
 }
-
-export default RemoveButton;

@@ -2,28 +2,36 @@
 import React, { Component } from 'react';
 import AddButton from '../containers/gallery/AddButtonContainer';
 import RefreshButton from '../containers/gallery/RefreshButtonContainer';
-import ClearButton from '../buttons/gallery/ClearButton';
 import FilterBar from '../containers/gallery/FilterBarContainer'
-import DateRange from './DateRange';
 import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
+import ServerIndicator from '../containers/gallery/ServerIndicatorContainer';
 
-type Props = {};
+import styled from 'styled-components';
 
-export default class TopBar extends Component<Props> {
-  props: Props;
+export default class TopBar extends Component {
+    labelDiv = styled.div(`
+        margin: auto 0 auto 1em;
+    `);
 
-  render() {
-    return (
-      <div>
-        <StyledTopBarDiv className="d-inline-flex" data-tid="container">
-          <AddButton />
-          <RefreshButton />
-          <FilterBar/>
-          <DateRange />
-          <ClearButton />
-        </StyledTopBarDiv>
-        <StyledTopBarHR/>
-      </div>
-    );
-  }
+    render() {
+        return (
+            <div>
+                <StyledTopBarDiv className="d-inline-flex" data-tid="container">
+                    <AddButton />
+                    <RefreshButton />
+                    <FilterBar/>
+                    <this.labelDiv className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em'}}>
+                        <input type="checkbox" className="custom-control-input" id="labels" defaultChecked={false} onClick={this.props.toggleLabels}/>
+                        <label className="custom-control-label" htmlFor="labels">Display Names</label>
+                    </this.labelDiv>
+                    <this.labelDiv className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em'}}>
+                        <input type="checkbox" className="custom-control-input" id="drawRsml" defaultChecked={true} onClick={this.props.toggleArch}/>
+                        <label className="custom-control-label" htmlFor="drawRsml">Draw Architecture</label>
+                    </this.labelDiv>
+                    <ServerIndicator />
+                </StyledTopBarDiv>
+                <StyledTopBarHR/>
+            </div>
+        );
+    }
 }

@@ -1,32 +1,32 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
-import { APPHOME, CONFIG } from '../../../constants/globals';
-import { existsSync, writeFile } from 'fs';
+import { writeConfig, CLOSE_VIEWER } from '../../../constants/globals';
 import { StyledButton } from '../StyledComponents'; 
+import TooltipOverlay from '../../common/TooltipOverlay';
+import { ipcRenderer } from 'electron';
 
-class RemoveButton extends Component {
+export default class RemoveButton extends Component {
 
-    render() {    
-        const deleteFolder = () => {
-            if (!this.props.path) return;
-            const filteredPaths = this.props.folders.filter(folder => folder.path !== this.props.path);
-            if (existsSync(APPHOME))    //Rewrite config file with removed directories so they don't persist
-                writeFile(APPHOME + CONFIG , JSON.stringify(filteredPaths, null, 4), err => {
-                    if (err) console.log(err); //idk do some handling here
-                });
+    deleteFolder = () => {
+        const { folders, path, apiAddress, apiKey } = this.props;
+        ipcRenderer.send(CLOSE_VIEWER, path);
+        if (!path) return;
+        const filteredPaths = folders.filter(folder => folder.path !== path);
+        writeConfig(JSON.stringify({ apiAddress, apiKey, folders: filteredPaths }, null, 4));
+        this.props.remove(path);
+    }
 
-            this.props.remove(this.props.path);
-        }
-    
-        return (
-            <StyledButton
-                variant="danger" 
-                onClick={deleteFolder} 
-                className={`btn btn-default fas fa-trash-alt button`} 
-            />    
-        )
+    render() { 
+        return <TooltipOverlay  component={ props => <StyledButton
+                variant="danger"
+                className={`btn btn-default fas fa-trash-alt button`}
+                onClick={e => {
+                    this.deleteFolder();
+                    e.stopPropagation()
+                }}      
+                {...props}
+            />} 
+            text={"Remove Folder"}
+        /> 
     }
 }
-
-export default RemoveButton;

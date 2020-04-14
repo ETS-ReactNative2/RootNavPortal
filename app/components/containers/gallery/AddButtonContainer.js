@@ -1,13 +1,14 @@
 import { connect } from 'react-redux';
 import Button from '../../buttons/gallery/AddButton'
-import { addFolders, showModal, closeModal, updateModal } from '../../../actions/galleryActions';
+import { addFolders, showModal, closeModal, updateModal, updateChecked } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
         folders: state.gallery.folders,
         modal: state.gallery.modal,
         imports: state.gallery.checked,
-        
+        apiAddress: state.gallery.apiAddress,
+        apiKey: state.gallery.apiKey
     }
 );
 
@@ -15,8 +16,9 @@ const mapDispatchToProps = dispatch => (
     { 
         closeModal: () => dispatch(closeModal()),
         showModal:  () => dispatch(showModal()),
-        addFolders: path => dispatch(addFolders(path)),
-        updateModalBody: tree => dispatch(updateModal(tree))
+        addFolders: folderInfo => dispatch(addFolders(folderInfo)),
+        updateModalBody: tree => dispatch(updateModal(tree)),
+        clearChecked: () => dispatch(updateChecked([]))
     }
 );
 

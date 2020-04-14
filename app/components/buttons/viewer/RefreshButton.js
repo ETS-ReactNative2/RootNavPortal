@@ -1,19 +1,20 @@
 // @flow
 import React, { Component } from 'react';
-import '../../common.css';
 import { StyledButton } from '../StyledComponents'; 
+import TooltipOverlay from '../../common/TooltipOverlay';
 
-class RefreshButton extends Component {
+export default class RefreshButton extends Component {
 
     render() {    
         return (
-            <StyledButton
-                variant="primary" 
-                className={`btn btn-default fas fa-sync button`} 
-                onClick={""}
+            <TooltipOverlay component={ props => <StyledButton
+                    variant="primary" 
+                    className={`btn btn-default fas fa-sync button`} 
+                    onClick={this.props.loadPlugins} 
+                    {...props}
+                />} 
+                text={"Reload Plugins"}
             />    
         )
     }
 }
-
-export default RefreshButton;
