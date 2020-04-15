@@ -3,6 +3,8 @@
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
+- Fixed potential crash when importing non .js plugins.
+- Added type checking for plugins.
 
 # 0.5.0
 
