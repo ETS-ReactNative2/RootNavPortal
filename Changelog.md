@@ -3,6 +3,7 @@
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
 - Fixed potential crash when importing non .js plugins.
+- Added type checking for plugins.
 
 # 0.5.0
 
