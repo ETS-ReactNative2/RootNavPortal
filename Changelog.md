@@ -2,6 +2,7 @@
 - Modified message dialog when closing the gallery while images are still processing.
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
+- Fixed potential crash when importing non .js plugins.
 
 # 0.5.0
 

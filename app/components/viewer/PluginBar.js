@@ -269,7 +269,7 @@ export default class PluginBar extends Component {
             const pluginFilenames = readdirSync(PLUGINDIR); // Get all plugin filenames
             pluginFilenames.forEach(filename => {
                 if (!filename.match(/.+?(?:js|ts|jsx)$/)) return; //if it's not a js file, we don't want to use it.
-                const plugin = _require(`${PLUGINDIR}${filename.replace('.js', '')}`); // For each filename, import the plugin
+                const plugin = _require(`${PLUGINDIR}${filename.replace(/.+?(?:js|ts|jsx)$/, '')}`); // For each filename, import the plugin
                 
                 if (["name", "group", "function", "description"].every(param => param in plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
                     // Todo good typechecking
