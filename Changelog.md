@@ -1,7 +1,8 @@
-# 0.5.1
+# Next Release:
 - Modified message dialog when closing the gallery while images are still processing.
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
+- Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 
 # 0.5.0
 

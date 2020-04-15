@@ -34,6 +34,15 @@ export default class FolderView extends Component {
 		return (nextProps.isActive !== this.props.isActive) || (JSON.stringify(nextProps.files) !== JSON.stringify(this.props.files));
 	}
 
+	componentDidUpdate()
+	{
+		const { files, thumbs, isActive } = this.props; 
+		if (isActive && !thumbs && files && !this.state.thumbsGenerating)
+		{
+			this.generateThumbs(files, Object.keys(files))
+		}
+	}
+
 	spinner = () => {
         const [show, setShow] = useState(false);
         const target = useRef(null);
@@ -108,16 +117,10 @@ export default class FolderView extends Component {
 					});
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
 					if (filesToParse.length) ipcRenderer.send(API_PARSE, filesToParse);
-
-					this.generateThumbs(structuredFiles, fileKeys);
 				}
 				this.setState({ read: true }); //Only try read the filesystem once on import. Having no files in a folder would prompt a read, as it won't know if none were found, or if it just hasn't scanned yet
 				//Refresh button can still manually rescan.
 			});		
-		}
-		else if (!thumbs && files && !this.state.thumbsGenerating)
-		{
-			this.generateThumbs(files, Object.keys(files))
 		}
 	}
 
