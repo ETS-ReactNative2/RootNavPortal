@@ -6,6 +6,8 @@
 - Fixed potential crash when importing non .js plugins.
 - Added type checking for plugins.
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
+- Fixed a bug causing thumbnails to not refresh after background app
+- Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple
 
 # 0.5.0
 

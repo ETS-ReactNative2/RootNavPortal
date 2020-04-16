@@ -16,7 +16,8 @@ import utils from '../../constants/pluginUtils';
 import cloneDeep from 'lodash.clonedeep';
 
 export default class PluginBar extends Component {
-    
+    csvPath = "";
+
     constructor(props) 
     {
         super(props);
@@ -32,7 +33,7 @@ export default class PluginBar extends Component {
         };
         this.exportDest = React.createRef();
     }
-
+    
     getGroupsFromPlugins = plugins => Object.fromEntries(Object.keys(plugins).map(group => [group, true]));
 
     deactivateAllPlugins = () => {
@@ -225,7 +226,7 @@ export default class PluginBar extends Component {
                         path,
                         header: headers[type]
                     });
-                    csvWriter.writeRecords(data[type]).then(() => console.log(`written to ${path}`));
+                    csvWriter.writeRecords(data[type]).then(() => { this.csvPath = path; console.log(`written to ${path}`) });
                 }
             });
             setTimeout(() => this.setState({ ...this.state, measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
@@ -313,6 +314,6 @@ export default class PluginBar extends Component {
     };
 
     openContainingDirectory = () => {
-        shell.showItemInFolder(this.exportDest.current.value);
+        shell.showItemInFolder(this.csvPath);
     }
 }
