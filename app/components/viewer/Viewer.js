@@ -5,7 +5,7 @@ import FolderChecklist from '../containers/viewer/FolderListContainer';
 import { StyledContainer, StyledSidebarContainer } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
-import { matchPathName, CLOSE_VIEWER } from '../../constants/globals';
+import { matchPathName, CLOSE_VIEWER, IMAGE_EXTS_REGEX } from '../../constants/globals';
 import { remote, ipcRenderer } from 'electron';
 import Render from '../containers/viewer/RenderContainer';
 
@@ -60,16 +60,16 @@ export default class Viewer extends Component {
         let index = keys.indexOf(fileName);
         let file;
         let initialIndex = index;
-
+        let containsImage;
         do 
         {
             index += direction;
             if (index < 0) index = keys.length - 1; //Wrap left or right around the array if out of bounds
             if (index == keys.length) index = 0;
             file = files[folder][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
+            containsImage = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
         }
-        while (!file.rsml && initialIndex != index) //Only loop through the folder once
-
+        while ((!file.rsml || !containsImage) && initialIndex != index) //Only loop through the folder once
         if (initialIndex != index) //If nothing was found, do nothing
         {
             this.setState({path: folder + sep + keys[index]});
