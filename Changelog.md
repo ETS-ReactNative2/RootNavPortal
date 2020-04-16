@@ -5,6 +5,7 @@
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Fixed potential crash when importing non .js plugins.
 - Added type checking for plugins.
+- Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
 
 # 0.5.0
 

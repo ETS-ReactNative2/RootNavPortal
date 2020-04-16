@@ -13,7 +13,7 @@ export default class FolderChecklist extends Component {
             checked: [props.path],
             expanded: [],
             nodes: []
-        }
+        };
     }
 
     componentDidMount() {
@@ -31,11 +31,11 @@ export default class FolderChecklist extends Component {
           expanded: expanded.length != 0 ? expanded.filter(it => folderPaths.includes(it)) : this.getDefaultExpanded(tree, folderPaths, checked),
           nodes: tree
         });
-    }
+    };
 
     getDefaultExpanded = (tree, folderPaths, startingChecked) => {
         return folderPaths.filter(path => startingChecked.some(checked => checked.includes(path))).concat(tree.map(item => item.value));
-    }
+    };
 
     // Converts a flat list of foldername strings into a hierarchical object representing folder structure
     folderListToTree = list => {
@@ -44,32 +44,51 @@ export default class FolderChecklist extends Component {
             tree = this.addToChildren(path, tree)
         });
         return tree;
-    }
+    };
 
     addToChildren = (path, children) => {
         let nodeIndex = children.findIndex(childNode => path.includes(childNode.value));
-        if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children)
+        if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children);
         else {
             const name = matchPathName(path).fileName;
             const style = path == this.props.path ? { padding: "2px 7px", background: "rgba(51, 51, 204, 0.3)", borderRadius: "5px", "&:hover": {background: "white"}} : {};
             children.push({ value: path, children: [], label: <span style={style} title={path}>{name}</span> });
         }
         return children;
-    }
+    };
 
     cascadeChecked = (checked, clicked) => {
         return checked.includes(clicked.value) ? checked.concat(this.flattenChildren(clicked.children)) : checked;
-    }
+    };
 
     flattenChildren = children => {
         return children.map(child => this.flattenChildren(child.children).concat(child.value)).flat();
-    }
+    };
 
     componentDidUpdate(prevProps) {
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
-        if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path) this.reset();
+        if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path || this.checkNewRSML(prevProps.files)) this.reset();
     }
+
+    checkNewRSML = oldFiles => {
+        const { files } = this.props;
+        let folders = Object.keys(files);
+        for (let i = 0; i < folders.length; i++)
+        {
+            let fileObj = files[folders[i]];
+            let fileNames = Object.keys(fileObj);
+            for (let j = 0; j < fileNames.length; j++)
+            {
+                if (files[folders[i]][fileNames[j]].parsedRSML)
+                {
+                    if (!oldFiles[folders[i]] || !oldFiles[folders[i]][fileNames[j]] || !oldFiles[folders[i]][fileNames[j]].parsedRSML) return true;
+                    //If new RSML has appeared in a folder/file, update.
+                }
+            }
+        }
+        return false;
+    };
 
     render() {
         const { nodes, checked, expanded } = this.state;
