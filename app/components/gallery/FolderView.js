@@ -36,12 +36,17 @@ export default class FolderView extends Component {
 
 	componentDidUpdate()
 	{
+		this.checkThumbs();
+	}
+
+	checkThumbs()
+	{
 		const { files, thumbs, isActive } = this.props; 
 		if (isActive && !thumbs && files && !this.state.thumbsGenerating)
 		{
 			this.generateThumbs(files, Object.keys(files))
 		}
-	}
+	};
 
 	spinner = () => {
         const [show, setShow] = useState(false);
@@ -122,6 +127,7 @@ export default class FolderView extends Component {
 				//Refresh button can still manually rescan.
 			});		
 		}
+		this.checkThumbs();
 	}
 
 	render() {
