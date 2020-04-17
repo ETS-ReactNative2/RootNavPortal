@@ -17,7 +17,7 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIF
 import { join } from 'path';
 const { autoUpdater } = require('electron-updater');
 
-if (app.isPackaged)
+if (process.platform == 'win32' && app.isPackaged)
 {
     autoUpdater.checkForUpdatesAndNotify();
 }
