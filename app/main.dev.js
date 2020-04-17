@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED, IMAGES_REMOVED_FROM_GALLERY } from './constants/globals';
 import { join } from 'path';
 
 // export default class AppUpdater {
@@ -216,9 +216,13 @@ ipcMain.on('getExportDest', event => {
     });
 });
 
-ipcMain.on(CLOSE_VIEWER, (event, path) => {
-    BrowserWindow.getAllWindows().forEach(window => window.webContents.send(CLOSE_VIEWER, path));
-});
+ipcMain.on(CLOSE_VIEWER, (event, path) => relayToAllViewer(CLOSE_VIEWER, path));
+
+ipcMain.on(IMAGES_REMOVED_FROM_GALLERY, (event, info) => relayToAllViewer(IMAGES_REMOVED_FROM_GALLERY, info));
+
+const relayToAllViewer = (event, data) => {
+    BrowserWindow.getAllWindows().forEach(window => window.webContents.send(event, data));
+}
 
 /**********************
 **  Open Viewer Event

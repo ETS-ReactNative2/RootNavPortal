@@ -11,6 +11,7 @@
 - Fixed a crash when navigating the viewer into an RSML without an image
 - Fixed mutliple crashes and exceptions relating to refreshing the gallery page
 - Added tooltip to explain why images are being skipped in viewer page
+- Fixed crash where deleting an image from the file system and then refreshing would crash viewer if that image was currently open.
 
 # 0.5.0
 

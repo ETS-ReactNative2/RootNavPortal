@@ -5,7 +5,7 @@ import { StyledButton } from '../StyledComponents';
 import { readdir } from 'fs';
 import { sep } from 'path';
 import { ipcRenderer } from 'electron';
-import { ALL_EXTS_REGEX, API_PARSE, sendThumbs, _require, IMAGE_EXTS } from '../../../constants/globals'
+import { ALL_EXTS_REGEX, API_PARSE, sendThumbs, _require, IMAGE_EXTS, IMAGES_REMOVED_FROM_GALLERY  } from '../../../constants/globals'
 import TooltipOverlay from '../../common/TooltipOverlay';
 
 export default class RefreshButton extends Component {
@@ -62,8 +62,10 @@ export default class RefreshButton extends Component {
                     });
                     if (newThumbs.length)
                         sendThumbs(newThumbs.filter(item => item !== undefined), addThumbs);
-                    if (removeThumbnails.length)
+                    if (removeThumbnails.length) {
+                        ipcRenderer.send(IMAGES_REMOVED_FROM_GALLERY, removeThumbnails);
                         removeThumbs(removeThumbnails); // Remove old thumbnails.
+                    }
                 }
             }
         });

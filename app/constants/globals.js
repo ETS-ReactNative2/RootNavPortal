@@ -15,6 +15,7 @@ export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
 export const CLOSE_VIEWER = 'close-viewer';
+export const IMAGES_REMOVED_FROM_GALLERY = 'images-removed-from-gallery';
 export const NOTIFICATION_CLICKED = 'NOTIFICATION_CLOSED';
 export const HTTP_PORT = 9000;
 

@@ -5,7 +5,7 @@ import FolderChecklist from '../containers/viewer/FolderListContainer';
 import { StyledContainer, StyledSidebarContainer } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
-import { matchPathName, CLOSE_VIEWER, IMAGE_EXTS_REGEX } from '../../constants/globals';
+import { matchPathName, CLOSE_VIEWER, IMAGE_EXTS_REGEX, IMAGES_REMOVED_FROM_GALLERY } from '../../constants/globals';
 import { remote, ipcRenderer } from 'electron';
 import Render from '../containers/viewer/RenderContainer';
 
@@ -27,6 +27,11 @@ export default class Viewer extends Component {
         ipcRenderer.on(CLOSE_VIEWER, (event, closePath) => {
             if (matchPathName(this.state.path).path == closePath) // If the viewer is currently open on a folder that's been deleted, close the viewer.
                 remote.getCurrentWindow().close();
+        });
+        ipcRenderer.on(IMAGES_REMOVED_FROM_GALLERY, (event, info) => {
+            if (info.some(removedFile => this.state.path === `${removedFile.folder}${sep}${removedFile.filename}`)) {
+                this.loadNextRSML(1);
+            }
         });
     }
 
@@ -70,7 +75,7 @@ export default class Viewer extends Component {
             containsImage = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
         }
         while ((!file.rsml || !containsImage) && initialIndex != index) //Only loop through the folder once
-        if (initialIndex != index) //If nothing was found, do nothing
+        if (initialIndex != index) //If nothing was found, do nothing TODO put in special case here, and let viewer have 'nothing' loaded.
         {
             this.setState({path: folder + sep + keys[index]});
         }
