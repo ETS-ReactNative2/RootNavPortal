@@ -160,12 +160,12 @@ export default class Routes extends Component {
                 {
                     label: "&Server Settings",
                     accelerator: 'Ctrl+P',
-                    click: () => this.props.updateAPIModal(true)
+                    click: () => { this.props.updateAPIModal(true); this.setState({ infoModal: false }) }
                 },
                 {
                     label: "&About",
                     accelerator: 'Ctrl+I',
-                    click: () => this.setState({ infoModal: true })
+                    click: () => { this.setState({ infoModal: true }); this.props.updateAPIModal(false) }
                 }
             ]
         },
