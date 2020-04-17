@@ -1,5 +1,5 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
-    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
+    IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, REMOVE_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
     UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
     TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH } from '../actions/galleryActions';
 
@@ -69,19 +69,33 @@ export default (state = initialState, action) => {
         //action.thumb = [{ folder: "C:\Andrew\Desktop\rsml", fileName: "wheat_1", ext: "png", thumb: {type: "Buffer", data: [x, x, x,]}, {...}}
         case ADD_THUMB: {
             return {
-            ...state,
-            thumbs: {
-                ...state.thumbs,
-                ...action.thumbs.reduce((acc, obj) => ({
-                    ...acc, 
-                    [obj.folder]: {
-                        ...(state.thumbs[obj.folder] || {}),
-                        ...(acc[obj.folder] || {}),
-                        [obj.fileName]: obj.thumb
-                    }
-                }), {})
+                ...state,
+                thumbs: {
+                    ...state.thumbs,
+                    ...action.thumbs.reduce((acc, obj) => ({
+                        ...acc, 
+                        [obj.folder]: {
+                            ...(state.thumbs[obj.folder] || {}),
+                            ...(acc[obj.folder] || {}),
+                            [obj.fileName]: obj.thumb
+                        }
+                    }), {})
+                }
             }
         }
+        case REMOVE_THUMB: return {
+                ...state,
+                thumbs: {
+                    ...Object.fromEntries(
+                        Object.entries(state.thumbs).reduce((acc, folder) => ([
+                            ...acc,
+                            [folder[0], Object.fromEntries(
+                                Object.entries(folder[1])
+                                    .filter(file => !action.toRemove.some(it => it.folder == folder[0] && it.filename == file[0]))
+                            )]
+                        ]), [])
+                    )
+                }
         }
         case UPDATE_FILTER_TEXT: return {
             ...state,

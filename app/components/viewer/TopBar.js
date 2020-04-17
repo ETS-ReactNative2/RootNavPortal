@@ -1,6 +1,6 @@
 // @flow
 import React, { Component } from 'react';
-import { StyledTopBarDiv, StyledTopBarHR } from '../CommonStyledComponents'
+import { StyledTopBarDiv, StyledTopBarHR, StyledIcon } from '../CommonStyledComponents'
 import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
 import ResetChangesButton from '../containers/viewer/ResetButtonContainer';
@@ -8,6 +8,7 @@ import SaveRSMLButton from '../containers/viewer/SaveButtonContainer';
 import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
 import { StyledRow } from './StyledComponents';
 import { matchPathName } from '../../constants/globals';
+import TooltipOverlay from '../common/TooltipOverlay';
 import { Row } from 'react-bootstrap';
 
 export default class TopBar extends Component {
@@ -25,7 +26,17 @@ export default class TopBar extends Component {
                     <StyledRow>
                         <div className="col-sm-4"><b>Tag:</b> {tag}</div>
                         <div className="col-sm-2">{
-                            noRSMLInFolder ? <b>No RSML found in Folder</b> : <><b>Open Image:</b> {Object.keys(folderFiles).indexOf(tag) + 1} of {Object.keys(folderFiles).length}</>
+                            noRSMLInFolder ? <b>No RSML found in Folder</b> : <>
+                                <b>Open Image: </b> 
+                                {Object.keys(folderFiles).indexOf(tag) + 1} of {Object.keys(folderFiles).length}
+                                <TooltipOverlay  component={ props => <StyledIcon
+                                        className={"fas fa-info-circle"}
+                                        {...props}
+                                    />} 
+                                    text={"Any images with missing RSML vice versa will be skipped."} // Temporary solution
+                                    placement={"bottom"}
+                                /> 
+                            </>
                         }</div>
                         <div className="col-sm-3"><b>Analysis Date:</b> {date}</div>
                         <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>

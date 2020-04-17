@@ -12,7 +12,7 @@ export default class Render extends Component {
     constructor(props)
     {
         super(props);
-        this.canvasID = [...Array(5)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
+        this.canvasID = [...Array(8)].map(() => Math.random().toString(36)[2]).join(''); //Make a random canvas ID so we can open multiple and recreating isn't a problem
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15, selection: false }); //Extra pixels around an object the canvas includes in hitbox
         this.imageSize = {};
     }

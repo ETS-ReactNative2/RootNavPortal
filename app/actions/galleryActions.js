@@ -9,6 +9,7 @@ export const IMPORT_CONFIG  = 'IMPORT_CONFIG';
 export const UPDATE_CHECKED = 'UPDATE_CHECKED';
 export const ADD_FILES      = 'ADD_FILES';
 export const ADD_THUMB      = 'ADD_THUMB';
+export const REMOVE_THUMB   = 'REMOVE_THUMB';
 export const UPDATE_FILTER_TEXT = 'UPDATE_FILTER_TEXT';
 export const UPDATE_FILTER_ANALYSED = 'UPDATE_FILTER_ANALYSED';
 export const UPDATE_PARSED_RSML = "UPDATE_PARSED_RSML";
@@ -34,6 +35,7 @@ export const importConfig  = (folders, apiAddress, apiKey)  => ({ type: IMPORT_C
 export const updateChecked = checked => ({ type: UPDATE_CHECKED, checked });
 export const addFiles      = (folder, files) => ({ type: ADD_FILES, folder, files });
 export const addThumb      = thumbs => ({ type: ADD_THUMB, thumbs }) //folder: full folder path string, fileName: file string, no ext
+export const removeThumb      = toRemove => ({ type: REMOVE_THUMB, toRemove }) //[{folder: folder1, filename: file1}, {folder: folder2, filename: file2},...]
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
 export const updateFilterAnalysed = checked => ({ type: UPDATE_FILTER_ANALYSED, checked });
 export const updateParsedRSML = newFiles => ({ type: UPDATE_PARSED_RSML, newFiles });

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import RefreshButton from '../../buttons/gallery/RefreshButton';
-import { refreshFiles, addFiles, addThumb } from '../../../actions/galleryActions';
+import { refreshFiles, addFiles, addThumb, removeThumb } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => (
     { 
@@ -14,7 +14,8 @@ const mapDispatchToProps = dispatch => (
     { 
         refreshFiles: files => dispatch(refreshFiles(files)),
         addFiles: (folder, files) => dispatch(addFiles(folder, files)),
-        addThumbs: thumbs => dispatch(addThumb(thumbs))
+        addThumbs: thumbs => dispatch(addThumb(thumbs)),
+        removeThumbs: toRemove => dispatch(removeThumb(toRemove))
     }
 );
 
