@@ -17,7 +17,7 @@ export default class Viewer extends Component {
     {
         super(props);
         const { addViewer, removeViewer, path } = props;
-        this.state = { path, redFolderBorder: false };
+        this.state = { path: (path == null ? null : path ), redFolderBorder: false };
         
         addViewer();
         remote.getCurrentWindow().on('close', () => { //These will cause memory leaks in prod if lots of viewers get opened
@@ -56,12 +56,12 @@ export default class Viewer extends Component {
         this.loadNextRSML(e.key == this.LEFT_KEY ? -1 : 1);
     };
 
-    loadNextRSML = direction => {
+    // Optional parameter to take the current path in order to avoid a second state change immediately after the first in some cases. 
+    loadNextRSML = (direction, optionalCurrentPath) => {
         const { editStack, resetEditStack, files } = this.props;
         if (editStack.length) resetEditStack();
-        const { path, fileName } = matchPathName(this.state.path); 
-        let folder = path.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
-        let keys = Object.keys(files[folder]);
+        const { path, fileName } = matchPathName(optionalCurrentPath || this.state.path); 
+        let keys = Object.keys(files[path]);
         let index = keys.indexOf(fileName);
         let file;
         let initialIndex = index;
@@ -71,13 +71,13 @@ export default class Viewer extends Component {
             index += direction;
             if (index < 0) index = keys.length - 1; //Wrap left or right around the array if out of bounds
             if (index == keys.length) index = 0;
-            file = files[folder][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
+            file = files[path][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
             containsImage = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
         }
         while ((!file.rsml || !containsImage) && initialIndex != index) //Only loop through the folder once
         if (initialIndex != index) //If nothing was found, do nothing TODO put in special case here, and let viewer have 'nothing' loaded.
         {
-            this.setState({path: folder + sep + keys[index]});
+            this.setState({path: path + sep + keys[index]});
         }
     };
 
@@ -91,7 +91,6 @@ export default class Viewer extends Component {
     getNumberOfPlants = rsml => {
         if (!rsml) return "Unknown";
         let { path, fileName } = matchPathName(this.state.path);
-        path.replace(/\\\\/g, '\\');
         return this.props.files[path][fileName].parsedRSML.rsmlJson.rsml[0].scene[0].plant.length;
     };
 
@@ -102,19 +101,26 @@ export default class Viewer extends Component {
     }
 
     updatePath = newPath => {
-        const folder = newPath.replace(/\\\\/g, '\\'); //I have a feeling this is going to need OS specific file code here, since Linux can have backslashes(?) - this happens due to URL needing to escape, I think
-        const files = Object.keys(this.props.files[folder]);
+        const { editStack, resetEditStack } = this.props;
+        const files = Object.keys(this.props.files[newPath]);
         if (files.length == 0) return; // Don't change the folder if there's no files in it!
-        this.setState({path: folder + sep + files[0]});
-        this.props.resetEditStack();
+        const firstFile = files[0];
+        const newFilePath = newPath + sep + firstFile;
+
+        const exts = Object.keys(this.props.files[newPath][firstFile]);
+        if (exts.find(ext => ext.match(IMAGE_EXTS_REGEX)) && exts.includes("rsml")) // If the first file has an image, then load!
+            this.setState(state => {return {...state, path: newFilePath}});
+        else 
+            this.loadNextRSML(1, newFilePath);
+
+        if (editStack.length) resetEditStack();
     }
 
     render() 
     {
         const { path, redFolderBorder } = this.state;
-        const matchedPath = matchPathName(path);
-        matchedPath.path.replace(/\\\\/g, '\\');
-        const rsml = this.props.files[matchedPath.path][matchedPath.fileName].parsedRSML;
+        const matchedPath = path ? matchPathName(path) : null;
+        const rsml = matchedPath ? this.props.files[matchedPath.path][matchedPath.fileName].parsedRSML : null;
         return (
             <StyledContainer>
                 <TopBar path={path} date={this.getDate(rsml)} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants(rsml)}/>
