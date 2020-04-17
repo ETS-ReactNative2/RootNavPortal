@@ -211,7 +211,6 @@ export default class Render extends Component {
 
     draw = () => {
         const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
-        console.log("file", file);
         if (file && file.parsedRSML) //Ready to draw!
         {
             //If there's something on the edit stack, grab the last one, else we use the file state RSML

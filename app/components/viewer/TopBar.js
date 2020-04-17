@@ -50,7 +50,7 @@ export default class TopBar extends Component {
                     <Row style={{width: "100%"}}>
                         <div className="col-4" style={{display: "-webkit-box"}}>
                             <div className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em', width: "auto"}}>
-                                <input type="checkbox" className="custom-control-input" id="architecture" defaultChecked={true} onClick={this.props.toggleArch} />
+                                <input type="checkbox" className="custom-control-input" disabled={!folderFiles} id="architecture" defaultChecked={true} onClick={this.props.toggleArch} />
                                 <label className="custom-control-label" htmlFor="architecture">Architecture</label>
                             </div>
                             <div className="custom-control custom-checkbox" style={{margin: 'auto 1em auto 1em'}}>
