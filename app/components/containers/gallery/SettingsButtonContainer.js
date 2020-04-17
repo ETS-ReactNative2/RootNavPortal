@@ -7,7 +7,8 @@ const mapStateToProps = (state, ownProps) => ({
     folders: state.gallery.folders,
     apiAddress: state.gallery.apiAddress,
     apiKey: state.gallery.apiKey,
-    apiModels: state.backend.apiModels
+    apiModels: state.backend.apiModels,
+    apiStatus: state.gallery.apiStatus
 });
 
 const mapDispatchToProps = dispatch => (
