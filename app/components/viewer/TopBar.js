@@ -33,7 +33,7 @@ export default class TopBar extends Component {
                                         className={"fas fa-info-circle"}
                                         {...props}
                                     />} 
-                                    text={"Any missing RSML or images will be filtered out."} // Temporary solution
+                                    text={"Any images with missing RSML vice versa will be skipped."} // Temporary solution
                                     placement={"bottom"}
                                 /> 
                             </>
