@@ -8,6 +8,8 @@
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
 - Fixed a bug causing thumbnails to not refresh after background app
 - Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple
+- Fixed a crash when navigating the viewer into an RSML without an image
+- Fixed mutliple crashes and exceptions relating to refreshing the gallery page
 
 # 0.5.0
 
