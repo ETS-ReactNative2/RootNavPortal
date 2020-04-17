@@ -17,9 +17,6 @@ import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIF
 import { join } from 'path';
 const { autoUpdater } = require('electron-updater');
 
-const bUpdate = false;
-let dialogOpts;
-
 if (app.isPackaged)
 {
     autoUpdater.checkForUpdatesAndNotify();

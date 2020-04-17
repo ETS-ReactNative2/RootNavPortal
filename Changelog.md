@@ -1,10 +1,12 @@
 # Next Release:
+- Added auto-updates for Windows
+- Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
+- Added type checking for plugins.
 - Modified message dialog when closing the gallery while images are still processing.
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Fixed potential crash when importing non .js plugins.
-- Added type checking for plugins.
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
 - Fixed a bug causing thumbnails to not refresh after background app
 - Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple
