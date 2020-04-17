@@ -7,13 +7,13 @@ export default class LeftButton extends Component {
 
     render() {    
         return (
-            <TooltipOverlay component={ props => <StyledButton
-                    style={{marginRight: "2em"}} 
+            <TooltipOverlay  component={ props => <span className="d-inline-block" {...props}><StyledButton
                     variant="secondary" 
+                    disabled={this.props.disabled}
                     onClick={() => this.props.click(-1)} 
-                    className={`btn btn-default fas fa-arrow-left button`} 
+                    className={`btn btn-default fa fa-arrow-left button`} 
                     {...props}
-                />} 
+                /></span>} 
                 text={"Previous Image"}
             /> 
         )

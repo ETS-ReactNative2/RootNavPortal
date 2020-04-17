@@ -1,7 +1,21 @@
-# 0.5.1
+# 0.6.0:
+- Added auto-updates for Windows. App will download, notify, and update on close
+- Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
+- Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
+- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open.
+- Added type checking for plugins.
 - Modified message dialog when closing the gallery while images are still processing.
 - Added separator to icon menu.
 - Re-added missing util function `splitLinesAsPlants`.
+- Added tooltip to explain why images are being skipped in viewer page
+- Fixed potential crash when importing non .js plugins.
+- Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
+- Fixed a bug causing thumbnails to not refresh after background app
+- Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple
+- Fixed a crash when navigating the viewer into an RSML without an image
+- Fixed mutliple crashes and exceptions relating to refreshing the gallery page
+- Fixed crash where deleting an image from the file system and then refreshing would crash viewer if that image was currently open
+- Fixed bug when switching folders in the viewer can crash if the first tag has no image or RSML
 
 # 0.5.0
 

@@ -16,7 +16,8 @@ import utils from '../../constants/pluginUtils';
 import cloneDeep from 'lodash.clonedeep';
 
 export default class PluginBar extends Component {
-    
+    csvPath = "";
+
     constructor(props) 
     {
         super(props);
@@ -32,7 +33,7 @@ export default class PluginBar extends Component {
         };
         this.exportDest = React.createRef();
     }
-
+    
     getGroupsFromPlugins = plugins => Object.fromEntries(Object.keys(plugins).map(group => [group, true]));
 
     deactivateAllPlugins = () => {
@@ -225,7 +226,7 @@ export default class PluginBar extends Component {
                         path,
                         header: headers[type]
                     });
-                    csvWriter.writeRecords(data[type]).then(() => console.log(`written to ${path}`));
+                    csvWriter.writeRecords(data[type]).then(() => { this.csvPath = path; console.log(`written to ${path}`) });
                 }
             });
             setTimeout(() => this.setState({ ...this.state, measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
@@ -269,10 +270,10 @@ export default class PluginBar extends Component {
             const pluginFilenames = readdirSync(PLUGINDIR); // Get all plugin filenames
             pluginFilenames.forEach(filename => {
                 if (!filename.match(/.+?(?:js|ts|jsx)$/)) return; //if it's not a js file, we don't want to use it.
-                const plugin = _require(`${PLUGINDIR}${filename.replace('.js', '')}`); // For each filename, import the plugin
+                const plugin = _require(`${PLUGINDIR}${filename.replace(/.+?(:js|ts|jsx)$/, '')}`); // For each filename, import the plugin
                 
-                if (["name", "group", "function", "description"].every(param => param in plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
-                    // Todo good typechecking
+                if (["name", "group", "function", "description"].every(param => param in plugin) && this.pluginTypeCheck(plugin)) { // If the plugins have all the necessary members, then add it to the plugins object.
+
                     if (!(plugin.group in plugins)) plugins[plugin.group] = {}; // Initialise empty object for group
                     plugins[plugin.group][plugin.name] = { "function": plugin.function, "active": false, description: plugin.description };
                 }
@@ -281,6 +282,10 @@ export default class PluginBar extends Component {
         }
         return plugins;
     }
+
+    // Requires a valid plugin object (correct object keys) be passed in, and returns if the types of all these keys are correct.
+    pluginTypeCheck = plugin => typeof plugin.name === "string" && typeof plugin.group === "string" 
+                                && typeof plugin.description === "string" && typeof plugin.function === 'function';
 
     togglePlugin = (groupName, pluginName) => {
         const { plugins } = this.state;
@@ -309,6 +314,6 @@ export default class PluginBar extends Component {
     };
 
     openContainingDirectory = () => {
-        shell.showItemInFolder(this.exportDest.current.value);
+        shell.showItemInFolder(this.csvPath);
     }
 }

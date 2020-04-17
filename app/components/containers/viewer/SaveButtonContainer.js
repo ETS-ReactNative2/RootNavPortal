@@ -8,7 +8,7 @@ const mapStateToProps = (state, ownProps) => {
     let viewer =  state.viewer.viewers[process.pid];
     const { path, fileName }  = matchPathName(ownProps.path);
     return {
-        parsedRSML: state.gallery.files[path][fileName].parsedRSML,
+        parsedRSML: path && fileName ? state.gallery.files[path][fileName].parsedRSML : null,
         editStack: viewer ? viewer.editStack : false,
         path: ownProps.path
     }

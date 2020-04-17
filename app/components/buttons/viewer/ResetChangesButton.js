@@ -14,6 +14,7 @@ export default class ResetChanges extends Component {
                     style={{pointerEvents: isActive ? 'all' : 'none' }}
                     onClick={() => isActive ? this.props.resetEditStack() : 0} //Cut action if not needed
                     className={`btn btn-default fa fa-trash-restore button`} 
+                    {...props}
                 /></span>
             } 
                 text={"Reset RSML Changes"}

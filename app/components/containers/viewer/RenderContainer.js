@@ -9,7 +9,7 @@ const mapStateToProps = (state, ownProps) => {
     let viewer =  state.viewer.viewers[process.pid];
     return { 
         path: ownProps.path,
-        file: state.gallery.files[path][fileName],
+        file: path && fileName ? state.gallery.files[path][fileName] : null,
         architecture:  viewer ? viewer.architecture : false, //These prevent errors when unloading the viewer, since the action updates children before the process actually ends
         segMasks: viewer ? viewer.segMasks : false,
         editStack: viewer ? viewer.editStack : false

@@ -16,7 +16,7 @@ export const StyledFolderViewDiv = styled.div` && {
 }`;
     
 export const StyledFilterBarSpan = styled.span` && {
-    width: 30em;
+    width: 27em;
     margin: auto 0 auto 1em;
 }`
 

@@ -6,14 +6,19 @@ import { matchPathName, API_DELETE, writeConfig } from '../../../constants/globa
 import { ipcRenderer } from 'electron';
 import { StyledIcon } from '../../CommonStyledComponents';
 import TooltipOverlay from '../../common/TooltipOverlay';
+import styled from 'styled-components';
 
 export default class SettingsButton extends Component {
-
+    StyledI = styled.i`
+        color: #d9534f;
+        margin-right: 0.25em;
+        font-size: 1.2em;
+    `;
     ACTION_NONE         = 0
     ACTION_REANALYSE    = 1;
     ACTION_CHANGE_MODEL = 2;
 
-    DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working internet connection.\n\nAre you sure you want to do this?"
+    DELETE_MESSAGE = "will <b>delete any and all RSML files</b> in this directory and resubmit images to RootNav API. This requires a working server connection.\n\nAre you sure you want to do this?"
     defaultModel = { description: "Please select a model", value: "" };
 
     constructor(props) {
@@ -148,7 +153,7 @@ export default class SettingsButton extends Component {
                         }}>
                             Confirm
                     </Button>}
-
+                    {!this.state.confirmText && !this.props.apiStatus ? <span>No server connection found. No images can be analysed <this.StyledI className="fas fa-exclamation-circle"/> </span> : ""}
                     <Button variant="secondary" onClick={e => {         
                         e.stopPropagation();
                         this.cancelAction();

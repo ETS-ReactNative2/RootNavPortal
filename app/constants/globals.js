@@ -15,6 +15,7 @@ export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
 export const CLOSE_VIEWER = 'close-viewer';
+export const IMAGES_REMOVED_FROM_GALLERY = 'images-removed-from-gallery';
 export const NOTIFICATION_CLICKED = 'NOTIFICATION_CLOSED';
 export const HTTP_PORT = 9000;
 
@@ -38,9 +39,9 @@ export const API_POLLTIME  = 1000 * 5; //API poll interval in milliseconds
 export const THUMB_PERCENTAGE = 15;
 export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' };
 
-export const DEFAULT_CONFIG = { apiAdrdress: "", apiKey: "", folders: [] };
+export const DEFAULT_CONFIG = { apiAddress: "", apiKey: "", folders: [] };
 
-export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups; //Matches the file's dir path and actual name. no trailing slash on the path
+export const matchPathName = path => (path && path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups) || { path: "", fileName: "" }; //Matches the file's dir path and actual name. no trailing slash on the path
 
 export const getProcessTypeFromURL = url => {
     const groups = url.match(/\/app.html\?(?<name>[a-z]*)/).groups;
@@ -87,7 +88,7 @@ export const sendThumbs = (thumbs, addThumbs) => {
         get(`http://127.0.0.1:${HTTP_PORT}/health`).then(res => {
             post(`http://127.0.0.1:${HTTP_PORT}/thumb`, thumbs).then(res => resolve(addThumbs(res.data))).catch(err => setTimeout(() => resolve(sendThumbs(thumbs, addThumbs)), 2000)); //If Axios hangs up, try again.
         }).catch(err => setTimeout(() => resolve(sendThumbs(thumbs, addThumbs)), 5000)); //If backend isn't up yet, wait 5s and try again.
-        //Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem.
+        //Add some limit to this, in case firewalls or similar block local HTTP server, in which case we have a big problem. TODO
     });
 };
 defaults.adapter = _require('axios/lib/adapters/http'); //Axios will otherwise default to the XHR adapter due to being in an Electron browser, and won't work.
