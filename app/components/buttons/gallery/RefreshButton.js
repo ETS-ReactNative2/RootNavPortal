@@ -31,12 +31,10 @@ export default class RefreshButton extends Component {
                 });
                 // Remove old thumbnails that are no longer needed
                 Object.keys(structuredFiles[folder.path]).forEach(name => {
-                    console.log(Object.keys(structuredFiles[folder.path][name]), Object.keys(files[folder.path][name]));
                     if (Object.keys(files[folder.path][name]).some(key => IMAGE_EXTS.includes(key) && !Object.keys(structuredFiles[folder.path][name]).includes(key))) {
                         removeThumbnails.push({folder: folder.path, filename: name});
                     }
                 })
-                console.log(removeThumbnails);
                 callback();
             });
         }, err => {

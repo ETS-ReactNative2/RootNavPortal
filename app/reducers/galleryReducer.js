@@ -83,9 +83,7 @@ export default (state = initialState, action) => {
                 }
             }
         }
-        case REMOVE_THUMB: {
-            console.log(action.toRemove);
-            const x =  {
+        case REMOVE_THUMB: return {
                 ...state,
                 thumbs: {
                     ...Object.fromEntries(
@@ -98,9 +96,6 @@ export default (state = initialState, action) => {
                         ]), [])
                     )
                 }
-            }
-            console.log(x.thumbs)
-            return x;
         }
         case UPDATE_FILTER_TEXT: return {
             ...state,
