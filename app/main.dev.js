@@ -13,16 +13,19 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED, UPDATE_READY } from './constants/globals';
 import { join } from 'path';
+const { autoUpdater } = require('electron-updater');
 
-// export default class AppUpdater {
-//   constructor() {
-//     log.transports.file.level = 'info';
-//     autoUpdater.logger = log;
-//     autoUpdater.checkForUpdatesAndNotify();
-//   }
-// }
+const bUpdate = false;
+let dialogOpts;
+
+if (app.isPackaged)
+{
+    autoUpdater.checkForUpdatesAndNotify();
+}
+
+console.log("I am version: " + app.getVersion());
 
 const CLOSE = 0;
 const BACKGROUND = 1;
@@ -30,7 +33,7 @@ let closeFlag; //Hack - app.quit causes the close event to fire again, so we nee
 let appIcon = null; //Orphan variable required so the icon doesn't get GC'd by V8
 let mainWindow = null;
 let backendWindow = null;
-let iconClick = () => mainWindow ? mainWindow.focus() : openGallery();
+const iconClick = () => mainWindow ? mainWindow.focus() : openGallery();
 
 /**********************
 **  Open the Gallery
