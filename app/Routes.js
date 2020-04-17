@@ -12,6 +12,9 @@ import { Button, Modal, InputGroup, Collapse } from 'react-bootstrap';
 import { writeConfig, _require } from './constants/globals';
 import styled from 'styled-components';
 const { Menu } = remote;
+import os from 'os';
+import { exec } from 'child_process';
+
 export default class Routes extends Component {
 
     StyledPort = styled.input`
@@ -31,7 +34,7 @@ export default class Routes extends Component {
     constructor(props)
     {
         super(props);
-        this.state = { openCollapse: false, changeSaveAnimation: false, validateWarning: false };
+        this.state = { openCollapse: false, changeSaveAnimation: false, validateWarning: false, infoModal: false };
 
         const menu = Menu.buildFromTemplate(this.menuTemplate);
         remote.getCurrentWindow().setMenu(menu);
@@ -59,10 +62,7 @@ export default class Routes extends Component {
         path = path.replace(/%20/g, " "); //Replace any encoded spaces in the file path with a space.
         exts = exts.split('|');
 
-        let view = Routes.Views(path, exts)[page];
-        if (view == null) 
-            view = Routes.Views()[routes.HOME];
-        return view;
+        return Routes.Views(path, exts)[page] || Routes.Views()[routes.HOME];
     }
 
     saveSettings = () => {
@@ -120,6 +120,34 @@ export default class Routes extends Component {
                         </Button>
                     </Modal.Footer>
                 </Modal> 
+
+                <Modal show={this.state.infoModal} onHide={() => this.setState({ infoModal: false })}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Application Info <span><this.StyledI style={{verticalAlign: 'text-top'}} className="fas fa-info-circle"/></span></Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <b>RootNav Portal</b> version {remote.app.getVersion()}
+                        <br/><hr/>
+                        <b>Maintainers:</b>
+                        <ul>
+                            <li><b>Andrew Reynolds</b>: andrew.n64@hotmail.com</li>
+                            <li><b>Daniel Cordell</b>: danielbc@hotmail.co.uk</li>
+                            <li><b>Mike Pound</b>: sbzmpp@exmail.nottingham.ac.uk</li>
+                        </ul>
+                        For suggestions, feature requests or bug reports, please file an issue at <a style={{color: '#0000EE'}} onClick={() => exec(`${process.platform == 'win32' ? "start" : "open"} https://github.com/Chagrilled/RootNavPortal`)}>
+                            RootNav Portal's GitHub repository</a> or email a maintainer.
+                        <br/><hr/>
+                        <b>Electron</b>: {process.versions['electron']}<br/>
+                        <b>Chrome</b>: {process.versions['chrome']}<br/>
+                        <b>Node</b>: {process.versions['node']}<br/>
+                        <b>OS</b>: {`${os.type()} ${os.arch()} ${os.release()}`}
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant="primary" onClick={() => this.setState({ infoModal: false })}>
+                            Close
+                        </Button>
+                    </Modal.Footer>
+                </Modal> 
             </div>
             </Router>
         );
@@ -127,14 +155,19 @@ export default class Routes extends Component {
 
     menuTemplate = [
         {
-            label: '&File',
+            label: '&Menu',
             submenu: [
                 {
                     label: "&Server Settings",
                     accelerator: 'Ctrl+P',
-                    click: () => this.props.updateAPIModal(true)
+                    click: () => { this.props.updateAPIModal(true); this.setState({ infoModal: false }) }
+                },
+                {
+                    label: "&About",
+                    accelerator: 'Ctrl+I',
+                    click: () => { this.setState({ infoModal: true }); this.props.updateAPIModal(false) }
                 }
             ]
-        }
+        },
     ];
 }
