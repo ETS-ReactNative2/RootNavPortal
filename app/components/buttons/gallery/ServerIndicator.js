@@ -33,7 +33,7 @@ export default class ServerIndicator extends Component {
                     this.props.updateAPIModal(true);
                     e.stopPropagation()
                 }}      
-                style={{ transition: '0.75s ease-in-out', marginLeft: 'auto' }}
+                style={{ transition: '0.75s ease-in-out'}}
                 {...props}
             />} 
             text={this.getText()}

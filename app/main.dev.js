@@ -239,7 +239,7 @@ ipcMain.on('openViewer', (event, path) => {
         },
         devTools: process.env.NODE_ENV === 'production' ? false : true
     }); 
-    subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path}`);
+    subWindow.loadURL(`file://${__dirname}/app.html?viewer?${path || ""}`);
 
     subWindow.webContents.on('did-finish-load', () => {
         if (!subWindow) return subWindow = null;

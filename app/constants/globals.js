@@ -41,7 +41,7 @@ export const COLOURS = { PRIMARY: '#f53', LATERAL: '#ffff00', HOVERED: 'white' }
 
 export const DEFAULT_CONFIG = { apiAddress: "", apiKey: "", folders: [] };
 
-export const matchPathName = path => path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups || { path: "", fileName: "" }; //Matches the file's dir path and actual name. no trailing slash on the path
+export const matchPathName = path => (path && path.match(/(?<path>.+)(?:\\|\/)(?<fileName>.+)/).groups) || { path: "", fileName: "" }; //Matches the file's dir path and actual name. no trailing slash on the path
 
 export const getProcessTypeFromURL = url => {
     const groups = url.match(/\/app.html\?(?<name>[a-z]*)/).groups;

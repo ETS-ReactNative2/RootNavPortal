@@ -10,7 +10,7 @@ export default class FolderChecklist extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            checked: [props.path],
+            checked: props.path ? [props.path] : [],
             expanded: [],
             nodes: []
         };

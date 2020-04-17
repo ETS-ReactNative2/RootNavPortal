@@ -211,8 +211,8 @@ export default class Render extends Component {
 
     draw = () => {
         const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
-        
-        if (file.parsedRSML) //Ready to draw!
+        console.log("file", file);
+        if (file && file.parsedRSML) //Ready to draw!
         {
             //If there's something on the edit stack, grab the last one, else we use the file state RSML
             const polylines = editStack.length ? editStack[editStack.length - 1] : file.parsedRSML.polylines;
@@ -225,7 +225,6 @@ export default class Render extends Component {
 
             // Save image size, for scaling usage!;
             this.imageSize = sizeOf(path + sep + fileName + "." + ext);
-
 
             if (segMasks && file._C1 && file._C2) //Composite the segmasks together
                 if (!file.seg_mask) 
@@ -265,7 +264,7 @@ export default class Render extends Component {
             let polyline = new fabric.Polyline(line.points, {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
-                strokeWidth: 4,
+                strokeWidth: 6,
                 perPixelTargetFind: true,
                 name: line.id,
                 lockMovementX: true,

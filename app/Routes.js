@@ -58,8 +58,8 @@ export default class Routes extends Component {
     }
 
     static View(props) {
-        let { page = "", path = "", exts = "" } = props.location.search.match(/(?<page>\?[^?]+)\??(?<path>[^|]+)?\|?(?<exts>.+)?/).groups //This matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and |rsml|png|etc. The negated sets are to delimit the capture groups
-        path = path.replace(/%20/g, " "); //Replace any encoded spaces in the file path with a space.
+        let { page = "", path, exts = "" } = props.location.search.match(/(?<page>\?[^?]+)\??(?<path>[^|]+)?\|?(?<exts>.+)?/).groups //This matches the passed URL into 3 groups - ?viewer, ?folder/filepath, and |rsml|png|etc. The negated sets are to delimit the capture groups
+        path = path ? path.replace(/%20/g, " ") : path; //Replace any encoded spaces in the file path with a space.
         exts = exts.split('|');
 
         return Routes.Views(path, exts)[page] || Routes.Views()[routes.HOME];

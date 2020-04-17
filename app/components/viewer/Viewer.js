@@ -17,7 +17,7 @@ export default class Viewer extends Component {
     {
         super(props);
         const { addViewer, removeViewer, path } = props;
-        this.state = { path: (path == null ? null : path ), redFolderBorder: false };
+        this.state = { path: (!path ? null : path ), redFolderBorder: false };
         
         addViewer();
         remote.getCurrentWindow().on('close', () => { //These will cause memory leaks in prod if lots of viewers get opened
@@ -95,6 +95,7 @@ export default class Viewer extends Component {
     };
 
     hasSegMasks = () => {
+        if (!this.state.path) return false;
         let { path, fileName } = matchPathName(this.state.path);
         const file = this.props.files[path][fileName];
         return file.hasOwnProperty("_C1") && file.hasOwnProperty("_C2");
@@ -125,7 +126,7 @@ export default class Viewer extends Component {
             <StyledContainer>
                 <TopBar path={path} date={this.getDate(rsml)} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants(rsml)}/>
                 <StyledSidebarContainer>
-                    <FolderChecklist path={matchPathName(path).path} updatePath={this.updatePath} redFolderBorder={redFolderBorder}/>
+                    <FolderChecklist path={matchedPath ? matchedPath.path : null} updatePath={this.updatePath} redFolderBorder={redFolderBorder}/>
                     <Render path={path}/>
                     <PluginBar toggleFolderBorder={this.toggleFolderBorder}/>
                 </StyledSidebarContainer>

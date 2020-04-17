@@ -15,6 +15,7 @@
 - Added tooltip to explain why images are being skipped in viewer page
 - Fixed crash where deleting an image from the file system and then refreshing would crash viewer if that image was currently open
 - Fixed bug when switching folders in the viewer can crash if the first tag has no image or RSML
+- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open.
 
 # 0.5.0
 
