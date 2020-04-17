@@ -1,4 +1,4 @@
-# Next Release:
+# 0.6.0:
 - Added auto-updates for Windows. App will download, notify, and update on close
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
