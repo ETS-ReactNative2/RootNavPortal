@@ -21,6 +21,8 @@ export const HTTP_PORT = 9000;
 
 export const WINDOW_HEIGHT = 800;
 export const WINDOW_WIDTH  = 1200;
+export const MIN_HEIGHT = 720;
+export const MIN_WIDTH  = 960; //Half of 1080p as min width?
 
 export const IMAGE_EXTS = ['jpg', 'jpeg', 'jpe', 'jfif', 'jif', 'png', 'tif', 'tiff'];
 export const DATA_EXTS  = ['rsml'];
