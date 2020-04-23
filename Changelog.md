@@ -1,5 +1,9 @@
+# Next Release:
+- Fixed a bug causing filenames with `.`s in them to not be picked up properly for the API
+- Increased folder depth to 8 in case it caused a problem.
+
 # 0.6.0:
-- Added auto-updates for Windows. App will download, notify, and update on close
+- Added auto-updating. App will download, notify, and update on close
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
 - Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open.

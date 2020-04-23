@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT, NOTIFICATION_CLICKED } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT, NOTIFICATION_CLICKED, IMAGE_EXTS } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
@@ -108,7 +108,7 @@ export default class Backend extends Component {
 
         this.fastify.post('/import', async (request, reply) => {
             reply.type('application/json').code(200);
-            return request.body.map((item, i) => dree.scan(item, { depth: 5, exclude: /node_modules|system32|Windows|boot|etc|dev|bin/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
+            return request.body.map((item, i) => dree.scan(item, { depth: 8, exclude: /node_modules|system32|Windows|boot|etc|dev|bin/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
         });
 
         //Polled before sending thumbs, to check if the backend process has started the server yet
@@ -141,7 +141,6 @@ export default class Backend extends Component {
             {
                 let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                 let filePath = folder + sep + file + "." + imageExt;
-
                 const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !this.inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
@@ -373,5 +372,5 @@ export default class Backend extends Component {
         return ""
     }
 
-    matchFileParts = file => file.match(/(?<path>.+(?:\\|\/))(?<fileName>.+?)(?<ext>\..+)/).groups; //Matches the file path into the absolute directory path/, file name and .ext
+    matchFileParts = file => file.match(new RegExp(`(?<path>.+(?:\\\\|\\/))(?<fileName>.+?)(?<ext>\\.${IMAGE_EXTS.join("|")})$`, 'i')).groups; //Matches the file path into the absolute directory path/, file name and .ext
 }
