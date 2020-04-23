@@ -1,7 +1,7 @@
 // @flow
 import React, { Component, useState, useRef } from 'react';
 import { sep } from 'path';
-import { ipcRenderer } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import { StyledImageCard } from './StyledComponents'
 import { IMAGE_EXTS, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
@@ -9,6 +9,7 @@ import styled from 'styled-components';
 import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 import sizeOf from 'image-size';
+const { Menu, MenuItem } = remote;
 
 export default class Thumbnail extends Component {
     constructor(props)
@@ -19,7 +20,8 @@ export default class Thumbnail extends Component {
         this.element = React.createRef();
         this.resizeTimer = null;
         this.scrollTimer = null;
-
+        this.menu = new Menu()
+        this.menu.append(new MenuItem({ label: 'Toggle as Failed', click() { props.setFailedState(props.folder, props.fileName) } }))
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { selection: false }); 
         this.state = { visible: false }
         //On resize, force a refresh so our canvas can update its image to fit the containing div.
@@ -28,11 +30,18 @@ export default class Thumbnail extends Component {
             this.resizeTimer = setTimeout(() => this.forceUpdate(), 75)
         });
     }
-
+    
     StyledSpinner = styled(Spinner)` && {
         position: absolute;
         right: 0.3em;
         top: 0.1em;
+    }`;
+
+    StyledX = styled.i` {
+        position: absolute;
+        right: 0.2em;
+        top: 0em;
+        color: red;
     }`;
 
     //Central spinner for loading images
@@ -96,7 +105,7 @@ export default class Thumbnail extends Component {
     componentDidMount()
     {
         if (this.isVisible(this.props.active)) this.setState({ visible: true }); //This loads images that appear at boot for folders already open
-        window.addEventListener('scroll', this.onScroll, true)
+        window.addEventListener('scroll', this.onScroll, true);
         this.setupCanvas();
         this.draw();    
     }
@@ -104,6 +113,11 @@ export default class Thumbnail extends Component {
     componentWillUnmount() {
         window.removeEventListener('scroll', this.onScroll);
     }
+
+    handleRightClick = e => {
+        e.preventDefault();
+        if (this.props.file.parsedRSML) this.menu.popup({ window: remote.getCurrentWindow() })
+    };
 
     onScroll = e => { 
         clearTimeout(this.scrollTimer);
@@ -172,7 +186,7 @@ export default class Thumbnail extends Component {
         const [show, setShow] = useState(false);
         const target = useRef(null);
         const { folder, fileName, queue, inFlight, model, apiStatus, file } = this.props;
-        if (!apiStatus) return "";  //Disable all spinner notifications if no API connection - red model alert might still be relevant, but I don't think it's worth showing.
+        if (!apiStatus && !file.failed) return "";  //Disable all spinner notifications if no API connection - red model alert might still be relevant, but I don't think it's worth showing.
 
         let spinner, tooltipText;
         if (!model && !file.rsml)
@@ -189,6 +203,11 @@ export default class Thumbnail extends Component {
         {
             spinner = <this.StyledSpinner ref={target} id={fileName} animation="border" variant="secondary" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
             tooltipText = "Queued for processing";
+        }
+        else if (file.failed) //Red X if marked as failed
+        {
+            spinner = <this.StyledX ref={target} id={fileName} className={"fas fa-times fa-3x"} onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            tooltipText = "Marked as Failed";
         }
 
         return (
@@ -223,7 +242,7 @@ export default class Thumbnail extends Component {
         const heightRatio = imageSize ? imageSize.height / imageSize.width : 1.3;
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard style={{width: `${baseVH * 25}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element}>
+            <StyledImageCard style={{width: `${baseVH * 25}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
                 <div style={{width: `${baseVH * 25}px`, height: `${heightRatio * (baseVH * 25)}px`}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>

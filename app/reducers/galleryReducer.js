@@ -1,7 +1,7 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, REMOVE_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
     UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
-    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH } from '../actions/galleryActions';
+    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH, SET_FAILED_STATE } from '../actions/galleryActions';
 
 const initialState = { folders: [], files: {}, thumbs: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
     filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false, apiModal: false, apiAuth: true };
@@ -176,6 +176,20 @@ export default (state = initialState, action) => {
         case UPDATE_API_AUTH: return {
             ...state,
             apiAuth: action.auth
+        }
+        case SET_FAILED_STATE: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: {
+                    ...state.files[action.folder],
+                    [action.fileName]: {
+                        ...state.files[action.folder][action.fileName],
+                        result: state.files[action.folder][action.fileName],
+                        failed: action.failedState ?? !state.files[action.folder][action.fileName].failed
+                    }
+                }
+            }
         }
         default: return state;
     }

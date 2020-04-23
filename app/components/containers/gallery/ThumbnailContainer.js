@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { setFailedState } from '../../../actions/galleryActions';
 import Thumbnail from '../../gallery/Thumbnail';
 
 const mapStateToProps = (state, ownProps) => { 
@@ -20,7 +21,7 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = dispatch => (
-    { }
+    { setFailedState: (folder, fileName, failedState) => dispatch(setFailedState(folder, fileName, failedState)) }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thumbnail);

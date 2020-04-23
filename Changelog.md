@@ -1,4 +1,5 @@
 # Next Release:
+- Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
 - Fixed a bug causing filenames with `.`s in them to not be picked up properly for the API
 - Increased folder depth to 8 in case it caused a problem.
 

@@ -23,6 +23,7 @@ export const SAVE_API_SETTINGS = 'SAVE_API_SETTINGS';
 export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
 export const UPDATE_API_MODAL = 'UPDATE_API_MODAL';
 export const UPDATE_API_AUTH = 'UPDATE_API_AUTH';
+export const SET_FAILED_STATE = 'SET_FAILED_STATE';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -49,3 +50,4 @@ export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, add
 export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });  
 export const updateAPIModal = bool => ({ type: UPDATE_API_MODAL, bool }); //This is in Redux so the indicator button and menus can open the modal
 export const updateAPIAuth = auth => ({ type: UPDATE_API_AUTH, auth });
+export const setFailedState = (folder, fileName, failedState) => ({ type: SET_FAILED_STATE, folder, fileName, failedState});

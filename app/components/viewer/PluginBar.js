@@ -181,7 +181,7 @@ export default class PluginBar extends Component {
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
             Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
-                if (file.parsedRSML) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
+                if (file.parsedRSML && !file.failed) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
                     Object.values(group).forEach(plugin => plugin.active ? //for each active plugin
                         funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines, utils)) : null)); //pass the data to each plugin
             });

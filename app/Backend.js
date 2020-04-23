@@ -225,6 +225,7 @@ export default class Backend extends Component {
             Object.keys(files[path][fileName]).forEach(extension => { //For each extension in the state object
                 
                 if (extension == 'parsedRSML') return; //Get rid of the existing parsed polylines and JSON RSML
+                if (extension == 'failed') return; //Get rid of fail state if reanalysing
                 if (extension.match(/_C1|_C2|rsml/)) //If it's an API file
                 {
                     access(path + sep + fileName + (extension != 'rsml' ? extension + ".png" : '.' + extension), constants.F_OK, err => { //Does it exist?
