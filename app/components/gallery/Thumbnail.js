@@ -20,15 +20,20 @@ export default class Thumbnail extends Component {
         this.element = React.createRef();
         this.resizeTimer = null;
         this.scrollTimer = null;
-        this.menu = new Menu()
-        this.menu.append(new MenuItem({ label: 'Toggle as Failed', click() { props.setFailedState(props.folder, props.fileName) } }))
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { selection: false }); 
         this.state = { visible: false }
+        this.resetMenu(props);
+
         //On resize, force a refresh so our canvas can update its image to fit the containing div.
         window.addEventListener('resize', e => {
             clearTimeout(this.resizeTimer);
             this.resizeTimer = setTimeout(() => this.forceUpdate(), 75)
         });
+    }
+
+    resetMenu = props => {
+        this.menu = new Menu()
+        this.menu.append(new MenuItem({ label: props.file.failed ? 'Unset as Failed' : 'Set as Failed', click() { props.setFailedState(props.folder, props.fileName) } }))
     }
     
     StyledSpinner = styled(Spinner)` && {
@@ -100,6 +105,8 @@ export default class Thumbnail extends Component {
             this.setState({ visible: true }) //Allow updates, but set state if the component is onscreen after a re-render -> i.e if a folder was opened, this will load the first few
         this.setupCanvas();
         this.draw();
+        if (this.props.file.failed != prevProps.file.failed)
+            this.resetMenu(this.props);
     }
 
     componentDidMount()
