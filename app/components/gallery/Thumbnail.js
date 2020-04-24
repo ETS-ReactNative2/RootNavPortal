@@ -3,12 +3,13 @@ import React, { Component, useState, useRef } from 'react';
 import { sep } from 'path';
 import { ipcRenderer, remote } from 'electron';
 import { StyledImageCard } from './StyledComponents'
-import { IMAGE_EXTS, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
+import { IMAGE_EXTS, IMAGE_EXTS_REGEX, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
 import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
 import { fabric } from 'fabric'; //Fabric will give you node-gyp build errors, but it's fine, because we're actually a browser. :electrongottem:
 import sizeOf from 'image-size';
+
 const { Menu, MenuItem } = remote;
 
 export default class Thumbnail extends Component {
@@ -40,6 +41,12 @@ export default class Thumbnail extends Component {
         position: absolute;
         right: 0.3em;
         top: 0.1em;
+    }`;
+
+    StyledNoImageIcon = styled.div` && {
+        position: absolute;
+        left: 0.1em;
+        bottom: 0.3em;
     }`;
 
     StyledX = styled.i` {
@@ -151,28 +158,38 @@ export default class Thumbnail extends Component {
         if (!this.state.visible) return false; //If the component hasn't been on screen yet, prevent the canvas from drawing.
         const { file, architecture, thumb } = this.props;
         const polylines = file.parsedRSML ? file.parsedRSML.polylines : null;
+        const noImage = !Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
         let image = new Image();
         const buffer = this.getBuffer(thumb);
-        if (!buffer) return;
-        image.src = 'data:image/png;base64,' + buffer.toString('base64'); //Otherwise we can just ref the file path normally
-        
-        image.onload = () => {
-            let im = new fabric.Image(image, {
-                left: 0, top: 0, selectable: false
-            });
+        if (buffer) {
+            image.src = 'data:image/png;base64,' + buffer.toString('base64'); //Otherwise we can just ref the file path normally
+            
+            image.onload = () => {
+                let im = new fabric.Image(image, {
+                    left: 0, top: 0, selectable: false
+                });
 
-            im.scaleToHeight(this.container.current.clientHeight); //Scale the image towards the containing divs size. 
-            im.scaleToWidth(this.container.current.clientWidth); //Perhaps not great, but I can't think of a better way. The sizing issue is circular.
-            this.fabricCanvas.add(im);
+                im.scaleToHeight(this.container.current.clientHeight); //Scale the image towards the containing divs size. 
+                im.scaleToWidth(this.container.current.clientWidth); //Perhaps not great, but I can't think of a better way. The sizing issue is circular.
+                this.fabricCanvas.add(im);
 
-            if (polylines && architecture) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
-        };     
-    };
+                if (polylines && (noImage || architecture)) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
+            };     
+        } 
+        else if (polylines && (noImage)) {
+            const RSMLSize = this.getRSMLSize(polylines);
+            this.drawRSML(polylines, 
+                {scaleX: this.container.current.clientWidth/RSMLSize.x, scaleY: this.container.current.clientHeight/RSMLSize.y},
+            noImage);
+            this.fabricCanvas.backgroundColor = "#111133"; // Make the background a blueish-grey for contrast.
+        }
+    }
 
-    drawRSML = (polylines, scaling) => {
+    drawRSML = (polylines, scaling, noImage) => {
+        const thumbPercentage = noImage ? 100 : THUMB_PERCENTAGE;
         polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-            let polyline = new fabric.Polyline(line.points.map(point => ({ x: point.x * THUMB_PERCENTAGE * scaling.scaleX / 100, y: point.y * THUMB_PERCENTAGE * scaling.scaleY / 100 })), {
+            let polyline = new fabric.Polyline(line.points.map(point => ({ x: point.x * thumbPercentage * scaling.scaleX  / 100, y: point.y * thumbPercentage * scaling.scaleY / 100 })), {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
                 strokeWidth: 2,
@@ -187,6 +204,20 @@ export default class Thumbnail extends Component {
             this.fabricCanvas.add(polyline);
         });
     };
+
+    // Get the size that RSML should take up in the thumbnail, if no image.
+    getRSMLSize = polylines => {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        polylines.forEach(polyline => {
+            polyline.points.forEach(point => {
+                if (point.x < minX) minX = point.x;
+                if (point.x > maxX) maxX = point.x;
+                if (point.y < minY) minY = point.y;
+                if (point.y > maxY) maxY = point.y;
+            });
+        });
+        return {x: maxX + minX, y: maxY + minY};
+    }
 
     //Generates the API spinner with tooltip overlay, which need to be in a function component for state hooks, or nothing
     spinner = () => {
@@ -228,6 +259,26 @@ export default class Thumbnail extends Component {
             </>
         )
     }
+
+    noImageIcon = () => {
+        const [show, setShow] = useState(false);
+        const target = useRef(null);
+        return (
+            <>
+                <Overlay target={target.current} show={show} placement="top">
+                {({ placement, scheduleUpdate, arrowProps, outOfBoundaries, show: _show, ...props }) => (
+                    <Tooltip placement={top} {...props}> {"This tag has no image, so only the RSML is displayed"} </Tooltip>
+                )}
+                </Overlay>
+                <this.StyledNoImageIcon ref={target} onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}>
+                    <span className="fa-stack">
+                        <i style={{color: "yellow"}} className="fas fa-image fa-stack-1x fa-inverse"></i>
+                        <i style={{color: "Red"}} className="fas fa-ban fa-stack-2x"></i>
+                    </span>
+                </this.StyledNoImageIcon>
+            </>
+        )
+    }
     
     FabricCanvas = () => <canvas id={this.canvasID}></canvas>;
 
@@ -237,8 +288,7 @@ export default class Thumbnail extends Component {
         //folder - the full path to this folder - in state.gallery.folders
         //file - object that contains ext:bool KVs for this file - state.gallery.files[folder][fileName]
         //fileName - the full file name, no extension
-        const { fileName, thumb } = this.props;
-
+        const { fileName, thumb, file } = this.props;
         // Dispose of the canvas and redraw
         if (this.fabricCanvas)
             this.fabricCanvas.dispose();
@@ -247,13 +297,18 @@ export default class Thumbnail extends Component {
         const imageSize = buffer && sizeOf(buffer);
         const baseVH = Math.round(window.innerHeight / 100);
         const heightRatio = imageSize ? imageSize.height / imageSize.width : 1.3;
+
+        const noImage = !Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
             <StyledImageCard style={{width: `${baseVH * 25}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
                 <div style={{width: `${baseVH * 25}px`, height: `${heightRatio * (baseVH * 25)}px`}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
-                    { (!thumb || !this.state.visible) ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
+                    {noImage ? <this.noImageIcon/> : ""}
+                    {/*If there's no thumbnail and there should be (there is an image), OR the thumbnail isn't visible, render the loading spinner.*/}
+                    { ((!thumb && Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX))) || !this.state.visible) ? <this.LoadingSpinner animation="border" variant="primary" /> : "" }
                 </div>
                 <CollapsableLabel file={fileName}/>
             </StyledImageCard> 
