@@ -317,7 +317,6 @@ export default class Backend extends Component {
                 this.props.setFailedState(path, fileName, true);
                 this.removeInflight(filePath);
             }
-            else console.log("Bad Job Poll Result: " + res.data);
         })
         .catch(err => console.error(err))
     };

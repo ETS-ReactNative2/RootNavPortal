@@ -24,6 +24,7 @@ export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
 export const UPDATE_API_MODAL = 'UPDATE_API_MODAL';
 export const UPDATE_API_AUTH = 'UPDATE_API_AUTH';
 export const SET_FAILED_STATE = 'SET_FAILED_STATE';
+export const REMOVE_FILES = 'REMOVE_FILES';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -51,3 +52,4 @@ export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });
 export const updateAPIModal = bool => ({ type: UPDATE_API_MODAL, bool }); //This is in Redux so the indicator button and menus can open the modal
 export const updateAPIAuth = auth => ({ type: UPDATE_API_AUTH, auth });
 export const setFailedState = (folder, fileName, failedState) => ({ type: SET_FAILED_STATE, folder, fileName, failedState});
+export const removeFiles = (folder, fileNames) => ({ type: REMOVE_FILES, folder, fileNames }); //removes an array of filenames from a folder's file structure in state

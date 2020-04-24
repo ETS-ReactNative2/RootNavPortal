@@ -109,7 +109,7 @@ export default class PluginBar extends Component {
                         </InputGroup.Prepend>
                         <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
                         <InputGroup.Append>
-                            <SelectDestinationButton setExportDest={this.setExportDest}/>
+                            <SelectDestinationButton setExportDest={this.setExportDest} ipcMessage={'getExportDest'}/>
                         </InputGroup.Append>
                     </InputGroup>
                     <Collapse in={this.state.measuring}>
@@ -157,7 +157,7 @@ export default class PluginBar extends Component {
 
     measureToast = () => {
         return (
-            <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+            <Toast onClose={() => this.setState({ toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
                 style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '15vw' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
@@ -170,13 +170,13 @@ export default class PluginBar extends Component {
 
     setExportDest = value => {
         this.exportDest.current.value = value;
-        this.setState({ ...this.state, exportable: true });
+        this.setState({ exportable: true });
     };
 
     //Modal's measure button clicked
     export = () => {
-        if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
-        this.setState({ ...this.state, measuring: true, measuresComplete: false });
+        if (!this.exportDest.current.value) return this.setState({ exportable: false });
+        this.setState({ measuring: true, measuresComplete: false });
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
@@ -229,7 +229,7 @@ export default class PluginBar extends Component {
                     csvWriter.writeRecords(data[type]).then(() => { this.csvPath = path; console.log(`written to ${path}`) });
                 }
             });
-            setTimeout(() => this.setState({ ...this.state, measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
+            setTimeout(() => this.setState({ measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
         });
     };
 
@@ -251,9 +251,9 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = () => {
-        if (this.props.folders.length) return this.setState({ ...this.state, modal: true });
+        if (this.props.folders.length) return this.setState({ modal: true });
         this.props.toggleFolderBorder();
-        this.setState({ ...this.state, toast: true });
+        this.setState({ toast: true });
     };
     
     loadPlugins = () => {
@@ -281,7 +281,7 @@ export default class PluginBar extends Component {
             });
         }
         return plugins;
-    }
+    };
 
     // Requires a valid plugin object (correct object keys) be passed in, and returns if the types of all these keys are correct.
     pluginTypeCheck = plugin => typeof plugin.name === "string" && typeof plugin.group === "string" 
@@ -291,7 +291,6 @@ export default class PluginBar extends Component {
         const { plugins } = this.state;
         if (!plugins.hasOwnProperty(groupName) || !plugins[groupName].hasOwnProperty(pluginName)) return;
         this.setState({
-            ...this.state,
             plugins: {
                 ...plugins,
                 [groupName]: {
@@ -303,17 +302,16 @@ export default class PluginBar extends Component {
                 } 
             }
         });
-    }
+    };
 
     togglePluginGroup = groupName => {
         if (!this.state.hasOwnProperty(groupName)) return;
         this.setState({
-            ...this.state,
             [groupName]: !this.state[groupName]
         });
     };
 
     openContainingDirectory = () => {
         shell.showItemInFolder(this.csvPath);
-    }
+    };
 }

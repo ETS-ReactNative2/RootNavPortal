@@ -8,21 +8,21 @@ export default class SelectDestinationButton extends Component {
     constructor(props)
     {
         super(props);
-        ipcRenderer.on('exportDest', (event, data) => {
+        ipcRenderer.on(props.ipcMessage, (event, data) => {
             this.setRefValue(data)
         });
     }
 
     setRefValue = data => {
         this.props.setExportDest(data);
-        ipcRenderer.removeListener('exportDest', this.setRefValue);
+        ipcRenderer.removeListener(this.props.ipcMessage, this.setRefValue);
     };
 
     render() {    
         return (
             <TooltipOverlay  component={ props => <StyledButton
                     variant="secondary" 
-                    onClick={() => ipcRenderer.send('getExportDest')} 
+                    onClick={e => { e.stopPropagation(); ipcRenderer.send(this.props.ipcMessage) }} 
                     className={`btn btn-default fa fa-folder-open button`}
                     style={{height: 'auto', margin: '0px', minHeight: 'auto'}}
                     {...props}
