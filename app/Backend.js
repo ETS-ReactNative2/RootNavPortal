@@ -311,21 +311,33 @@ export default class Backend extends Component {
     pollJob = (jobID, filePath) => {
         get(this.props.apiAddress + "/job/" + jobID).then(res => {
             if (res.data == 'COMPLETED') this.getOutput(jobID, filePath); 
-            else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME); 
+            else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME);
+            else if (res.data == "FAILED") {
+                const { path, fileName } = matchPathName(filePath);
+                this.props.setFailedState(path, fileName, true);
+                this.removeInflight(filePath);
+            }
+            else console.log("Bad Job Poll Result: " + res.data);
         })
         .catch(err => console.error(err))
     };
 
     getOutput = (jobID, filePath) => {
-
+        let failed = false;
         let requests = [
-            get(this.props.apiAddress + "/job/" + jobID + "/output/rsml"),
-            get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
-            get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
+            get(this.props.apiAddress + "/job/" + jobID + "/output/rsml").catch(err => null),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}).catch(err => null),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'}).catch(err => null)
         ]
         const { updateFile, folders, addQueue } = this.props;
 
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
+            if (responses.some(resp => resp == null)) { // If any responses failed, end.
+                const { path, fileName } = matchPathName(filePath);
+                this.props.setFailedState(path, fileName, true);
+                this.removeInflight(filePath);
+                return;
+            }
             let exts = {};
             const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
 

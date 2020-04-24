@@ -1,17 +1,18 @@
 # Next Release:
 - Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
 - Fixed a bug causing filenames with `.`s in them to not be picked up properly for the API
-- Increased folder depth to 8 in case it caused a problem.
+- Increased folder depth to 8 in case it caused a problem
+- Any failed API responses mark that image as failed
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
-- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open.
-- Added type checking for plugins.
-- Modified message dialog when closing the gallery while images are still processing.
-- Added separator to icon menu.
-- Re-added missing util function `splitLinesAsPlants`.
+- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open
+- Added type checking for plugins
+- Modified message dialog when closing the gallery while images are still processing
+- Added separator to icon menu
+- Re-added missing util function `splitLinesAsPlants`
 - Added tooltip to explain why images are being skipped in viewer page
 - Fixed potential crash when importing non .js plugins.
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made

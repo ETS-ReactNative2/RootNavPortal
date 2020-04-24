@@ -30,8 +30,8 @@ export default class RefreshButton extends Component {
                     structuredFiles[folder.path][name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
                 });
                 // Remove old thumbnails that are no longer needed
-                Object.keys(structuredFiles[folder.path]).forEach(name => {
-                    if (Object.keys(files[folder.path][name]).some(key => IMAGE_EXTS.includes(key) && !Object.keys(structuredFiles[folder.path][name]).includes(key))) {
+                Object.keys(structuredFiles[folder.path] ?? {}).forEach(name => {
+                    if (files[folder.path] && Object.keys(files[folder.path][name]).some(key => IMAGE_EXTS.includes(key) && !Object.keys(structuredFiles[folder.path][name]).includes(key))) {
                         removeThumbnails.push({folder: folder.path, filename: name});
                     }
                 })
