@@ -1,4 +1,5 @@
 # Next Release:
+- Added 'Export Failed' to folder settings. Any images marked as failed can be exported to a selected directory and removed from RootNav Portal
 - Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
 - Fixed a bug causing filenames with `.`s in them to not be picked up properly for the API
 - Increased folder depth to 8 in case it caused a problem
