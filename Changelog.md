@@ -5,6 +5,7 @@
 - Increased folder depth to 8 in case it caused a problem
 - Any failed API responses mark that image as failed
 - RSML now correctly renders in thumbnails if there is no accompanying image
+- Added button and styling to Viewer to toggle failed, and colouring the name red if it is failed
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
