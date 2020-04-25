@@ -27,7 +27,7 @@ export default class SelectDestinationButton extends Component {
                     style={{height: 'auto', margin: '0px', minHeight: 'auto'}}
                     {...props}
                 />} 
-                text={"Select Export Location"}
+                text={this.props.tooltip}
             /> 
         )
     }

@@ -109,7 +109,7 @@ export default class PluginBar extends Component {
                         </InputGroup.Prepend>
                         <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
                         <InputGroup.Append>
-                            <SelectDestinationButton setExportDest={this.setExportDest} ipcMessage={'getExportDest'}/>
+                            <SelectDestinationButton setExportDest={this.setExportDest} ipcMessage={'getExportDest'} tooltip={"Select export location"}/>
                         </InputGroup.Append>
                     </InputGroup>
                     <Collapse in={this.state.measuring}>

@@ -1,11 +1,13 @@
 # Next Release:
+- Added "Reimport Files" to folder settings. Any images and RSML in the chosen folder will be reimported back to the folder from which reimport was selected
 - Added 'Export Failed' to folder settings. Any images marked as failed can be exported to a selected directory and removed from RootNav Portal
 - Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
-- Fixed a bug causing filenames with `.`s in them to not be picked up properly for the API
+- Added button and styling to Viewer to toggle failed, and colouring the name red if it is failed
+- RSML now correctly renders in thumbnails if there is no accompanying source image
+- Fixed a bug causing filenames with `.`s in them to not be read properly in the backend
 - Increased folder depth to 8 in case it caused a problem
 - Any failed API responses mark that image as failed
-- RSML now correctly renders in thumbnails if there is no accompanying image
-- Added button and styling to Viewer to toggle failed, and colouring the name red if it is failed
+- Images marked as failed either by user or by API error will not be re-queued for the API
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close

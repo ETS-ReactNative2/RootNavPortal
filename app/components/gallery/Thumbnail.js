@@ -22,7 +22,7 @@ export default class Thumbnail extends Component {
         this.resizeTimer = null;
         this.scrollTimer = null;
         this.fabricCanvas = new fabric.Canvas(this.canvasID, { selection: false }); 
-        this.state = { visible: false }
+        this.state = { visible: false };
         this.resetMenu(props);
 
         //On resize, force a refresh so our canvas can update its image to fit the containing div.
@@ -33,9 +33,9 @@ export default class Thumbnail extends Component {
     }
 
     resetMenu = props => {
-        this.menu = new Menu()
-        this.menu.append(new MenuItem({ label: props.file.failed ? 'Unset as Failed' : 'Set as Failed', click() { props.setFailedState(props.folder, props.fileName) } }))
-    }
+        this.menu = new Menu();
+        this.menu.append(new MenuItem({ label: props.file.failed ? 'Mark as Failed' : 'Unmark as Failed', click() { props.setFailedState(props.folder, props.fileName) } }));
+    };
     
     StyledSpinner = styled(Spinner)` && {
         position: absolute;
@@ -71,9 +71,9 @@ export default class Thumbnail extends Component {
         const { folder, file, fileName } = this.props;
         if (IMAGE_EXTS.some(ext => ext in file) && this.hasRSML()) 
         {
-            ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).join("|"), () => {}) //| is the delimeter for file extensions in the URL bar
+            ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).join("|"), () => {}); //| is the delimeter for file extensions in the URL bar
         }
-    }
+    };
 
     isVisible = active => { //Returns true if the image is currently on screen. Cannot be used before render()
         if (!active || !this.element.current) return false;
@@ -150,10 +150,6 @@ export default class Thumbnail extends Component {
         this.fabricCanvas.hoverCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
     };
 
-    getBuffer = thumb => {
-        return thumb ? Buffer.from(thumb) : null;
-    }
-
     draw = () => {
         if (!this.state.visible) return false; //If the component hasn't been on screen yet, prevent the canvas from drawing.
         const { file, architecture, thumb } = this.props;
@@ -177,14 +173,16 @@ export default class Thumbnail extends Component {
                 if (polylines && (noImage || architecture)) this.drawRSML(polylines, im.getObjectScaling()); //Pass the scale factor through so the RSML can calc the right offset
             };     
         } 
-        else if (polylines && (noImage)) {
+        else if (polylines && noImage) 
+        {
             const RSMLSize = this.getRSMLSize(polylines);
             this.drawRSML(polylines, 
-                {scaleX: this.container.current.clientWidth/RSMLSize.x, scaleY: this.container.current.clientHeight/RSMLSize.y},
-            noImage);
+                { scaleX: this.container.current.clientWidth / RSMLSize.x, scaleY: this.container.current.clientHeight / RSMLSize.y },
+                noImage
+            );
             this.fabricCanvas.backgroundColor = "#111133"; // Make the background a blueish-grey for contrast.
         }
-    }
+    };
 
     drawRSML = (polylines, scaling, noImage) => {
         const thumbPercentage = noImage ? 100 : THUMB_PERCENTAGE;
@@ -216,8 +214,8 @@ export default class Thumbnail extends Component {
                 if (point.y > maxY) maxY = point.y;
             });
         });
-        return {x: maxX + minX, y: maxY + minY};
-    }
+        return { x: maxX + minX, y: maxY + minY };
+    };
 
     //Generates the API spinner with tooltip overlay, which need to be in a function component for state hooks, or nothing
     spinner = () => {
@@ -257,8 +255,8 @@ export default class Thumbnail extends Component {
                 </Overlay>
                 {spinner}
             </>
-        )
-    }
+        );
+    };
 
     noImageIcon = () => {
         const [show, setShow] = useState(false);
@@ -277,12 +275,12 @@ export default class Thumbnail extends Component {
                     </span>
                 </this.StyledNoImageIcon>
             </>
-        )
-    }
+        );
+    };
     
     FabricCanvas = () => <canvas id={this.canvasID}></canvas>;
-
-    hasRSML = () => "rsml" in this.props.file;
+    hasRSML      = () => "rsml" in this.props.file;
+    getBuffer    = thumb => thumb ? Buffer.from(thumb) : null;
 
 	render() {
         //folder - the full path to this folder - in state.gallery.folders

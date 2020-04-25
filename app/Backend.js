@@ -137,7 +137,7 @@ export default class Backend extends Component {
         const { files, addQueue } = this.props;
 
         Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
-            if (!files[folder][file].rsml)
+            if (!files[folder][file].rsml && !files[folder][file].failed)
             {
                 let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                 let filePath = folder + sep + file + "." + imageExt;

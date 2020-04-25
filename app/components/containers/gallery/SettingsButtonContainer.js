@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Button from '../../buttons/gallery/SettingsButton'
-import { updateFolderModel, removeFiles } from '../../../actions/galleryActions';
+import { updateFolderModel, removeFiles, addFiles, addThumb } from '../../../actions/galleryActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
     path: ownProps.path,
@@ -14,7 +14,9 @@ const mapStateToProps = (state, ownProps) => ({
 
 const mapDispatchToProps = dispatch => ({ 
     updateFolderModel: (path, model) => dispatch(updateFolderModel(path, model)),
-    removeFiles: (folder, fileNames) => dispatch(removeFiles(folder, fileNames))
+    removeFiles: (folder, fileNames) => dispatch(removeFiles(folder, fileNames)),
+    addFiles: (folder, files) => dispatch(addFiles(folder, files)),
+    addThumbs: thumbs => dispatch(addThumb(thumbs)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Button)
