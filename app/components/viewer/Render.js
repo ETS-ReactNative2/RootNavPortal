@@ -297,7 +297,7 @@ export default class Render extends Component {
 
     FabricCanvas = () => {
         //this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
-        return <canvas id={this.canvasID}>test</canvas>;
+        return <canvas id={this.canvasID} >test</canvas>;
     };
 
     render() 

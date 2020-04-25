@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { StyledTopBarDiv, StyledTopBarHR, StyledIcon } from '../CommonStyledComponents'
 import LeftButton from '../buttons/viewer/LeftButton';
 import RightButton from '../buttons/viewer/RightButton';
+import ToggleFailedButton from '../buttons/viewer/ToggleFailedButton';
 import ResetChangesButton from '../containers/viewer/ResetButtonContainer';
 import SaveRSMLButton from '../containers/viewer/SaveButtonContainer';
 import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
@@ -14,12 +15,13 @@ import { Row } from 'react-bootstrap';
 export default class TopBar extends Component {
 
     render() {
-        const { path, buttonHandler, plants, date, hasSegMasks } = this.props;
+        const { path, buttonHandler, plants, date, hasSegMasks, file, setFailedState } = this.props;
         const splitPath = matchPathName(path);
         let tag = path ? splitPath.fileName : ""; //Matches the file path into the absolute directory path and file name
         const folderFiles = this.props.files[splitPath.path];
-
         const noRSMLInFolder = folderFiles && !Object.values(folderFiles).some(file => file.parsedRSML);
+
+        const isSetFailed = file.failed;
 
         let message = ""
         if (noRSMLInFolder) 
@@ -27,11 +29,25 @@ export default class TopBar extends Component {
         else if (folderFiles) 
             message = <><b>Open Image: </b>{`${Object.keys(folderFiles).indexOf(tag) + 1} of ${Object.keys(folderFiles).length}`}</>
 
+        let renderTag = tag;
+        if (file.failed) 
+            renderTag = <>
+            <span style={{color: "red"}}>{tag}</span>
+                <TooltipOverlay component={ props => <StyledIcon
+                        className={"fas fa-info-circle"}
+                        style={{color: "red"}}
+                        {...props}
+                    />} 
+                    text={"Marked as Failed"} // Temporary solution
+                    placement={"bottom"}
+                /> 
+            </>
+
         return (
             <div>
                 <StyledTopBarDiv data-tid="container">
                     <StyledRow>{ folderFiles ? <>
-                        <div className="col-sm-4"><b>Tag:</b> {tag}</div>
+                        <div className="col-sm-4"><b>Tag:</b> {renderTag}</div>
                         <div className="col-sm-2">{message}
                             <TooltipOverlay component={ props => <StyledIcon
                                     className={"fas fa-info-circle"}
@@ -62,7 +78,10 @@ export default class TopBar extends Component {
                             <LeftButton click={buttonHandler} disabled={!folderFiles}/>
                             <RightButton click={buttonHandler} disabled={!folderFiles}/>
                         </div>
-                        <div className="col-4" style={{textAlign: "right"}}>
+                        <div className="col-1" style={{textAlign: "right"}}>
+                            <ToggleFailedButton isSetFailed={isSetFailed} toggleFailed={() => setFailedState(splitPath.path, splitPath.fileName)} click={buttonHandler} disabled={!folderFiles}/>
+                        </div>
+                        <div className="col-3" style={{textAlign: "right"}}>
                             <ResetChangesButton />
                             <UndoChangesButton />
                             <SaveRSMLButton path={path} />
