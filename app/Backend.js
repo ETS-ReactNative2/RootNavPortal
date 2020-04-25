@@ -384,5 +384,5 @@ export default class Backend extends Component {
         return ""
     }
 
-    matchFileParts = file => file.match(new RegExp(`(?<path>.+(?:\\\\|\\/))(?<fileName>.+?)(?<ext>\\.${IMAGE_EXTS.join("|")})$`, 'i')).groups; //Matches the file path into the absolute directory path/, file name and .ext
+    matchFileParts = file => file.match(new RegExp(`(?<path>.+(?:\\\\|\\/))(?<fileName>.+?)(?<ext>\\.(?:${IMAGE_EXTS.join("|")}))$`, 'i')).groups; //Matches the file path into the absolute directory path/, file name and .ext
 }
