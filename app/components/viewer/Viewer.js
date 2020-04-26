@@ -74,7 +74,7 @@ export default class Viewer extends Component {
             file = files[path][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
             containsImage = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
         }
-        while ((!file.rsml || !containsImage) && initialIndex != index) //Only loop through the folder once
+        while ((!file.rsml) && initialIndex != index) //Only loop through the folder once
         if (initialIndex != index) //If nothing was found, do nothing TODO put in special case here, and let viewer have 'nothing' loaded.
         {
             this.setState({path: path + sep + keys[index]});
@@ -109,7 +109,7 @@ export default class Viewer extends Component {
         const newFilePath = newPath + sep + firstFile;
 
         const exts = Object.keys(this.props.files[newPath][firstFile]);
-        if (exts.find(ext => ext.match(IMAGE_EXTS_REGEX)) && exts.includes("rsml")) // If the first file has an image, then load!
+        if (exts.includes("rsml")) // If the first file has RSML, then load!
             this.setState(state => {return {...state, path: newFilePath}});
         else 
             this.loadNextRSML(1, newFilePath);

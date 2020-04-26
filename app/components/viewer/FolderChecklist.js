@@ -129,7 +129,6 @@ export default class FolderChecklist extends Component {
                         parentOpen: <i className="far fa-folder-open"/>,
                         leaf: <i className="far fa-folder"/>,
                     }}
-                    showExpandAll={true}
                     onCheck={(rawChecked, clicked) => { 
                         const checked = this.cascadeChecked(rawChecked, clicked);
                         this.setState({ checked })

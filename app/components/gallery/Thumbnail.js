@@ -69,7 +69,7 @@ export default class Thumbnail extends Component {
     openViewer = e => 
     {
         const { folder, file, fileName } = this.props;
-        if (IMAGE_EXTS.some(ext => ext in file) && this.hasRSML()) 
+        if (this.hasRSML()) 
         {
             ipcRenderer.send('openViewer', folder + sep + fileName + "|" + Object.keys(file).join("|"), () => {}); //| is the delimeter for file extensions in the URL bar
         }
@@ -144,10 +144,11 @@ export default class Thumbnail extends Component {
     setupCanvas = () => {
         if (!this.container.current) {
             this.fabricCanvas.initialize(document.getElementById(this.canvasID));
-        };
+        }
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: this.container.current.clientWidth, height: this.container.current.clientHeight });
         this.fabricCanvas.setDimensions({ width: this.container.current.clientWidth, height: this.container.current.clientHeight }, { backstoreOnly: true });
-        this.fabricCanvas.hoverCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
+        this.fabricCanvas.defaultCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
+        this.fabricCanvas.hoverCursor = this.fabricCanvas.defaultCursor;
     };
 
     draw = () => {

@@ -8,6 +8,7 @@
 - Increased folder depth to 8 in case it caused a problem
 - Any failed API responses mark that image as failed
 - Images marked as failed either by user or by API error will not be re-queued for the API
+- RSML without an image can now be correctly displayed on the viewer
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
