@@ -1,6 +1,6 @@
 const group = "Plant Measurements";
 const name = "Average Lateral Emergence Angle";
-const id = 'latEmergence';
+const id = 'avgEmergenceLateralAngle';
 const description = "The mean emergence angle in degrees for all lateral roots. Measured relative to the primary root they emerge from, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
