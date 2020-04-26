@@ -209,8 +209,15 @@ export default class Render extends Component {
         }
     };
 
+    imageCallback = (image, polylines) => {
+        this.fabricCanvas.add(new fabric.Image(image, {
+            left: 0, top: 0, selectable: false
+        }));
+        if (this.props.architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+    };
+
     draw = () => {
-        const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
+        const { file, architecture, segMasks, editStack } = this.props;
         if (file && file.parsedRSML) //Ready to draw!
         {
             //If there's something on the edit stack, grab the last one, else we use the file state RSML
@@ -218,8 +225,7 @@ export default class Render extends Component {
             if (!polylines) return;
 
             let image = new Image();
-            const { path, fileName }  = matchPathName(this.props.path);
-
+            const { path, fileName } = matchPathName(this.props.path);
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
             this.fabricCanvas.backgroundColor = "white"; 
 
@@ -227,13 +233,7 @@ export default class Render extends Component {
                 // Save image size, for scaling usage!;
                 this.imageSize = sizeOf(path + sep + fileName + "." + ext);
                 if (segMasks && file._C1 && file._C2) //Composite the segmasks together
-                    if (!file.seg_mask) 
-                        imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
-                            .then(output => {
-                                updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
-                                image.src = 'data:image/png;base64,' + output.toString('base64');
-                            });
-                    else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
+                    this.renderSegMask(image);
                 
                 else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
                 {
@@ -247,33 +247,18 @@ export default class Render extends Component {
                 }
                 else image.src = path + sep + fileName + "." + ext; //Otherwise we can just ref the file path normally
 
-                image.onload = () => {
-                    this.fabricCanvas.add(new fabric.Image(image, {
-                        left: 0, top: 0, selectable: false
-                    }));
-                    if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
-                };
+                image.onload = () => this.imageCallback(image, polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
                 this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
             }
             else 
             {
-                if (segMasks && file._C1 && file._C2) { //Composite the segmasks together
-                    if (!file.seg_mask) 
-                        imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
-                            .then(output => {
-                                updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
-                                image.src = 'data:image/png;base64,' + output.toString('base64');
-                            });
-                    else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
+                if (segMasks && file._C1 && file._C2) 
+                { 
+                    this.renderSegMask(image);
 
                     this.imageSize = sizeOf(path + sep + fileName + "_C1.png");
 
-                    image.onload = () => {
-                        this.fabricCanvas.add(new fabric.Image(image, {
-                            left: 0, top: 0, selectable: false
-                        }));
-                        if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
-                    };
+                    image.onload = () => this.imageCallback(image, polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
                     
                     this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.       
                     this.drawRSML(polylines);
@@ -283,11 +268,24 @@ export default class Render extends Component {
                     this.fabricCanvas.backgroundColor = "#111133"; // Make the background a blueish-grey for contrast.  
                     const RSMLSize = this.getRSMLSize(polylines);
                     this.imageSize = { width: Math.max(500, RSMLSize.x), height: RSMLSize.y };
-                    this.drawRSML(polylines, this.imageSize.width/2 - RSMLSize.minX - RSMLSize.centerX); // Centering RSML in the view.
+                    this.drawRSML(polylines, this.imageSize.width / 2 - RSMLSize.minX - RSMLSize.centerX); // Centering RSML in the view.
                     this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.       
                 }  
             }
         }
+    };
+
+    renderSegMask = image => {
+        const { file, updateFile } = this.props;
+        const { path, fileName } = matchPathName(this.props.path)
+
+        if (!file.seg_mask) 
+        imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+            .then(output => {
+                updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
+                image.src = 'data:image/png;base64,' + output.toString('base64');
+            });
+        else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
     };
 
     drawRSML = (polylines, repositionToCenter) => {
@@ -308,7 +306,7 @@ export default class Render extends Component {
         });
     };
 
-        // Get the size that RSML should take up in the thumbnail, if no image.
+    // Get the size that RSML should take up in the thumbnail, if no image.
     getRSMLSize = polylines => {
         let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
         polylines.forEach(polyline => {
@@ -319,7 +317,12 @@ export default class Render extends Component {
                 if (point.y > maxY) maxY = point.y;
             });
         });
-        return {x: (maxX - minX)*1.5, y: (maxY + minY)*1.5, centerX: (maxX - minX)/2, minX};
+        return { 
+            x: (maxX - minX) * 1.5, //Apparently this 1.5 is "just to make them bigger" 
+            y: (maxY + minY) * 1.5, //To put a buffer frame around the RSML
+            centerX: (maxX - minX) / 2, 
+            minX
+        };
     }
     
 
