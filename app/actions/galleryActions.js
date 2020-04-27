@@ -13,7 +13,7 @@ export const REMOVE_THUMB   = 'REMOVE_THUMB';
 export const UPDATE_FILTER_TEXT = 'UPDATE_FILTER_TEXT';
 export const UPDATE_FILTER_ANALYSED = 'UPDATE_FILTER_ANALYSED';
 export const UPDATE_PARSED_RSML = "UPDATE_PARSED_RSML";
-export const UPDATE_CHECKLIST_DROPDOWN = 'UPDATE_CHECKLIST_DROPDOWN';
+export const UPDATE_FOLDER_MODELS_DROPDOWN = 'UPDATE_FOLDER_MODELS_DROPDOWN';
 export const UPDATE_FOLDER_MODEL = 'UPDATE_FOLDER_MODEL';
 export const UPDATE_FILE = 'UPDATE_FILE';
 export const RESET_FOLDER = 'RESET_FOLDER';
@@ -41,7 +41,7 @@ export const removeThumb      = toRemove => ({ type: REMOVE_THUMB, toRemove }) /
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
 export const updateFilterAnalysed = checked => ({ type: UPDATE_FILTER_ANALYSED, checked });
 export const updateParsedRSML = newFiles => ({ type: UPDATE_PARSED_RSML, newFiles });
-export const updateChecklistDropdown = (path, model) => ({ type: UPDATE_CHECKLIST_DROPDOWN, path, model });
+export const updateFolderModelsDropdown = (paths, model) => ({ type: UPDATE_FOLDER_MODELS_DROPDOWN, paths, model });
 export const updateFolderModel = (path, model) => ({ type: UPDATE_FOLDER_MODEL, path, model });
 export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, folder, fileName, newExts });
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions

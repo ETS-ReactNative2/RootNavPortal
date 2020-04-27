@@ -4,7 +4,7 @@ import { FormGroup, FormControl, Row } from 'react-bootstrap';
 export default class TreeChecklistDropdown extends Component {
     render() 
     {
-        const { name, path, checked, updateChecklistDropdown, model, apiModels, folders } = this.props;
+        const { name, path, checked, updateFolderModels, model, apiModels, folders } = this.props;
         const disabled = folders.find(it => it.path == path);
         return (
             <FormGroup as={Row}>
@@ -14,7 +14,7 @@ export default class TreeChecklistDropdown extends Component {
                     </span>
                 </div>
                 {checked ? 
-                    <FormControl defaultValue={model} as='select' onChange={e => updateChecklistDropdown(path, e.target.value)} disabled={disabled}>
+                    <FormControl value={model} as='select' onChange={e => updateFolderModels(path, e.target.value)} disabled={disabled}>
                         <option value={''}>Select Model</option>
                         { apiModels.map(model => <option key={model.value} value={model.value}>{model.description}</option>) }
                     </FormControl> 

@@ -68,26 +68,45 @@ export default class TreeChecklist extends Component {
     {
         if (!nodes) return [];
         return nodes.map((item, i) => {
+            const model = this.props.checked.find(it => it.path == item.value)?.model;
             return ({
                 ...item,
-                label: this.getDropdown(item.name, item.value, checked, item.model),
+                label: this.getDropdown(item.name, item.value, checked, model),
                 children: this.refreshNodeLabels(item.children, checked),
             })
         });
     }
 
     // Creates the dropdown, with props that determine whether the dropdown should show at all.
-    getDropdown = (name, value, checked, model) => <TreeChecklistDropdown name={name} path={value} checked={checked.includes(value)} model={model} />;
+    getDropdown = (name, value, checked, model) => <TreeChecklistDropdown name={name} path={value} checked={checked.includes(value)} model={model} updateFolderModels={this.updateFolderModelsDropdown} />;
   
-    getChildrenRecursive = (checked, nodes) => {
+    getChildrenRecursive = (parent, nodes) => {
         let children = [];
         nodes.forEach(node => {
-            if (this.isChildOf(checked.value, node.value)) 
-                children.push(...this.getChildrenRecursive(checked, node.children));
-            else if (checked.value == node.value || this.isChildOf(node.value, checked.value)) 
-                children.push(...node.children.map(child => child.value), ...this.getChildrenRecursive(checked, node.children));
+            if (this.isChildOf(parent, node.value)) 
+                children.push(...this.getChildrenRecursive(parent, node.children));
+            else if (parent == node.value || this.isChildOf(node.value, parent)) 
+                children.push(...node.children.map(child => child.value), ...this.getChildrenRecursive(parent, node.children));
         });
         return children;
+    }
+
+    updateFolderModelsDropdown = (pathOfChanged, model) => {
+        const { nodes } = this.state;
+        const children = model ? this.getChildrenRecursive(pathOfChanged, nodes) : [];
+        this.props.updateFolderModelsDropdown(children.concat(pathOfChanged), model);
+    }
+
+    componentDidUpdate(prevProps, prevState) 
+    {
+        const { checked, nodes } = this.state;
+        // If the models have changed in props since last update, change the dropdown labels to reflect this.
+        // Has to be here because mapStateToProps updates props too late, otherwise would be at the bottom of updateFolderModelsDropdown() 
+        if (prevProps.checked.some(prevChecked => prevChecked.model != this.props.checked.find(it => it.path == prevChecked.path)?.model)) {
+            this.setState({ 
+                nodes: this.refreshNodeLabels(nodes, checked)
+            });    
+        }
     }
 
     isChildOf = (child, parent) => {
@@ -133,15 +152,21 @@ export default class TreeChecklist extends Component {
                     expanded={expanded}
                     noCascade={true}
                     onCheck={(checked, newlyChecked) => {
-                        const children = this.getChildrenRecursive(newlyChecked, nodes);
-                        const checkedWithChildren = checked.concat(children).filter((it, i, arr) => arr.indexOf(it) == i);
-                        const expandedWithChildren = expanded.concat(...children, newlyChecked.value).filter((it, i, arr) => arr.indexOf(it) == i);
-                        this.setState({ 
-                            checked: checkedWithChildren, 
-                            expanded: expandedWithChildren, 
-                            nodes: this.refreshNodeLabels(nodes, checkedWithChildren.concat(importedFolders.map(it => it.path))) 
-                        });
-                        updateChecked(this.getUpdatedCheckedWithModels(checkedWithChildren));
+                        if (checked.find(it => it == newlyChecked.value)) { // If it's just been checked, then get all children and check/expand them
+                            const children = this.getChildrenRecursive(newlyChecked.value, nodes);
+                            const checkedWithChildren = checked.concat(children).filter((it, i, arr) => arr.indexOf(it) == i);
+                            const expandedWithChildren = expanded.concat(...children, newlyChecked.value).filter((it, i, arr) => arr.indexOf(it) == i);
+                            this.setState({ 
+                                checked: checkedWithChildren, 
+                                expanded: expandedWithChildren, 
+                                nodes: this.refreshNodeLabels(nodes, checkedWithChildren.concat(importedFolders.map(it => it.path))) 
+                            });
+                            updateChecked(this.getUpdatedCheckedWithModels(checkedWithChildren));
+                        } 
+                        else { // If it's been unchecked, just update the checked list
+                            this.setState({ checked, nodes: this.refreshNodeLabels(nodes, checked.concat(importedFolders.map(it => it.path))) });
+                            updateChecked(this.getUpdatedCheckedWithModels(checked));    
+                        }
                     }}
                     checkModel={'all'}
                     onExpand={expanded => this.setState({ expanded })}

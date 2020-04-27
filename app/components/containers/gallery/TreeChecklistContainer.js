@@ -1,6 +1,7 @@
 import { connect } from 'react-redux';
 import TreeChecklist from '../../gallery/TreeChecklist';
 import { updateChecked } from '../../../actions/galleryActions';
+import { updateFolderModelsDropdown } from '../../../actions/galleryActions';
 
 const mapStateToProps = state => (
     { 
@@ -11,7 +12,10 @@ const mapStateToProps = state => (
 );
 
 const mapDispatchToProps = dispatch => (
-    { updateChecked: paths => dispatch(updateChecked(paths)) }
+    { 
+        updateChecked: paths => dispatch(updateChecked(paths)),
+        updateFolderModelsDropdown: (paths, model) => dispatch(updateFolderModelsDropdown(paths, model)),
+     }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(TreeChecklist)

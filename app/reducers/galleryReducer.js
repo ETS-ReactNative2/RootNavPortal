@@ -1,6 +1,6 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, REMOVE_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
+    UPDATE_PARSED_RSML, UPDATE_FOLDER_MODELS_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
     TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH, SET_FAILED_STATE, REMOVE_FILES } from '../actions/galleryActions';
 
 const initialState = { folders: [], files: {}, thumbs: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
@@ -124,13 +124,13 @@ export default (state = initialState, action) => {
                 }), {})
             }
         }
-        case UPDATE_CHECKLIST_DROPDOWN: return {
+        case UPDATE_FOLDER_MODELS_DROPDOWN: return {
             ...state,
-            checked: state.checked.map(folder => action.path != folder.path ? folder : {...folder, model: action.model})
+            checked: state.checked.map(folder => action.paths.includes(folder.path) ? {...folder, model: action.model} : folder)
         }
         case UPDATE_FOLDER_MODEL: return {
             ...state,
-            folders: state.folders.map(it => it.path == action.path ? {...it, model: action.model} : it)
+            folders: state.folders.map(folder => folder.path == action.path ? {...folder, model: action.model} : folder)
         }
         case UPDATE_FILE: return {
             ...state,
