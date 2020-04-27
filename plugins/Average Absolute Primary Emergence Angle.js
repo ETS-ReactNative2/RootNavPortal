@@ -1,7 +1,7 @@
 const group = "Plant Measurements";
-const name = "Average Primary Emergence Angle";
-const id = 'avgEmergencePrimaryAngle';
-const description = "The mean emergence angle in degrees of all primary roots relative to vertical, per plant";
+const name = "Average Absolute Primary Emergence Angle";
+const id = 'avgAbsEmergencePrimaryAngle';
+const description = "Mean absolute emergence angle in degrees of all primary roots relative to vertical, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -15,7 +15,7 @@ const plugin = (rsmlJson, polylines, utils) => {
             let points = line.points.slice(0, 20); // Take first 20 points of array
             points = utils.pointsSublistFromDistance(points, 5); // Cut off points that make length > 5px.
             const gradient = utils.linearRegressionGradient(points);
-            const angle = utils.boundAngle(utils.gradientToAngle(points, gradient));
+            const angle = Math.abs(utils.boundAngle(utils.gradientToAngle(points, gradient)));
 
             if (!multiplePlants) results[0][id] = utils.addToAverage(results[0][id], angle, index + 1);
             else {
