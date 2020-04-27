@@ -19,9 +19,9 @@ export default class TopBar extends Component {
         const splitPath = matchPathName(path);
         let tag = path ? splitPath.fileName : ""; //Matches the file path into the absolute directory path and file name
         const folderFiles = this.props.files[splitPath.path];
-        const noRSMLInFolder = folderFiles && !Object.values(folderFiles).some(file => file.parsedRSML);
+        const noRSMLInFolder = folderFiles && !Object.values(folderFiles).some(file => file?.parsedRSML);
 
-        const isSetFailed = file.failed;
+        const isSetFailed = file?.failed;
 
         let message = ""
         if (noRSMLInFolder) 
@@ -30,9 +30,10 @@ export default class TopBar extends Component {
             message = <><b>Open Image: </b>{`${Object.keys(folderFiles).indexOf(tag) + 1} of ${Object.keys(folderFiles).length}`}</>
 
         let renderTag = tag;
-        if (file.failed) 
-            renderTag = <>
-            <span style={{color: "red"}}>{tag}</span>
+        if (file?.failed) 
+            renderTag = (
+            <>
+                <span style={{color: "red"}}>{tag}</span>
                 <TooltipOverlay component={ props => <StyledIcon
                         className={"fas fa-info-circle"}
                         style={{color: "red"}}
@@ -41,25 +42,28 @@ export default class TopBar extends Component {
                     text={"Marked as Failed"} // Temporary solution
                     placement={"bottom"}
                 /> 
-            </>
+            </>);
 
         return (
             <div>
                 <StyledTopBarDiv data-tid="container">
-                    <StyledRow>{ folderFiles ? <>
-                        <div className="col-sm-4"><b>Tag:</b> {renderTag}</div>
-                        <div className="col-sm-2">{message}
-                            <TooltipOverlay component={ props => <StyledIcon
-                                    className={"fas fa-info-circle"}
-                                    {...props}
-                                />} 
-                                text={"Any images without RSML will be skipped."} // Temporary solution
-                                placement={"bottom"}
-                            /> 
-                        </div>
-                        <div className="col-sm-3"><b>Analysis Date:</b> {date}</div>
-                        <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>
-                    </> : <><b>No Images Loaded:</b>&nbsp;{"Please select a folder on the left hand side to open."}</>}</StyledRow>
+                    <StyledRow>{ folderFiles ? 
+                        <>
+                            <div className="col-sm-4"><b>Tag:</b> {renderTag}</div>
+                            <div className="col-sm-2">{message}
+                                <TooltipOverlay component={ props => <StyledIcon
+                                        className={"fas fa-info-circle"}
+                                        {...props}
+                                    />} 
+                                    text={"Any images lacking RSML will be skipped."} // Temporary solution
+                                    placement={"bottom"}
+                                /> 
+                            </div>
+                            <div className="col-sm-3"><b>Analysis Date:</b> {date}</div>
+                            <div className="col-sm-3"><b>Number of Plants:</b> {plants}</div>
+                        </> 
+                        : <><b>No Images Loaded:</b>&nbsp;{"Please select a folder on the left hand side to open."}</>}
+                    </StyledRow>
                 </StyledTopBarDiv>
                 <StyledTopBarHR/>
                 <StyledTopBarDiv className="d-inline-flex container" data-tid="container" style={{paddingTop: '0', minWidth: '100%'}}>
