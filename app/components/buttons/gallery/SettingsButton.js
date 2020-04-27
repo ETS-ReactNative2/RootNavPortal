@@ -328,7 +328,10 @@ export default class SettingsButton extends Component {
                     >
                         Open <StyledIcon className={"fas fa-external-link-alt"}/>
                     </Button>
-                    <Button variant={copyingComplete ? "success" : "danger"} onClick={this.closeExportModal} style={{transition: '0.2s ease-in-out'}}>
+                    <Button variant={copyingComplete ? "success" : "danger"} onClick={e => {
+                        e.stopPropagation();
+                        this.closeExportModal();
+                    }} style={{transition: '0.2s ease-in-out'}}>
                         {copyingComplete ? "Close" : "Cancel"}
                     </Button>
                     <Button variant="primary" onClick={e => { e.stopPropagation(); actionFlag == this.ACTION_EXPORT ? this.export() : this.import() }}>
