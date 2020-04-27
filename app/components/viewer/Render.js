@@ -107,7 +107,7 @@ export default class Render extends Component {
                 this.lastPosX = opt.clientX;
                 this.lastPosY = opt.clientY;
             }
-            if (e.target && this.fabricCache.selectedID)
+            if (this.fabricCache.selectedID)
             {
                 let line = this.getObjectByName(this.fabricCache.selectedID)
                 if (line) line.set('stroke', line.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
