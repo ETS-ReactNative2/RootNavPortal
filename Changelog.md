@@ -10,6 +10,7 @@
 - Images marked as failed either by user or by API error will not be re-queued for the API
 - RSML without an image can now be correctly displayed on the viewer
 - Added new 'absolute average' measurements for angles
+- Checking a node in the add button folder picker now checks and expands all children
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
