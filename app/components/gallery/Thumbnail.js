@@ -228,22 +228,22 @@ export default class Thumbnail extends Component {
         let spinner, tooltipText;
         if (!model && !file.rsml)
         {
-            spinner = <this.StyledSpinner ref={target} animation="grow" variant="danger" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            spinner = <this.StyledSpinner ref={target} animation="grow" variant="danger" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}/>;
             tooltipText = "Please select a model from the folder settings to process these files";
         }
         else if (inFlight[folder + sep + fileName])
         {
-            spinner = <this.StyledSpinner ref={target} animation="border" variant="success" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            spinner = <this.StyledSpinner ref={target} animation="border" variant="success" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}/>;
             tooltipText = "Currently processing";
         }
         else if (queue.find(file => file.includes(folder + sep + fileName + "."))) //Try avoid files with subset names
         {
-            spinner = <this.StyledSpinner ref={target} id={fileName} animation="border" variant="secondary" onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            spinner = <this.StyledSpinner ref={target} id={fileName} animation="border" variant="secondary" onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}/>;
             tooltipText = "Queued for processing";
         }
         else if (file.failed) //Red X if marked as failed
         {
-            spinner = <this.StyledX ref={target} id={fileName} className={"fas fa-times fa-3x"} onMouseEnter={() => setShow(!show)} onMouseLeave={() => setShow(!show)}/>;
+            spinner = <this.StyledX ref={target} id={fileName} className={"fas fa-times fa-3x"} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}/>;
             tooltipText = "Marked as Failed";
         }
 
