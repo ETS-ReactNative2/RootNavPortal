@@ -14,7 +14,7 @@ export default class TreeChecklistDropdown extends Component {
                     </span>
                 </div>
                 {checked ? 
-                    <FormControl value={model} as='select' onChange={e => updateFolderModels(path, e.target.value)} disabled={disabled}>
+                    <FormControl value={model || ""} as='select' onChange={e => updateFolderModels(path, e.target.value)} disabled={disabled}>
                         <option value={''}>Select Model</option>
                         { apiModels.map(model => <option key={model.value} value={model.value}>{model.description}</option>) }
                     </FormControl> 

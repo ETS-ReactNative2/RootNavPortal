@@ -69,9 +69,10 @@ export default class TreeChecklist extends Component {
         if (!nodes) return [];
         return nodes.map((item, i) => {
             const model = this.props.checked.find(it => it.path == item.value)?.model;
+            const isDisabled = this.props.folders.find(it => it.path == item.value);
             return ({
                 ...item,
-                label: this.getDropdown(item.name, item.value, checked, model),
+                label: isDisabled ? item.label : this.getDropdown(item.name, item.value, checked, model),
                 children: this.refreshNodeLabels(item.children, checked),
             })
         });
@@ -93,11 +94,12 @@ export default class TreeChecklist extends Component {
 
     updateFolderModelsDropdown = (pathOfChanged, model) => {
         const { nodes } = this.state;
-        const children = model ? this.getChildrenRecursive(pathOfChanged, nodes) : [];
+        let children = model ? this.getChildrenRecursive(pathOfChanged, nodes) : [];
+        children = children.filter(child => !this.props.folders.find(it => it.path == child));
         this.props.updateFolderModelsDropdown(children.concat(pathOfChanged), model);
     }
 
-    componentDidUpdate(prevProps, prevState) 
+    componentDidUpdate(prevProps) 
     {
         const { checked, nodes } = this.state;
         // If the models have changed in props since last update, change the dropdown labels to reflect this.

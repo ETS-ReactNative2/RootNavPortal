@@ -7,7 +7,8 @@ const mapStateToProps = state => (
     { 
         tree: state.gallery.modalBody,
         importedFolders: state.gallery.folders,
-        checked: state.gallery.checked
+        checked: state.gallery.checked,
+        folders: state.gallery.folders,
     }
 );
 
