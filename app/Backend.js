@@ -275,15 +275,16 @@ export default class Backend extends Component {
         let file = this.queue.shift();
         const { path, fileName, ext } = this.matchFileParts(file);
 
-        let model = folders.find(folder => (folder.path + sep) == path).model;
-        if (!model || !apiModels.some(apiModel => apiModel.value == model)) return;
+        let model = (folders.find(folder => (folder.path + sep) == path) || {}).model; //If there's no model, if means the folder has been removed from gallery while inflight
+        const filePath = path + fileName + ext;
+        removeQueue(path + fileName + ext);
+
+        if (!existsSync(filePath)) return;
+        if (!model || !apiModels.some(apiModel => apiModel.value == model)) return; 
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
-        removeQueue(path + fileName + ext);
-        
         const formData = new mFormData();
-        const filePath = path + fileName + ext;
-        if (!existsSync(filePath)) return;
+        
         
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', this.rootNavModel); //3 is rootnav, hardcoded. Unlikely to change.
@@ -318,7 +319,11 @@ export default class Backend extends Component {
                 this.removeInflight(filePath);
             }
         })
-        .catch(err => console.error(err))
+        .catch(err => { 
+            console.error(err); 
+            this.removeInflight(filePath);
+             this.inflightReqs++;
+        });
     };
 
     getOutput = (jobID, filePath) => {
@@ -339,8 +344,14 @@ export default class Backend extends Component {
             }
             let exts = {};
             const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
+            let model = (folders.find(folder => folder.path == path) || {}).model;
+           
+            if (!model) //If there's no model, if means the folder has been removed from gallery while inflight
+            {
+                return this.removeInflight(filePath);
+            }
 
-            if (this.inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
+            if (this.inflightFiles[filePath].model != model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
                 addQueue([path + sep + fileName + this.inflightFiles[filePath].ext]);
