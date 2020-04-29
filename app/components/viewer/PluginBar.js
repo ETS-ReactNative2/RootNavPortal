@@ -156,14 +156,18 @@ export default class PluginBar extends Component {
     };
 
     measureToast = () => {
+        let toastBody = "You have no folders selected for measuring";
+        if (this.props.folders.length && !this.filteredFileCount()) 
+            toastBody = "No files match the filter query";
+
         return (
-            <Toast onClose={() => this.setState({ toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
-                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '15vw' }} >
+            <Toast onClose={() => this.setState({ toast: false})} delay={6000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: 'max-content' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
                     <strong className="mr-auto">Measure Error</strong>
                 </Toast.Header>
-                <Toast.Body>You have no folders selected for measuring</Toast.Body>
+                <Toast.Body>{toastBody}</Toast.Body>
             </Toast>
         );
     };
@@ -173,6 +177,17 @@ export default class PluginBar extends Component {
         this.setState({ exportable: true });
     };
 
+    //Returns how many files are included by the filter string
+    filteredFileCount = () => {
+        return this.props.folders.reduce((acc, folder) => acc + Object.keys(this.props.files[folder]).reduce((subAcc, fileName) => subAcc += fileName.toLowerCase().includes(this.props.filterText), 0), 0);
+    }
+
+    inFilterGroup = fileName => {
+        const { filterText } = this.props;
+        if (!filterText) return true;
+        return fileName.toLowerCase().includes(filterText);
+    };
+
     //Modal's measure button clicked
     export = () => {
         if (!this.exportDest.current.value) return this.setState({ exportable: false });
@@ -180,8 +195,9 @@ export default class PluginBar extends Component {
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
-            Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
-                if (file.parsedRSML && !file.failed) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
+            Object.keys(this.props.files[folder]).forEach(fileName => { //For each file inside state for that folder
+                let file = this.props.files[folder][fileName];
+                if (file.parsedRSML && !file.failed && this.inFilterGroup(fileName)) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
                     Object.values(group).forEach(plugin => plugin.active ? //for each active plugin
                         funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines, utils)) : null)); //pass the data to each plugin
             });
@@ -251,8 +267,11 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = () => {
-        if (this.props.folders.length) return this.setState({ modal: true });
-        this.props.toggleFolderBorder();
+        const { folders, toggleFolderBorder, toggleFilterBorder } = this.props;
+        let fileCount = this.filteredFileCount();
+        if (folders.length && fileCount) return this.setState({ modal: true });
+        if (!folders.length) toggleFolderBorder();
+        if (!fileCount) toggleFilterBorder();
         this.setState({ toast: true });
     };
     

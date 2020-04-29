@@ -1,5 +1,5 @@
 import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, 
-    SAVE_RSML, UPDATE_CHECKED } from '../actions/viewerActions';
+    UPDATE_CHECKED, UPDATE_VIEWER_FILTER } from '../actions/viewerActions';
 
 const initialState =  {viewers: {} };
 
@@ -14,7 +14,8 @@ export default (state = initialState, action) => {
                     architecture: true, 
                     segMasks: false ,
                     editStack: [],
-                    checked: []
+                    checked: [],
+                    filterText: ""
                 }
             }
         }
@@ -83,6 +84,16 @@ export default (state = initialState, action) => {
                 [action.viewerID]: {
                     ...state.viewers[action.viewerID],
                     checked: action.checked
+                }
+            }
+        }
+        case UPDATE_VIEWER_FILTER: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    filterText: action.text
                 }
             }
         }

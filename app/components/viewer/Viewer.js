@@ -46,9 +46,14 @@ export default class Viewer extends Component {
     }
 
     toggleFolderBorder = () => {
-        this.setState({redFolderBorder: true})
-        setTimeout(() => this.setState({redFolderBorder: false}), 4000);
+        this.setState({ redFolderBorder: true })
+        setTimeout(() => this.setState({ redFolderBorder: false }), 4000);
     }
+
+    toggleFilterBorder = () => {
+        this.setState({ redFilterBorder: true})
+        setTimeout(() => this.setState({ redFilterBorder: false }), 4000);
+    };
 
     handleClick = e =>
     {
@@ -119,16 +124,16 @@ export default class Viewer extends Component {
 
     render() 
     {
-        const { path, redFolderBorder } = this.state;
+        const { path, redFolderBorder, redFilterBorder } = this.state;
         const matchedPath = path ? matchPathName(path) : null;
         const rsml = matchedPath ? this.props.files[matchedPath.path][matchedPath.fileName].parsedRSML : null;
         return (
             <StyledContainer>
                 <TopBar path={path} date={this.getDate(rsml)} hasSegMasks={this.hasSegMasks()} buttonHandler={this.loadNextRSML} plants={this.getNumberOfPlants(rsml)}/>
                 <StyledSidebarContainer>
-                    <FolderChecklist path={matchedPath ? matchedPath.path : null} updatePath={this.updatePath} redFolderBorder={redFolderBorder}/>
+                    <FolderChecklist path={matchedPath ? matchedPath.path : null} updatePath={this.updatePath} redFolderBorder={redFolderBorder} redFilterBorder={redFilterBorder}/>
                     <Render path={path}/>
-                    <PluginBar toggleFolderBorder={this.toggleFolderBorder}/>
+                    <PluginBar toggleFolderBorder={this.toggleFolderBorder} toggleFilterBorder={this.toggleFilterBorder}/>
                 </StyledSidebarContainer>
             </StyledContainer>
         );

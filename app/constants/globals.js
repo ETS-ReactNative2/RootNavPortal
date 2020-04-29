@@ -1,4 +1,4 @@
-import os from 'os'
+import { homedir } from 'os'
 import { sep }  from 'path'
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { remote } from 'electron';
@@ -9,8 +9,8 @@ import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TE
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
-export const APPHOME    = `${os.homedir()}${sep}.rootnav${sep}`;
-export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
+export const APPHOME    = `${homedir()}${sep}.rootnav${sep}`;
+export const PLUGINDIR  = `${process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
 export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';

@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
-import { Card, Row } from 'react-bootstrap';
+import { Card, Row, InputGroup } from 'react-bootstrap';
 import { matchPathName } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
 import { StyledCard, StyledRedI } from './StyledComponents'
 import TooltipOverlay from '../common/TooltipOverlay';
 import { StyledIcon } from '../CommonStyledComponents';
+import styled from 'styled-components';
 
 export default class FolderChecklist extends Component {
+    typingTimeout = 0;
+    text = "";
+
+    StyledInput = styled.input`
+        border-radius: 0;
+    `;
+
+    StyledInputGroupText = styled(InputGroup.Text)`
+        border-radius: 0;
+    `;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -90,12 +102,25 @@ export default class FolderChecklist extends Component {
         return false;
     };
 
+    updateFilterText = e =>
+    {
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.text = e.target.value,
+        this.typingTimeout = setTimeout(() => this.props.updateViewerFilter(this.text.toLowerCase()), 200);
+    };
+
+    clear = () => { 
+        this.props.updateFilterText(""); 
+        this.textref.current.value = ""; 
+        this.checkboxref.current.checked = false;
+    }; 
+
     render() {
         const { nodes, checked, expanded } = this.state;
-        const { updateChecked, updatePath, redFolderBorder } = this.props;
+        const { updateChecked, updatePath, redFolderBorder, redFilterBorder } = this.props;
         return (
-            <StyledCard redborder={redFolderBorder ? 1 : 0} style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
-                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
+            <StyledCard redborder={redFolderBorder ? 1 : 0} style={{ borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
+                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em',  borderBottom: "0" }}>
                     <Row>
                         <div className="col-11">
                             <b>Select folders to measure</b>
@@ -110,6 +135,22 @@ export default class FolderChecklist extends Component {
                             />
                         </div>
                     </Row> 
+                </Card.Header>
+                <Card.Header style={{ padding: 0, borderBottom: "0"  }}>
+                    <InputGroup style={redFilterBorder ? { boxShadow: '0 0 10px red' } : {}}>
+                        <this.StyledInput key={0} type="text" className="form-control" placeholder="Filter images..." onChange={this.updateFilterText} ref={this.textref}/>
+                        <button key={1} className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={this.clear}>
+                            <i className="fa fa-times"></i>
+                        </button>
+                        <InputGroup.Append>
+                            <this.StyledInputGroupText>
+                                <div className="custom-control custom-checkbox">
+                                    <input type="checkbox" className="custom-control-input" id="any" onClick={this.updateFilterText} ref={this.checkboxref}/>
+                                    <label className="custom-control-label" htmlFor="any">Any</label>
+                                </div>
+                            </this.StyledInputGroupText>
+                        </InputGroup.Append>
+                    </InputGroup>
                 </Card.Header>
                 <div style={{ padding: '0.5em' }}><CheckboxTree
                     noCascade={true}

@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import FolderChecklist from '../../viewer/FolderChecklist';
-import { updateChecked } from '../../../actions/viewerActions';
+import { updateChecked, updateViewerFilter } from '../../../actions/viewerActions';
 
 const mapStateToProps = (state, ownProps) => ({
     folders: state.gallery.folders,
@@ -8,7 +8,8 @@ const mapStateToProps = (state, ownProps) => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-    updateChecked: checked => dispatch(updateChecked(process.pid, checked))
+    updateChecked: checked => dispatch(updateChecked(process.pid, checked)),
+    updateViewerFilter: text => dispatch(updateViewerFilter(process.pid, text))
 });
 
 

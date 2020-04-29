@@ -136,7 +136,7 @@ export default class FolderView extends Component {
 		const { isActive, folder, filterText, filterAnalysed, files } = this.props; 
 
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
-		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text
+		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText))) //Only display folder if there's no filterText, or any of the files includes the filter text
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1];
