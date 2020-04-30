@@ -13,6 +13,7 @@
 - Added new 'absolute average' measurements for angles
 - Checking a node in the add button folder picker now checks and expands all children
 - Selecting a model in the add button folder picker now propagates that model to all checked children
+- Added a number that shows how many files are left after filtering on the viewer page
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
@@ -24,7 +25,7 @@
 - Added separator to icon menu
 - Re-added missing util function `splitLinesAsPlants`
 - Added tooltip to explain why images are being skipped in viewer page
-- Fixed potential crash when importing non .js plugins.
+- Fixed potential crash when importing non .js plugins
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
 - Fixed a bug causing thumbnails to not refresh after background app
 - Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple

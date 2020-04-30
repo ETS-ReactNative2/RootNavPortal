@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component, createRef } from 'react';
 import { Card, Row, InputGroup } from 'react-bootstrap';
 import { matchPathName } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
@@ -26,14 +26,12 @@ export default class FolderChecklist extends Component {
             expanded: [],
             nodes: []
         };
+        this.textref = createRef();
+        this.checkboxref = createRef();
     }
 
-    componentDidMount() {
-        this.reset();
-        this.props.updateChecked(this.state.checked);
-    }   
-
     reset = () => {
+        console.log("reset");
         const { folders, files } = this.props;
         const folderPaths = folders.map(it => it.path).sort().filter(it => Object.keys(files).includes(it) && Object.values(files[it]).some(file => file.parsedRSML));
         const tree = this.folderListToTree(folderPaths);
@@ -63,8 +61,10 @@ export default class FolderChecklist extends Component {
         if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children);
         else {
             const name = matchPathName(path).fileName;
+            const filterTextNumIcon = this.props.filterText ? this.getNumberedIcon(this.filteredFileCount(path)) : <></>;
+
             const style = path == this.props.path ? { padding: "2px 7px", background: "rgba(51, 51, 204, 0.3)", borderRadius: "5px", "&:hover": {background: "white"}} : {};
-            children.push({ value: path, children: [], label: <span style={style} title={path}>{name}</span> });
+            children.push({ value: path, children: [], label: <span style={style} title={path}>{name}{filterTextNumIcon}</span> });
         }
         return children;
     };
@@ -77,10 +77,25 @@ export default class FolderChecklist extends Component {
         return children.map(child => this.flattenChildren(child.children).concat(child.value)).flat();
     };
 
+    componentDidMount() {
+        this.reset();
+        this.props.updateChecked(this.state.checked);
+        if (this.props.filterText) 
+        Array.from(document.getElementsByClassName("rct-node-clickable"))
+            .forEach(element => element.style.width = "-webkit-fill-available");
+    }   
+
     componentDidUpdate(prevProps) {
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
-        if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path || this.checkNewRSML(prevProps.files)) this.reset();
+        if (folderPaths.length != oldFolderPaths.length 
+            || prevProps.path != this.props.path 
+            || this.checkNewRSML(prevProps.files) 
+            || prevProps.filterText != this.props.filterText
+        ) this.reset();
+        if (this.props.filterText) 
+            Array.from(document.getElementsByClassName("rct-node-clickable"))
+                .forEach(element => element.style.width = "-webkit-fill-available");
     }
 
     checkNewRSML = oldFiles => {
@@ -102,15 +117,29 @@ export default class FolderChecklist extends Component {
         return false;
     };
 
+    filteredFileCount = path => {
+        return Object.keys(this.props.files[path]).reduce((acc, fileName) => acc += fileName.toLowerCase().includes(this.props.filterText), 0) 
+    };
+
     updateFilterText = e =>
     {
         if (this.typingTimeout) clearTimeout(this.typingTimeout);
         this.text = e.target.value,
-        this.typingTimeout = setTimeout(() => this.props.updateViewerFilter(this.text.toLowerCase()), 200);
+        this.typingTimeout = setTimeout(() => {
+            this.props.updateViewerFilter(this.text.toLowerCase());
+        }, 200);
     };
 
+    getNumberedIcon = num => (<TooltipOverlay component={ props => <div style={{fontSize: "0.65em", float: "right"}}className="fa-stack fa-sm" {...props}>
+            <span className={`far fa-circle fa-stack-2x`} />
+            <span style={{fontSize: "1.3em"}} className="fa-stack-1x">{num}</span>
+        </div>} 
+        text={`There are ${num} files in this folder that will be measured`}
+        placement={"top"}
+    />)
+
     clear = () => { 
-        this.props.updateFilterText(""); 
+        this.props.updateViewerFilter(""); 
         this.textref.current.value = ""; 
         this.checkboxref.current.checked = false;
     }; 
@@ -145,7 +174,7 @@ export default class FolderChecklist extends Component {
                         <InputGroup.Append>
                             <this.StyledInputGroupText>
                                 <div className="custom-control custom-checkbox">
-                                    <input type="checkbox" className="custom-control-input" id="any" onClick={this.updateFilterText} ref={this.checkboxref}/>
+                                    <input type="checkbox" className="custom-control-input" id="any" onClick={() => {}} ref={this.checkboxref}/>
                                     <label className="custom-control-label" htmlFor="any">Any</label>
                                 </div>
                             </this.StyledInputGroupText>
