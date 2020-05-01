@@ -3,7 +3,7 @@ import React, { Component, useState, useRef } from 'react';
 import { sep } from 'path';
 import { ipcRenderer, remote } from 'electron';
 import { StyledImageCard } from './StyledComponents'
-import { IMAGE_EXTS, IMAGE_EXTS_REGEX, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
+import { IMAGE_EXTS_REGEX, THUMB_PERCENTAGE, COLOURS } from '../../constants/globals'
 import { Spinner, Overlay, Tooltip } from 'react-bootstrap';
 import styled from 'styled-components';
 import CollapsableLabel from '../containers/gallery/CollapsableLabelContainer';
@@ -28,7 +28,7 @@ export default class Thumbnail extends Component {
         //On resize, force a refresh so our canvas can update its image to fit the containing div.
         window.addEventListener('resize', e => {
             clearTimeout(this.resizeTimer);
-            this.resizeTimer = setTimeout(() => this.forceUpdate(), 75)
+            this.resizeTimer = setTimeout(() => this.forceUpdate(), 0)
         });
     }
 
@@ -147,6 +147,7 @@ export default class Thumbnail extends Component {
         }
         this.fabricCanvas.initialize(document.getElementById(this.canvasID), { width: this.container.current.clientWidth, height: this.container.current.clientHeight });
         this.fabricCanvas.setDimensions({ width: this.container.current.clientWidth, height: this.container.current.clientHeight }, { backstoreOnly: true });
+        
         this.fabricCanvas.defaultCursor = this.hasRSML() ? 'pointer' : 'not-allowed';
         this.fabricCanvas.hoverCursor = this.fabricCanvas.defaultCursor;
     };
@@ -294,15 +295,17 @@ export default class Thumbnail extends Component {
 
         const buffer = this.getBuffer(thumb);
         const imageSize = buffer && sizeOf(buffer);
-        const baseVH = Math.round(window.innerHeight / 100);
         const heightRatio = imageSize ? imageSize.height / imageSize.width : 1.3;
 
         const noImage = !Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
 
+        let { clientWidth } = this.props.parentRef?.current || {};
+        clientWidth *= 0.95; // Shrink the width by 95% of it's parent so the thumbnails aren't just touching
+
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard style={{width: `${baseVH * 25}px`, maxWidth: `250px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
-                <div style={{width: `${baseVH * 25}px`, maxWidth: `250px`, height: `${heightRatio * (baseVH * 25)}px`, position: 'relative'}} ref={this.container}>
+            <StyledImageCard style={{width: `${clientWidth}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
+                <div style={{width: `${clientWidth}px`, height: `${heightRatio * (clientWidth)}px`, position: 'relative'}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
                     {noImage ? <this.noImageIcon/> : ""}

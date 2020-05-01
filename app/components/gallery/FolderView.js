@@ -1,5 +1,5 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
+import React, { Component, useState, useRef, createRef } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
@@ -57,7 +57,7 @@ export default class FolderView extends Component {
 
 	spinner = () => {
         const [show, setShow] = useState(false);
-        const target = useRef(null);
+		const target = useRef(null);
 
         let spinner, tooltipText;
         if (this.state.thumbsGenerating)
@@ -145,7 +145,8 @@ export default class FolderView extends Component {
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
 		const { isActive, folder, filterText, filterAnalysed, files } = this.props; 
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
-				
+		const gridCell = createRef(null);
+
 		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText))) //Only display folder if there's no filterText, or any of the files includes the filter text
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
@@ -170,8 +171,8 @@ export default class FolderView extends Component {
 									<StyledRow> {filesList
 										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
 										.map((file, index) => (
-											<this.StyledGridXXL key={index} className={`col-md-4 col-xl-3`} style={{paddingBottom: '1em', textAlign: '-webkit-center'}}>
-												<Thumbnail folder={folder} fileName={file}/>
+											<this.StyledGridXXL key={index} className={`col-md-3 col-xl-3`} style={{paddingBottom: '1em', textAlign: '-webkit-center'}} ref={gridCell}>
+												<Thumbnail folder={folder} fileName={file} parentRef={gridCell}/>
 											</this.StyledGridXXL>
 										))} 
 									</StyledRow>
