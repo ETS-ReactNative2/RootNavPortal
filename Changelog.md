@@ -14,6 +14,7 @@
 - Checking a node in the add button folder picker now checks and expands all children
 - Selecting a model in the add button folder picker now propagates that model to all checked children
 - Added a number that shows how many files are left after filtering on the viewer page
+- Thumbnail sizing is now based on the size of the bootstrap grid
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close
