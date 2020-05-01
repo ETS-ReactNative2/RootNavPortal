@@ -24,6 +24,13 @@ export default class FolderView extends Component {
 		margin-left: auto;
 		margin-right: 0.7em;
 	}`;
+
+	StyledGridXXL = styled.div` && { 
+		@media (min-width: 1400px) {
+			-ms-flex: 0 0 16.666667%;
+			flex: 0 0 16.666667%;
+			max-width: 16.666667%;
+	}}`;
 	
 	shouldComponentUpdate(nextProps, nextState) 
 	{
@@ -137,8 +144,8 @@ export default class FolderView extends Component {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
 		const { isActive, folder, filterText, filterAnalysed, files } = this.props; 
-
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
+				
 		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText))) //Only display folder if there's no filterText, or any of the files includes the filter text
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
@@ -163,9 +170,9 @@ export default class FolderView extends Component {
 									<StyledRow> {filesList
 										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
 										.map((file, index) => (
-											<div key={index} className="col-lg-3 col-xl-2" style={{paddingBottom: '1em', textAlign: '-webkit-center'}}>
+											<this.StyledGridXXL key={index} className={`col-md-4 col-xl-3`} style={{paddingBottom: '1em', textAlign: '-webkit-center'}}>
 												<Thumbnail folder={folder} fileName={file}/>
-											</div>
+											</this.StyledGridXXL>
 										))} 
 									</StyledRow>
 								</StyledFolderViewDiv> 

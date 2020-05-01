@@ -301,8 +301,8 @@ export default class Thumbnail extends Component {
 
         //The minHeight on the div is bad and should somehow change to something regarding the size of the image maybe
         return (
-            <StyledImageCard style={{width: `${baseVH * 25}px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
-                <div style={{width: `${baseVH * 25}px`, height: `${heightRatio * (baseVH * 25)}px`, position: 'relative'}} ref={this.container}>
+            <StyledImageCard style={{width: `${baseVH * 25}px`, maxWidth: `250px`, height: `fit-content`}} clickable={this.hasRSML() ? 1 : 0} className="bg-light" onClick={e => {e.stopPropagation(); this.openViewer()}} ref={this.element} onContextMenu={this.handleRightClick}>
+                <div style={{width: `${baseVH * 25}px`, maxWidth: `250px`, height: `${heightRatio * (baseVH * 25)}px`, position: 'relative'}} ref={this.container}>
                     <this.FabricCanvas />
                     <this.spinner/>
                     {noImage ? <this.noImageIcon/> : ""}
