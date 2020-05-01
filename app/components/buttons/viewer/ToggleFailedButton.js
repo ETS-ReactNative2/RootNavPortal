@@ -14,7 +14,7 @@ export default class ToggleFailedButton extends Component {
                     className={`btn btn-default fa button ` + (this.props.isSetFailed ? "fa-check" : "fa-ban")} 
                     {...props}
                 /></span>} 
-                text={this.props.isSetFailed ? "Unset as Failed" : "Set as Failed"}
+                text={this.props.isSetFailed ? "Unmark as Failed" : "Mark as Failed"}
             /> 
         )
     }

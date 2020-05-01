@@ -90,10 +90,12 @@ export default class FolderView extends Component {
 
 	componentDidMount()
 	{
-		const { folder, files, addFiles, thumbs } = this.props; 
+		const { folder, files, addFiles, folders } = this.props; 
 		if (!files && !this.state.read) 
 		{
+			let folderObject = folders.find(stateFolder => folder == stateFolder.path);
 			let structuredFiles = {};
+
 			readdir(folder, (err, folderFiles) => {
 
 				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX))
@@ -118,6 +120,7 @@ export default class FolderView extends Component {
 					//"Parse on demand upon exporting" - we need the polylines available on gallery for the thumbnails to render RSML when that gets written
 					let filesToParse = [];
 					fileKeys.forEach(fileName => {
+						if (folderObject.failed.includes(fileName)) structuredFiles[fileName].failed = true;
 						if (structuredFiles[fileName].rsml) filesToParse.push(folder + sep + fileName);
 					});
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state

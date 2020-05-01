@@ -52,8 +52,8 @@ export const getProcessTypeFromURL = url => {
 
 export const writeConfig = config => {
     if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-        mkdirSync(APPHOME, {mode: '0777', recursive: true});
-    writeFileSync(APPHOME + CONFIG , config);
+        mkdirSync(APPHOME, { mode: '0777', recursive: true });
+    writeFileSync(APPHOME + CONFIG, config);
 };
 
 export const xmlOptions = {

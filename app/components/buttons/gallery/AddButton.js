@@ -33,8 +33,13 @@ export default class AddButton extends Component {
 
     importFolders = () => {
         const { imports, addFolders, closeModal, folders, apiAddress, apiKey } = this.props;
-        const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}))
-            .filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
+        const config = imports.map(folder => ({ 
+            path: folder.path, 
+            model: folder.model, 
+            active: false, 
+            failed: [] 
+        })).filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
+        
         addFolders(config);
         closeModal();
         writeConfig(JSON.stringify({ apiAddress, apiKey, folders: folders.concat(config) }, null, 4));

@@ -34,7 +34,7 @@ export default class Thumbnail extends Component {
 
     resetMenu = props => {
         this.menu = new Menu();
-        this.menu.append(new MenuItem({ label: props.file.failed ? 'Mark as Failed' : 'Unmark as Failed', click() { props.setFailedState(props.folder, props.fileName) } }));
+        this.menu.append(new MenuItem({ label: props.file.failed ? 'Unmark as Failed' : 'Mark as Failed', click() { props.setFailedState(props.folder, props.fileName) } }));
     };
     
     StyledSpinner = styled(Spinner)` && {

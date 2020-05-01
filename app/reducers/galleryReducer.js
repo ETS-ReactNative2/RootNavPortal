@@ -185,7 +185,6 @@ export default (state = initialState, action) => {
                     ...state.files[action.folder],
                     [action.fileName]: {
                         ...state.files[action.folder][action.fileName],
-                        result: state.files[action.folder][action.fileName],
                         failed: action.failedState ?? !state.files[action.folder][action.fileName].failed
                     }
                 }

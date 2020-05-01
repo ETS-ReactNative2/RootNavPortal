@@ -10,8 +10,17 @@ export default class Gallery extends Component {
     constructor(props)
     {
         super(props);
+        
         remote.getCurrentWindow().on('close', () => {
-            writeConfig(JSON.stringify({ apiAddress: this.props.apiAddress, apiKey: this.props.apiKey, folders: this.props.folders }, null, 4))
+            writeConfig(JSON.stringify({ 
+                apiAddress: this.props.apiAddress, 
+                apiKey: this.props.apiKey, 
+                folders: this.props.folders.map(folder => ({
+                    ...folder,
+                    failed: this.props.files.hasOwnProperty(folder.path) ? Object.keys(this.props.files[folder.path]).map(fileName => this.props.files[folder.path][fileName].failed ? fileName : undefined).filter(name => name) : folder.failed
+                }))
+            }, null, 4));
+            return true;
         });
     }
 
