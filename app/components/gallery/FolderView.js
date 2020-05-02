@@ -31,6 +31,12 @@ export default class FolderView extends Component {
 			flex: 0 0 16.666667%;
 			max-width: 16.666667%;
 	}}`;
+
+	StyledCollapse = styled(Collapse)` && {
+		${Collapse}:not(.show):not(.collapsing) {
+			display: block;
+		}
+	}`;
 	
 	shouldComponentUpdate(nextProps, nextState) 
 	{
@@ -165,7 +171,7 @@ export default class FolderView extends Component {
 							</div> 
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
-						<Collapse in={!!(isActive && files && folder)}>
+						<this.StyledCollapse unmountOnExit={true} in={!!(isActive && files && folder)}>
 							<div>
 								<StyledFolderViewDiv>
 									<StyledRow> {filesList
@@ -178,7 +184,7 @@ export default class FolderView extends Component {
 									</StyledRow>
 								</StyledFolderViewDiv> 
 							</div>
-						</Collapse>
+						</this.StyledCollapse>
 				</StyledFolderCard>
 			);
 		}
