@@ -12,7 +12,7 @@ import { remote } from 'electron';
 import styled from 'styled-components';
 
 export default class TopBar extends Component {
-    hamburgerMaxSize = 1250;
+    hamburgerMaxSize = 1200;
 
     constructor(props) {
         
