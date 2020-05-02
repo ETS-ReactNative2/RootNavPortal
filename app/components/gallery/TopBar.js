@@ -12,7 +12,7 @@ import { remote } from 'electron';
 import styled from 'styled-components';
 
 export default class TopBar extends Component {
-    hamburgerMaxSize = 1250;
+    hamburgerMaxSize = 1200;
 
     constructor(props) {
         
@@ -76,11 +76,11 @@ export default class TopBar extends Component {
             </this.noCaretToggle>
             <Dropdown.Menu popperConfig={{offset: "10, 10"}}>
                 <RefreshButton isDropdown/>
-                <this.labelDiv className="custom-control custom-checkbox" style={{margin: '0 24px 0 24px', padding: '4px 0 4px 24px'}}>
+                <this.labelDiv className="custom-control custom-checkbox" style={{margin: '0 24px 0 24px', padding: '4px 0 4px 24px', width: 'max-content'}}>
                     <input type="checkbox" className="custom-control-input" id="labels" defaultChecked={this.props.labels} onClick={this.props.toggleLabels}/>
                     <label className="custom-control-label" htmlFor="labels">Display Names</label>
                 </this.labelDiv>
-                <this.labelDiv className="custom-control custom-checkbox" style={{margin: '0 24px 0 24px', padding: '4px 0 4px 24px'}}>
+                <this.labelDiv className="custom-control custom-checkbox" style={{margin: '0 24px 0 24px', padding: '4px 0 4px 24px' , width: 'max-content'}}>
                     <input type="checkbox" className="custom-control-input" id="drawRsml" defaultChecked={this.props.architecture} onClick={this.props.toggleArch}/>
                     <label className="custom-control-label" htmlFor="drawRsml">Draw Architecture</label>
                 </this.labelDiv>
@@ -88,7 +88,7 @@ export default class TopBar extends Component {
         </Dropdown>    
 
     hamburgerTop = () =>
-        <StyledTopBarDiv hamburger className="d-inline-flex" data-tid="container">
+        <StyledTopBarDiv className="d-inline-flex" data-tid="container">
             <this.hamburger/>
             <AddButton />
             <FilterBar/>
