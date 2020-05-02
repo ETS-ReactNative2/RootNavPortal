@@ -66,6 +66,7 @@ export default class TopBar extends Component {
                     </StyledRow>
                 </StyledTopBarDiv>
                 <StyledTopBarHR/>
+                {/*
                 <StyledTopBarDiv className="d-inline-flex container" data-tid="container" style={{paddingTop: '0', minWidth: '100%'}}>
                     <Row style={{width: "100%"}}>
                         <div className="col-4" style={{display: "-webkit-box"}}>
@@ -91,6 +92,31 @@ export default class TopBar extends Component {
                             <SaveRSMLButton path={path} />
                         </div>
                     </Row>
+                </StyledTopBarDiv>
+                */}
+                <StyledTopBarDiv className="d-flex flex-row container justify-content-center" data-tid="container" style={{paddingTop: '0', width: '100%', minWidth: '100%'}}>
+                <div className="p-2 mr-auto d-flex">
+                    <div className="custom-control custom-checkbox" style={{margin: 'auto 0 auto 1em', width: "auto"}}>
+                        <input type="checkbox" className="custom-control-input" disabled={!folderFiles} id="architecture" defaultChecked={true} onClick={this.props.toggleArch} />
+                        <label className="custom-control-label" htmlFor="architecture">Architecture</label>
+                    </div>
+                    <div className="custom-control custom-checkbox" style={{margin: 'auto 1em auto 1em'}}>
+                        <input type="checkbox" className="custom-control-input" disabled={!hasSegMasks} id="segMasks" onClick={this.props.toggleSegMasks}/>
+                        <label className="custom-control-label" htmlFor="segMasks">Segmentation Masks</label>
+                    </div>
+                </div>
+                <div className="p-2 align-self-center" style={{position: "fixed"}}>
+                    <LeftButton click={buttonHandler} disabled={!folderFiles}/>
+                    <RightButton click={buttonHandler} disabled={!folderFiles}/>
+                </div>
+                <div className="p-2" style={{marginRight: "0.5em"}}>
+                    <ToggleFailedButton isSetFailed={isSetFailed} toggleFailed={() => setFailedState(splitPath.path, splitPath.fileName)} click={buttonHandler} disabled={!folderFiles}/>
+                </div>
+                <div className="p-2">
+                    <ResetChangesButton />
+                    <UndoChangesButton />
+                    <SaveRSMLButton path={path} />
+                </div>
                 </StyledTopBarDiv>
             </div>
         );
