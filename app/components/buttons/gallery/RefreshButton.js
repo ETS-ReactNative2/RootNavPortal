@@ -74,7 +74,7 @@ export default class RefreshButton extends Component {
 
     render() {
         return this.props.isDropdown 
-        ? <Dropdown.Item style={{opacity: 1}} onClick={() => this.onClick()}>Refresh</Dropdown.Item>
+        ? <Dropdown.Item style={{opacity: 1, paddingLeft: "36px"}} onClick={() => this.onClick()}>Reload Folders</Dropdown.Item>
         : <TooltipOverlay  component={ props => <StyledButton
                 variant="primary" 
                 className={`btn btn-default fas fa-sync button`} 
