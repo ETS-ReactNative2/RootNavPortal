@@ -4,18 +4,19 @@
 - Added 'Export Failed' to folder settings. Any images marked as failed can be exported to a selected directory and removed from RootNav Portal
 - Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
 - Added button and styling to Viewer to toggle failed, and colouring the name red if it is failed
-- RSML now correctly renders in thumbnails if there is no accompanying source image
-- Fixed a bug causing filenames with `.`s in them to not be read properly in the backend
-- Increased folder depth to 8 in case it caused a problem
-- Any failed API responses mark that image as failed
-- Images marked as failed either by user or by API error will not be re-queued for the API
+- Added a shrinkable top bar with a hamburger
+- Added a number that shows how many files are left after filtering on the viewer page
 - RSML without an image can now be correctly displayed on the viewer
 - Added new 'absolute average' measurements for angles
+- RSML now correctly renders in thumbnails if there is no accompanying source image
+- Folders will now be matched by the filter bar, and display all images if the folder path includes the query string
+- Fixed a bug causing filenames with `.`s in them to not be read properly in the backend
+- Any failed API responses mark that image as failed
+- Images marked as failed either by user or by API error will not be re-queued for the API
 - Checking a node in the add button folder picker now checks and expands all children
 - Selecting a model in the add button folder picker now propagates that model to all checked children
-- Added a number that shows how many files are left after filtering on the viewer page
-- Thumbnail sizing is now based on the size of the bootstrap grid
-- Added a shrinkable top bar with a hamburger
+- Thumbnail sizing is now based on the size of the Bootstrap grid
+- Increased folder depth to 8 in case it caused a problem
 
 # 0.6.0:
 - Added auto-updating. App will download, notify, and update on close

@@ -231,20 +231,38 @@ export default class SettingsButton extends Component {
                             placement={"top"}
                         /> 
                     </Col>
-                    <Col>
+                    <Col style={{display: "flex"}}>
                         <Button style={{'float': 'right', width: 'max-content'}}variant="info" onClick={e => { 
                             e.stopPropagation(); 
                             this.setState({ exportModal: true, modal: false, actionFlag: this.ACTION_EXPORT });
                         }}>Export Failed</Button>
+
+                        <TooltipOverlay  component={ props => <StyledIcon
+                                className={"fas fa-info-circle"}
+                                style={{ marginTop: "auto", marginBottom: "auto" }}
+                                {...props}
+                            />} 
+                            text={"Exports images marked as failed to another folder for manual analysis."}
+                            placement={"top"}
+                        /> 
                     </Col>
-                    <Col>
+                    <Col style={{display: "flex"}}>
                         <Button style={{'float': 'right', width: 'max-content'}}variant="info" onClick={e => { 
                             e.stopPropagation(); 
                             this.setState({ exportModal: true, modal: false });
                         }}>Reimport Files</Button>
+                        
+                        <TooltipOverlay  component={ props => <StyledIcon
+                                className={"fas fa-info-circle"}
+                                style={{ marginTop: "auto", marginBottom: "auto" }}
+                                {...props}
+                            />} 
+                            text={"Imports a folder of images WITH RSML to this folder. Ideal for importing corrected images."}
+                            placement={"top"}
+                        /> 
                     </Col>
                     <Col> 
-                        <Button style={{'float': 'right'}}variant="danger" onClick={e => { 
+                        <Button style={{'float': 'right'}} variant="danger" onClick={e => { 
                             e.stopPropagation(); 
                             this.setState({ actionFlag: this.ACTION_REANALYSE })
                             this.refreshModal("Reanalysing " + this.DELETE_MESSAGE, "Reanalyse"); 

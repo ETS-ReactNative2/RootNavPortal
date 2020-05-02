@@ -153,7 +153,7 @@ export default class FolderView extends Component {
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
 		const gridCell = createRef(null);
 
-		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText))) //Only display folder if there's no filterText, or any of the files includes the filter text
+		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText) || folder.includes(filterText))) //Only display folder if there's no filterText, if any of the files includes the filter text, or if the folder is matched
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1];
@@ -174,9 +174,9 @@ export default class FolderView extends Component {
 						<this.StyledCollapse unmountOnExit={true} in={!!(isActive && files && folder)}>
 							<div>
 								<StyledFolderViewDiv>
-									<StyledRow> {filesList
-										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
-										.map((file, index) => (
+									<StyledRow> {filesList //If the folder is matched by the filter query, display all files
+										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase()) || folder.includes(filterText)) && (!filterAnalysed || !!files[file].rsml))) 
+										.map((file, index) => ( // Remove any files that do not meet the criteria set above.
 											<this.StyledGridXXL key={index} className={`col-md-3 col-xl-3`} style={{paddingBottom: '1em', textAlign: '-webkit-center'}} ref={gridCell}>
 												<Thumbnail folder={folder} fileName={file} parentRef={gridCell}/>
 											</this.StyledGridXXL>
