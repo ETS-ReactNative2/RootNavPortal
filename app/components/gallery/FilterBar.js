@@ -15,12 +15,6 @@ export default class FilterBar extends Component{
         this.checkboxref = React.createRef();
     }
 
-    componentDidMount() 
-    {
-        this.clear();
-    }
-
-
     updateFilterText = e =>
     {
         if (this.typingTimeout) clearTimeout(this.typingTimeout);
@@ -54,7 +48,7 @@ export default class FilterBar extends Component{
                     <InputGroup.Append>
                         <InputGroup.Text>
                         <div className="custom-control custom-checkbox">
-                            <input type="checkbox" className="custom-control-input" id="analysed" onClick={this.updateFilterAnalysed} ref={this.checkboxref}/>
+                            <input type="checkbox" className="custom-control-input" id="analysed" defaultChecked={this.props.filterAnalysed} onClick={this.updateFilterAnalysed} ref={this.checkboxref}/>
                             <label className="custom-control-label" htmlFor="analysed">Analysed</label>
                         </div>
                         </InputGroup.Text>

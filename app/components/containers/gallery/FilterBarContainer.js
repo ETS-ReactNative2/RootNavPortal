@@ -2,8 +2,10 @@ import { connect } from 'react-redux';
 import FilterBar from '../../gallery/FilterBar';
 import { updateFilterText, updateFilterAnalysed } from '../../../actions/galleryActions';
 
-const mapStateToProps = (state, ownProps) => (
-    { }
+const mapStateToProps = state => (
+    { 
+        filterAnalysed: state.gallery.filterAnalysed
+    }
 );
 
 const mapDispatchToProps = dispatch => (

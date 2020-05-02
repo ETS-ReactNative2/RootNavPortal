@@ -7,6 +7,7 @@ import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { ALL_EXTS_REGEX, API_PARSE, sendThumbs, _require, IMAGE_EXTS, IMAGES_REMOVED_FROM_GALLERY  } from '../../../constants/globals'
 import TooltipOverlay from '../../common/TooltipOverlay';
+import { Dropdown } from 'react-bootstrap';
 
 export default class RefreshButton extends Component {
 
@@ -72,7 +73,9 @@ export default class RefreshButton extends Component {
     }
 
     render() {
-        return <TooltipOverlay  component={ props => <StyledButton
+        return this.props.isDropdown 
+        ? <Dropdown.Item style={{opacity: 1}} onClick={() => this.onClick()}>Refresh</Dropdown.Item>
+        : <TooltipOverlay  component={ props => <StyledButton
                 variant="primary" 
                 className={`btn btn-default fas fa-sync button`} 
                 onClick={() => this.onClick()} 

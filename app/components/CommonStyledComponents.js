@@ -10,7 +10,7 @@ export const StyledTopBarHR = styled.hr` && {
 export const StyledTopBarDiv = styled.div` && {
     padding-top: 1rem;
     width: 100%;
-    padding-left: 70px;
+    padding-left: ${props => props.hamburger ? '30px' : '70px'};
     padding-right: 70px;
   }`;
 
