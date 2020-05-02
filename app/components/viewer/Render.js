@@ -186,10 +186,10 @@ export default class Render extends Component {
     handleDelete = e =>
     {
         if (!(this.deleteKeys.includes(e.key))) return;
-        const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
         const { selectedID } = this.fabricCache;
         if (selectedID)
         {
+            const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
             this.fabricCanvas.remove(this.getObjectByName(selectedID));
 
             if (!selectedID.includes('.'))

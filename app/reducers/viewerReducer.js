@@ -1,7 +1,7 @@
 import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, 
-    UPDATE_CHECKED, UPDATE_VIEWER_FILTER } from '../actions/viewerActions';
+    UPDATE_CHECKED, UPDATE_VIEWER_FILTER, TOGGLE_FILTER_MODE } from '../actions/viewerActions';
 
-const initialState =  {viewers: {} };
+const initialState =  { viewers: {} };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -15,7 +15,8 @@ export default (state = initialState, action) => {
                     segMasks: false ,
                     editStack: [],
                     checked: [],
-                    filterText: ""
+                    filterText: "",
+                    filterMode: false
                 }
             }
         }
@@ -96,6 +97,16 @@ export default (state = initialState, action) => {
                     filterText: action.text
                 }
             }
+        }
+        case TOGGLE_FILTER_MODE: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    filterMode: !state.viewers[action.viewerID].filterMode
+                }
+            }       
         }
         default: return state;
     }

@@ -9,7 +9,8 @@ const mapStateToProps = (state, ownProps) => {
         folders: viewer ? viewer.checked : [],
         apiInflight: state.backend.inFlight,
         apiQueue: state.backend.queue,
-        filterText: viewer ? viewer.filterText : ""
+        filterText: viewer ? viewer.filterText : "",
+        filterMode: viewer ? viewer.filterMode : false
     }
 };
 

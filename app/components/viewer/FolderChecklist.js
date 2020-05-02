@@ -31,7 +31,6 @@ export default class FolderChecklist extends Component {
     }
 
     reset = () => {
-        console.log("reset");
         const { folders, files } = this.props;
         const folderPaths = folders.map(it => it.path).sort().filter(it => Object.keys(files).includes(it) && Object.values(files[it]).some(file => file.parsedRSML));
         const tree = this.folderListToTree(folderPaths);
@@ -92,7 +91,9 @@ export default class FolderChecklist extends Component {
             || prevProps.path != this.props.path 
             || this.checkNewRSML(prevProps.files) 
             || prevProps.filterText != this.props.filterText
+            || prevProps.filterMode != this.props.filterMode
         ) this.reset();
+        
         if (this.props.filterText) 
             Array.from(document.getElementsByClassName("rct-node-clickable"))
                 .forEach(element => element.style.width = "-webkit-fill-available");
@@ -118,7 +119,9 @@ export default class FolderChecklist extends Component {
     };
 
     filteredFileCount = path => {
-        return Object.keys(this.props.files[path]).reduce((acc, fileName) => acc += fileName.toLowerCase().includes(this.props.filterText), 0) 
+        const { filterMode, filterText, files } = this.props;
+        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
+        return Object.keys(files[path]).reduce((acc, fileName) => acc += !!fileName.toLowerCase().match(regex) && !files[path][fileName].failed, 0) 
     };
 
     updateFilterText = e =>
@@ -146,7 +149,7 @@ export default class FolderChecklist extends Component {
 
     render() {
         const { nodes, checked, expanded } = this.state;
-        const { updateChecked, updatePath, redFolderBorder, redFilterBorder } = this.props;
+        const { updateChecked, updatePath, redFolderBorder, redFilterBorder, toggleFilterMode } = this.props;
         return (
             <StyledCard redborder={redFolderBorder ? 1 : 0} style={{ borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
                 <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em',  borderBottom: "0" }}>
@@ -173,10 +176,14 @@ export default class FolderChecklist extends Component {
                         </button>
                         <InputGroup.Append>
                             <this.StyledInputGroupText>
-                                <div className="custom-control custom-checkbox">
-                                    <input type="checkbox" className="custom-control-input" id="any" onClick={() => {}} ref={this.checkboxref}/>
+                            <TooltipOverlay component={ props => (<div className="custom-control custom-checkbox" {...props}>
+                                    <input type="checkbox" className="custom-control-input" id="any" onClick={() => toggleFilterMode()} ref={this.checkboxref}/>
                                     <label className="custom-control-label" htmlFor="any">Any</label>
-                                </div>
+                                </div>)} 
+                                text={`If checked, matches any individual word in the search query`}
+                                placement={"top"}
+                            />
+                                
                             </this.StyledInputGroupText>
                         </InputGroup.Append>
                     </InputGroup>

@@ -179,13 +179,17 @@ export default class PluginBar extends Component {
 
     //Returns how many files are included by the filter string
     filteredFileCount = () => {
-        return this.props.folders.reduce((acc, folder) => acc + Object.keys(this.props.files[folder]).reduce((subAcc, fileName) => subAcc += fileName.toLowerCase().includes(this.props.filterText), 0), 0);
+        const { filterMode, filterText, folders, files } = this.props;
+        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
+        return folders.reduce((acc, folder) => acc + Object.keys(files[folder]).reduce((subAcc, fileName) => subAcc += !!fileName.toLowerCase().match(regex), 0), 0);
     }
 
     inFilterGroup = fileName => {
-        const { filterText } = this.props;
+        const { filterText, filterMode } = this.props;
         if (!filterText) return true;
-        return fileName.toLowerCase().includes(filterText);
+
+        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
+        return !!fileName.toLowerCase().match(regex);
     };
 
     //Modal's measure button clicked
