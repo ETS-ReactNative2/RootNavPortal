@@ -10,7 +10,7 @@ import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
 import { StyledRow } from './StyledComponents';
 import { matchPathName } from '../../constants/globals';
 import TooltipOverlay from '../common/TooltipOverlay';
-import { Row } from 'react-bootstrap';
+import TextPopup from '../common/TextPopup';
 
 export default class TopBar extends Component {
 
@@ -29,28 +29,24 @@ export default class TopBar extends Component {
         else if (folderFiles) 
             message = <><b>Open Image: </b>{`${Object.keys(folderFiles).indexOf(tag) + 1} of ${Object.keys(folderFiles).length}`}</>
 
-        let renderTag = tag;
-        if (file?.failed) 
-            renderTag = (
-            <>
-                <span style={{color: "red"}}>{tag}</span>
-                <TooltipOverlay component={ props => <StyledIcon
-                        className={"fas fa-info-circle"}
-                        style={{color: "red"}}
-                        {...props}
-                    />} 
-                    text={"Marked as Failed"} // Temporary solution
-                    placement={"bottom"}
-                /> 
-            </>);
+        let renderTag = file?.failed ? <span style={{color: "red"}}>{tag}</span> : tag;
+        let failedIcon = file?.failed ? (
+            <TooltipOverlay component={ props => <StyledIcon
+                    className={"fas fa-info-circle"}
+                    style={{color: "red"}}
+                    {...props}
+                />} 
+                text={"Marked as Failed"}
+                placement={"bottom"}
+            />) : "";
 
         return (
             <div>
                 <StyledTopBarDiv data-tid="container">
                     <StyledRow>{ folderFiles ? 
                         <>
-                            <div className="col-sm-4"><b>Tag:</b> {renderTag}</div>
-                            <div className="col-sm-2">{message}
+                            <div className="col-sm-3" style={{overflowX: "hidden", textOverflow: "ellipsis"}}><b>Tag: </b><TextPopup displayText={renderTag} popupText={tag} placement="bottom"/>{failedIcon}</div>
+                            <div className="col-sm-3">{message}
                                 <TooltipOverlay component={ props => <StyledIcon
                                         className={"fas fa-info-circle"}
                                         {...props}
