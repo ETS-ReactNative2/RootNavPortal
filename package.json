@@ -305,7 +305,7 @@
     "history": "^4.7.2",
     "image-size": "^0.8.3",
     "image-thumbnail": "https://github.com/chagrilled/image-thumbnail",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "lodash.clonedeep": "^4.5.0",
     "react": "^16.13.0",
     "react-addons-shallow-compare": "^15.6.2",
