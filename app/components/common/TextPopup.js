@@ -7,10 +7,10 @@ export default props => {
 	const target = useRef(null);
 	return (
 		<>
-			{/* all:inherit to get any styling from the outside! */}
-			<div style={{all: "inherit"}} ref={target} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
+			{/* inherit to get any styling from the outside! */}
+			<span style={{textOverflow: "inherit", whiteSpace: "inherit", overflowX: "inherit", height: "inherit"}} ref={target} onMouseEnter={() => setShow(true)} onMouseLeave={() => setShow(false)}>
 				{displayText}
-			</div>
+			</span>
 			<Overlay target={target.current} containerPadding={-100} show={show} placement={placement}>
 				{({ show, ...props }) => (
 					<Tooltip id="overlay-example" {...props}>
