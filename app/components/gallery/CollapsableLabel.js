@@ -10,7 +10,9 @@ export default class CollapsableLabel extends Component {
 	StyledTextOverflowContainer = styled.div` && {
         text-overflow: ellipsis;
         white-space: nowrap;
-        overflow: hidden;
+        overflow-x: hidden;
+        height: 1em;
+        margin: 0.5em;
 	}`;
 
     render() {

@@ -71,7 +71,7 @@ export const StyledCardHeader = styled(Card.Header)` && {
 
 
 export const StyledCardBody = styled(Card.Footer)` && {
-    padding: 0.5em;
+    padding: 0em;
     height: 100%;
 }`
 
