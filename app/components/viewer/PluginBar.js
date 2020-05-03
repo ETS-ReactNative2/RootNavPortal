@@ -161,7 +161,7 @@ export default class PluginBar extends Component {
             toastBody = "No files match the filter query";
 
         return (
-            <Toast onClose={() => this.setState({ toast: false})} delay={6000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+            <Toast onClose={() => this.setState({ toast: false })} delay={6000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
                 style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: 'max-content' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
