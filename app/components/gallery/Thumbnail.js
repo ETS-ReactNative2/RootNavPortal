@@ -103,6 +103,7 @@ export default class Thumbnail extends Component {
         {
             return false; //Prevent thumbs reloading when queue changes
         }
+        if (this.props.file.seg_mask != nextProps.file.seg_mask) return false;
         return true; //so the label collapse animation is still smooth as the canvas won't redraw unnecessarily
     }
 
