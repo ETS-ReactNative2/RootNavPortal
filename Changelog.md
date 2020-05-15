@@ -1,4 +1,4 @@
-# Next Release:
+# 0.7.0:
 - Added a filter bar to the viewer page that filters the measure group to files that include the filter string
 - Added "Reimport Files" to folder settings. Any images and RSML in the chosen folder will be reimported back to the folder from which reimport was selected
 - Added 'Export Failed' to folder settings. Any images marked as failed can be exported to a selected directory and removed from RootNav Portal
