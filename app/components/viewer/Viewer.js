@@ -5,7 +5,7 @@ import FolderChecklist from '../containers/viewer/FolderListContainer';
 import { StyledContainer, StyledSidebarContainer } from './StyledComponents';
 import PluginBar from '../containers/viewer/PluginBarContainer';
 import { sep } from 'path';
-import { matchPathName, CLOSE_VIEWER, IMAGE_EXTS_REGEX, IMAGES_REMOVED_FROM_GALLERY } from '../../constants/globals';
+import { matchPathName, CLOSE_VIEWER, IMAGE_EXTS_REGEX, IMAGES_REMOVED_FROM_GALLERY, getFilterRegex } from '../../constants/globals';
 import { remote, ipcRenderer } from 'electron';
 import Render from '../containers/viewer/RenderContainer';
 
@@ -66,11 +66,13 @@ export default class Viewer extends Component {
         const { editStack, resetEditStack, files } = this.props;
         if (editStack.length) resetEditStack();
         const { path, fileName } = matchPathName(optionalCurrentPath || this.state.path); 
-        let keys = Object.keys(files[path]);
+
+        let keys  = Object.keys(files[path]);
         let index = keys.indexOf(fileName);
         let file;
         let initialIndex = index;
         let containsImage;
+        
         do 
         {
             index += direction;
@@ -79,11 +81,18 @@ export default class Viewer extends Component {
             file = files[path][keys[index]] //Cycle through array of files in our current folder to find one with an rsml - check with Mike if we should cycle through all folders
             containsImage = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
         }
-        while ((!file.rsml) && initialIndex != index) //Only loop through the folder once
-        if (initialIndex != index) //If nothing was found, do nothing TODO put in special case here, and let viewer have 'nothing' loaded.
+        while (initialIndex != index && !this.matchesFilter(keys[index]) || (!file.rsml)) //Only loop through the folder once
+        
+        if (initialIndex != index)
         {
             this.setState({path: path + sep + keys[index]});
         }
+    };
+
+    matchesFilter = file => {
+        const { filterText, filterMode } = this.props;
+        if (!filterText) return true;
+        return !!file.toLowerCase().match(getFilterRegex(filterText, filterMode));
     };
 
     getDate = rsml => {

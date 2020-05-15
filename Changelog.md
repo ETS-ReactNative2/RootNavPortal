@@ -10,6 +10,8 @@
 - Added new 'absolute average' measurements for angles
 - RSML now correctly renders in thumbnails if there is no accompanying source image
 - Folders will now be matched by the filter bar, and display all images if the folder path includes the query string
+- Viewer will skip any files not matched by the filter query
+- "Open Image: X of Y" respects the filter query, and will display red if no files are matched
 - Fixed a bug causing filenames with `.`s in them to not be read properly in the backend
 - Any failed API responses mark that image as failed
 - Images marked as failed either by user or by API error will not be re-queued for the API

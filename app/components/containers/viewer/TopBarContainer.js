@@ -14,6 +14,8 @@ const mapStateToProps = (state, ownProps) => {
         segMasks: viewer ? viewer.segMasks : false,
         files: state.gallery.files,
         file: path && fileName ? state.gallery.files[path][fileName] : null,
+        filterText: viewer ? viewer.filterText : "",
+        filterMode: viewer ? viewer.filterMode : false
     };
 };
 

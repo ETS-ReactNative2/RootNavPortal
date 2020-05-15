@@ -8,11 +8,28 @@ import ResetChangesButton from '../containers/viewer/ResetButtonContainer';
 import SaveRSMLButton from '../containers/viewer/SaveButtonContainer';
 import UndoChangesButton from '../containers/viewer/UndoButtonContainer';
 import { StyledRow } from './StyledComponents';
-import { matchPathName } from '../../constants/globals';
+import { matchPathName, getFilterRegex } from '../../constants/globals';
 import TooltipOverlay from '../common/TooltipOverlay';
 import TextPopup from '../common/TextPopup';
 
 export default class TopBar extends Component {
+
+    //Returns how many files have been matched by the filter query for the selected folder
+    filteredFileCount = () => {
+        const { filterText, filterMode, files, path } = this.props;
+        const folderFiles = files[matchPathName(path).path];
+        if (!filterText) return Object.keys(folderFiles).length;
+ 
+        return Object.keys(folderFiles).reduce((acc, fileName) => acc += !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)) && !folderFiles[fileName].failed, 0); 
+    }
+
+    //Gets the set of files to be indexed into to display the count. This ensures that "1 of 3" respects filtering., and isn't "5 of 2"
+    getFileSet = folderFiles => {
+        const { filterText, filterMode } = this.props;
+
+        return filterText ? Object.keys(folderFiles).reduce((acc, fileName) => (fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)) && !folderFiles[fileName].failed) ? [...acc, fileName] : acc, []) 
+            : Object.keys(folderFiles);
+    };
 
     render() {
         const { path, buttonHandler, plants, date, hasSegMasks, file, setFailedState } = this.props;
@@ -20,14 +37,13 @@ export default class TopBar extends Component {
         let tag = path ? splitPath.fileName : ""; //Matches the file path into the absolute directory path and file name
         const folderFiles = this.props.files[splitPath.path];
         const noRSMLInFolder = folderFiles && !Object.values(folderFiles).some(file => file?.parsedRSML);
-
         const isSetFailed = file?.failed;
 
         let message = ""
         if (noRSMLInFolder) 
             message = <b>"No RSML found in Folder"</b>;
         else if (folderFiles) 
-            message = <><b>Open Image: </b>{`${Object.keys(folderFiles).indexOf(tag) + 1} of ${Object.keys(folderFiles).length}`}</>
+            message = <><b>Open Image: </b>{`${this.getFileSet(folderFiles).indexOf(tag) + 1} of ${this.filteredFileCount()}`}</>;
 
         let renderTag = file?.failed ? <span style={{color: "red"}}>{tag}</span> : tag;
         let failedIcon = file?.failed ? (
@@ -46,7 +62,8 @@ export default class TopBar extends Component {
                     <StyledRow>{ folderFiles ? 
                         <>
                             <div className="col-sm-3" style={{overflowX: "hidden", textOverflow: "ellipsis"}}><b>Tag: </b><TextPopup displayText={renderTag} popupText={tag} placement="bottom"/>{failedIcon}</div>
-                            <div className="col-sm-3">{message}
+                            <div className="col-sm-3">
+                                <span style={{ color: this.filteredFileCount() ? 'black' : 'red'}}>{message}</span>
                                 <TooltipOverlay component={ props => <StyledIcon
                                         className={"fas fa-info-circle"}
                                         {...props}

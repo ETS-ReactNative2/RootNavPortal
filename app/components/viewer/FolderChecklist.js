@@ -1,6 +1,6 @@
 import React, { Component, createRef } from 'react';
 import { Card, Row, InputGroup } from 'react-bootstrap';
-import { matchPathName } from '../../constants/globals';
+import { matchPathName, getFilterRegex } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
 import { StyledCard, StyledRedI } from './StyledComponents'
 import TooltipOverlay from '../common/TooltipOverlay';
@@ -119,9 +119,8 @@ export default class FolderChecklist extends Component {
     };
 
     filteredFileCount = path => {
-        const { filterMode, filterText, files } = this.props;
-        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
-        return Object.keys(files[path]).reduce((acc, fileName) => acc += !!fileName.toLowerCase().match(regex) && !files[path][fileName].failed, 0) 
+        const { files, filterText, filterMode } = this.props;
+        return Object.keys(files[path]).reduce((acc, fileName) => acc += !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)) && !files[path][fileName].failed, 0); 
     };
 
     updateFilterText = e =>

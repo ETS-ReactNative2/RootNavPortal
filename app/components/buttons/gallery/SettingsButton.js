@@ -12,6 +12,7 @@ import { copyFile, unlink, copyFileSync, readdir, exists } from 'fs';
 import { sep } from 'path';
 import { StyledModalDialog } from '../../buttons/StyledComponents'; 
 
+//Todo: Refactor this entire garbage component.
 export default class SettingsButton extends Component {
     StyledI = styled.i`
         color: #d9534f;

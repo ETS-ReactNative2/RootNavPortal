@@ -3,7 +3,7 @@ import { existsSync, readdirSync, mkdirSync } from 'fs';
 import { shell } from 'electron';
 import React, { Component } from 'react';
 import { Button, Row, Modal, InputGroup, Collapse, Toast, Spinner } from 'react-bootstrap'
-import { PLUGINDIR, _require } from '../../constants/globals'
+import { PLUGINDIR, _require, getFilterRegex } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
@@ -161,7 +161,7 @@ export default class PluginBar extends Component {
             toastBody = "No files match the filter query";
 
         return (
-            <Toast onClose={() => this.setState({ toast: false })} delay={6000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+            <Toast onClose={() => this.setState({ toast: false })} delay={5000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
                 style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: 'max-content' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
@@ -180,16 +180,13 @@ export default class PluginBar extends Component {
     //Returns how many files are included by the filter string
     filteredFileCount = () => {
         const { filterMode, filterText, folders, files } = this.props;
-        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
-        return folders.reduce((acc, folder) => acc + Object.keys(files[folder]).reduce((subAcc, fileName) => subAcc += !!fileName.toLowerCase().match(regex), 0), 0);
+        return folders.reduce((acc, folder) => acc + Object.keys(files[folder]).reduce((subAcc, fileName) => subAcc += !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)), 0), 0);
     }
 
     inFilterGroup = fileName => {
         const { filterText, filterMode } = this.props;
         if (!filterText) return true;
-
-        const regex = new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
-        return !!fileName.toLowerCase().match(regex);
+        return !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode));
     };
 
     //Modal's measure button clicked
@@ -271,11 +268,11 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = () => {
-        const { folders, toggleFolderBorder, toggleFilterBorder } = this.props;
+        const { folders, toggleFolderBorder, toggleFilterBorder, filterText } = this.props;
         let fileCount = this.filteredFileCount();
         if (folders.length && fileCount) return this.setState({ modal: true });
         if (!folders.length) toggleFolderBorder();
-        if (!fileCount) toggleFilterBorder();
+        if (filterText && !fileCount) toggleFilterBorder();
         this.setState({ toast: true });
     };
     
