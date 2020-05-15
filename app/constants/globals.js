@@ -31,7 +31,7 @@ export const ALL_EXTS   = IMAGE_EXTS.concat(DATA_EXTS);
 export const IMAGE_EXTS_REGEX = new RegExp(`(?:${IMAGE_EXTS.join("|")})$`, 'i') // Regex for all image extensions (i - case insensitive), excludes extThumbs
 //First line is for file_C1.png convention for seg masks, latter line is for file.first_order.png - imo the .first_order.png convention is better, more informative, and more distinct, as _C1 could be a substring of a name.
 export const ALL_EXTS_REGEX   = new RegExp(`(?<fileName>.+?)(?<segMask>_C(?:1|2))?\.(?<ext>${ALL_EXTS.join("|")})$`, 'i');     // Regex for all files (i - case insensitive) - (dir path)(_C1 {if exists})(extension)
-//Gets the regex to match filtered files in the viewer. Used in several places, but relies on Redux variables
+//Gets the regex to match filtered files in the viewer. Used in several places, but relies on Redux variables - filterMode true = "Any"
 export const getFilterRegex = (filterText, filterMode) => new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
 // export const ALL_EXTS_REGEX   = new RegExp(`([^.]+)(?:\.(.+))?\.(${ALL_EXTS.join("|")})$`, 'i'); // Regex for all files (i - case insensitive) - (dir path)(first_order {if exists})(extension)
 export const _require = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require

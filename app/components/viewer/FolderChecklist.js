@@ -142,7 +142,7 @@ export default class FolderChecklist extends Component {
 
     clear = () => { 
         this.props.updateViewerFilter(""); 
-        this.props.toggleFilterMode();
+        if (this.props.filterMode) this.props.toggleFilterMode();
         this.textref.current.value = ""; 
         this.checkboxref.current.checked = false;
     }; 
