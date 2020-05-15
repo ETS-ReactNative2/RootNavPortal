@@ -1,7 +1,7 @@
 import { OPEN_DIR, REFRESH_DIRS, REMOVE_DIR, TOGGLE_DIR, CLOSE_MODAL, SHOW_MODAL, UPDATE_MODAL, 
     IMPORT_CONFIG, UPDATE_CHECKED, ADD_FILES, ADD_THUMB, REMOVE_THUMB, UPDATE_FILTER_TEXT, UPDATE_FILTER_ANALYSED, 
-    UPDATE_PARSED_RSML, UPDATE_CHECKLIST_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
-    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH } from '../actions/galleryActions';
+    UPDATE_PARSED_RSML, UPDATE_FOLDER_MODELS_DROPDOWN, UPDATE_FOLDER_MODEL, UPDATE_FILE, RESET_FOLDER, 
+    TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, SAVE_API_SETTINGS, UPDATE_API_STATUS, UPDATE_API_MODAL, UPDATE_API_AUTH, SET_FAILED_STATE, REMOVE_FILES } from '../actions/galleryActions';
 
 const initialState = { folders: [], files: {}, thumbs: {}, modal: false, modalBody: [], checked: [], hasReadConfig: false,  filterText: "", 
     filterAnalysed: false, labels: false, architecture: true, apiAddress: '', apiKey: '', apiStatus: false, apiModal: false, apiAuth: true };
@@ -31,7 +31,7 @@ export default (state = initialState, action) => {
         }
         case TOGGLE_DIR: return {
             ...state,
-            folders: state.folders.map(folder => folder.path == action.path ? {...folder, 'active':!folder.active} : folder)
+            folders: state.folders.map(folder => folder.path == action.path ? { ...folder, 'active': !folder.active} : folder)
         }
 
         //Modal reducer actions
@@ -124,13 +124,13 @@ export default (state = initialState, action) => {
                 }), {})
             }
         }
-        case UPDATE_CHECKLIST_DROPDOWN: return {
+        case UPDATE_FOLDER_MODELS_DROPDOWN: return {
             ...state,
-            checked: state.checked.map(folder => action.path != folder.path ? folder : {...folder, model: action.model})
+            checked: state.checked.map(folder => action.paths.includes(folder.path) ? {...folder, model: action.model} : folder)
         }
         case UPDATE_FOLDER_MODEL: return {
             ...state,
-            folders: state.folders.map(it => it.path == action.path ? {...it, model: action.model} : it)
+            folders: state.folders.map(folder => folder.path == action.path ? {...folder, model: action.model} : folder)
         }
         case UPDATE_FILE: return {
             ...state,
@@ -177,6 +177,38 @@ export default (state = initialState, action) => {
             ...state,
             apiAuth: action.auth
         }
+        case SET_FAILED_STATE: return {
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: {
+                    ...state.files[action.folder],
+                    [action.fileName]: {
+                        ...state.files[action.folder][action.fileName],
+                        failed: action.failedState ?? !state.files[action.folder][action.fileName].failed
+                    }
+                }
+            }
+        }
+        case REMOVE_FILES: return { //Removes a blacklist of filenames from a folder's entry in thumbs and files
+            ...state,
+            files: {
+                ...state.files,
+                [action.folder]: Object.keys(state.files[action.folder]).reduce((acc, fileName) => { 
+                    if (!action.fileNames.includes(fileName)) 
+                        acc[fileName] = state.files[action.folder][fileName]; 
+                    return acc; 
+                }, {})
+            },
+            thumbs: {
+                ...state.thumbs,
+                [action.folder]: Object.keys(state.thumbs[action.folder]).reduce((acc, fileName) => { 
+                    if (!action.fileNames.includes(fileName)) 
+                        acc[fileName] = state.thumbs[action.folder][fileName]; 
+                    return acc; 
+                }, {})
+            }
+        }
         default: return state;
     }
 }
@@ -194,16 +226,16 @@ export default (state = initialState, action) => {
 // apiStatus      = is the API up or not -- these are here due to the gallery reducer handling config, which also handles the API, so it's easier to keep them together in one reducer
 // apiModal       = determines if the API settings modal is open or not
 // apiAuth        = Is our authentication ok? Assumes yes. Used for the server indicator colours/text as well as a backend check.
+// thumbs         = Contains the thumbnail data, indexed similarly to files, by [folder][fileName].
 // files         = represents all files loaded into state as an object of objects of objects
 //              Files are indexed by their parent folder's full path, and then by the file base name, not including the extension
 //              The actual file object contains extension: bool pairs that represent if the file name+ext exists
 //              This allows for easy adding to the structure when we start dealing with async API calls that result in filesystem changes
-//              Also contained is an extension+Thumb: object containing the data buffer for the thumbnail for each image extension
 //              So each folder is an object that contains objects for each of its files:
 //              files: { folderName: { file1: {rsml: true, png: true}, file2: {} }, folder2:{ file1: {}, file2: {png: true} } }
 //              This ensures the full file system can be reconstructed from the concatenated keys.
-//              if folder C:\Andrew\Desktop\RootNav has file object wheat_test2: { rsml: true, png: true, pngThumb: {} }
-//              Then C:\Andrew\Desktop\RootNav\wheat_test2.rsml and .png exist, which a thumbnail for that png
+//              if folder C:\Andrew\Desktop\RootNav has file object wheat_test2: { rsml: true, png: true }
+//              Then C:\Andrew\Desktop\RootNav\wheat_test2.rsml and .png exist. The corresponding thumbnails will be in thumbs[folder][fileName] as they are handled and updated separately now
 
 /*
 Full example of state:
@@ -234,13 +266,11 @@ state: {
                 },
                 heatMap: {
                     png: true,
-                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] }
                 },
                 INEW_exp2,128,LN,1225,249: {
                     png: true,
                     rsml: true,
                     txt: true, 
-                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] },
                     parsedRSML: { rsmlJson: {}, polylines: [[{}, {}], [{}, {}]]},
                     _C1: true,
                     _C2: true
@@ -249,8 +279,15 @@ state: {
                     png: true,
                     rsml: true,
                     txt: true,
-                    pngThumb: { type: "Buffer", data: [137, 80, 12, 72.....] }
                 }
+            } 
+        }
+        thumbs: {
+            C:\Users\Andrew\Desktop\hkj: {
+                arch:  { type: "Buffer", data: [137, 80, 12, 72.....] }
+                heatMap: { type: "Buffer", data: [137, 80, 12, 72.....] }
+                INEW_exp2,128,LN,1225,249:  { type: "Buffer", data: [137, 80, 12, 72.....] }
+                RS2,5,27,testset:  { type: "Buffer", data: [137, 80, 12, 72.....] }
             } 
         }
     }

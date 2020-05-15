@@ -1,16 +1,16 @@
-import os from 'os'
+import { homedir } from 'os'
 import { sep }  from 'path'
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { remote } from 'electron';
 import { post, get, defaults } from 'axios';
 
 import { SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-    UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, UPDATE_API_MODAL } from '../actions/galleryActions';
+    UPDATE_FILTER_ANALYSED, UPDATE_FOLDER_MODELS_DROPDOWN, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, TOGGLE_DIR, ADD_THUMB, UPDATE_API_MODAL } from '../actions/galleryActions';
 import { TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED as UPDATE_CHECKED_VIEWER } from '../actions/viewerActions';
 
 
-export const APPHOME    = `${os.homedir()}${sep}.rootnav${sep}`;
-export const PLUGINDIR  = `${process.env.PORTABLE_EXECUTABLE_DIR || process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
+export const APPHOME    = `${homedir()}${sep}.rootnav${sep}`;
+export const PLUGINDIR  = `${process.argv.includes('--packaged=true') ? process.resourcesPath : process.cwd()}${sep}plugins${sep}`; //resourcesPath will get us to the right place on BOTH OSs, but only needed in release.
 export const CONFIG     = 'config.json';
 export const API_DELETE = 'api-delete';
 export const API_PARSE  = 'api-parse';
@@ -21,6 +21,8 @@ export const HTTP_PORT = 9000;
 
 export const WINDOW_HEIGHT = 800;
 export const WINDOW_WIDTH  = 1200;
+export const MIN_HEIGHT = 720;
+export const MIN_WIDTH  = 960; //Half of 1080p as min width?
 
 export const IMAGE_EXTS = ['jpg', 'jpeg', 'jpe', 'jfif', 'jif', 'png', 'tif', 'tiff'];
 export const DATA_EXTS  = ['rsml'];
@@ -29,6 +31,8 @@ export const ALL_EXTS   = IMAGE_EXTS.concat(DATA_EXTS);
 export const IMAGE_EXTS_REGEX = new RegExp(`(?:${IMAGE_EXTS.join("|")})$`, 'i') // Regex for all image extensions (i - case insensitive), excludes extThumbs
 //First line is for file_C1.png convention for seg masks, latter line is for file.first_order.png - imo the .first_order.png convention is better, more informative, and more distinct, as _C1 could be a substring of a name.
 export const ALL_EXTS_REGEX   = new RegExp(`(?<fileName>.+?)(?<segMask>_C(?:1|2))?\.(?<ext>${ALL_EXTS.join("|")})$`, 'i');     // Regex for all files (i - case insensitive) - (dir path)(_C1 {if exists})(extension)
+//Gets the regex to match filtered files in the viewer. Used in several places, but relies on Redux variables - filterMode true = "Any"
+export const getFilterRegex = (filterText, filterMode) => new RegExp(filterMode ? `${filterText.toLowerCase().trim().split(" ").join("|")}` : filterText.toLowerCase().trim());
 // export const ALL_EXTS_REGEX   = new RegExp(`([^.]+)(?:\.(.+))?\.(${ALL_EXTS.join("|")})$`, 'i'); // Regex for all files (i - case insensitive) - (dir path)(first_order {if exists})(extension)
 export const _require = typeof __webpack_require__ === "function" ? __non_webpack_require__ : require
 
@@ -50,8 +54,8 @@ export const getProcessTypeFromURL = url => {
 
 export const writeConfig = config => {
     if (!existsSync(APPHOME)) //Use our own directory to ensure write access when prod builds as read only.
-        mkdirSync(APPHOME, {mode: '0777', recursive: true});
-    writeFileSync(APPHOME + CONFIG , config);
+        mkdirSync(APPHOME, { mode: '0777', recursive: true });
+    writeFileSync(APPHOME + CONFIG, config);
 };
 
 export const xmlOptions = {
@@ -75,7 +79,7 @@ export const reduxActionFilter = action => {
     switch (process) {
         case "gallery":
             return ![SHOW_MODAL, CLOSE_MODAL, UPDATE_MODAL, UPDATE_CHECKED, UPDATE_FILTER_TEXT, 
-                UPDATE_FILTER_ANALYSED, UPDATE_CHECKLIST_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB, UPDATE_API_MODAL].includes(action.type);
+                UPDATE_FILTER_ANALYSED, UPDATE_FOLDER_MODELS_DROPDOWN, TOGGLE_DIR, TOGGLE_LABELS, TOGGLE_GALLERY_ARCH, ADD_THUMB, UPDATE_API_MODAL].includes(action.type);
         case "viewer":
             return ![TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, UPDATE_CHECKED_VIEWER, UPDATE_API_MODAL].includes(action.type);
         default:

@@ -1,7 +1,7 @@
 import { ADD_VIEWER, REMOVE_VIEWER, TOGGLE_ARCH, TOGGLE_SEGMASKS, PUSH_EDITSTACK, POP_EDITSTACK, RESET_EDITSTACK, 
-    SAVE_RSML, UPDATE_CHECKED } from '../actions/viewerActions';
+    UPDATE_CHECKED, UPDATE_VIEWER_FILTER, TOGGLE_FILTER_MODE } from '../actions/viewerActions';
 
-const initialState =  {viewers: {} };
+const initialState =  { viewers: {} };
 
 export default (state = initialState, action) => {
     switch (action.type)
@@ -14,7 +14,9 @@ export default (state = initialState, action) => {
                     architecture: true, 
                     segMasks: false ,
                     editStack: [],
-                    checked: []
+                    checked: [],
+                    filterText: "",
+                    filterMode: false
                 }
             }
         }
@@ -86,6 +88,26 @@ export default (state = initialState, action) => {
                 }
             }
         }
+        case UPDATE_VIEWER_FILTER: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    filterText: action.text
+                }
+            }
+        }
+        case TOGGLE_FILTER_MODE: return {
+            ...state,
+            viewers: {
+                ...state.viewers,
+                [action.viewerID]: {
+                    ...state.viewers[action.viewerID],
+                    filterMode: !state.viewers[action.viewerID].filterMode
+                }
+            }       
+        }
         default: return state;
     }
 }
@@ -94,6 +116,8 @@ export default (state = initialState, action) => {
 //Viewers are indexed by their process.pid values, as multiple viewers cannot interact/share their own state variables
 //Architecture - value of the architecture checkbox which defines whether or not to draw the RSML over the image
 //editStack - stores a history of edits -> each time the user does something to the canvas, the new state is pushed to the editStack
+//filterText - The query entered into the search box to limit what is displayed and measured
+//filterMode - true == "Any" => match each word in the filter query as a separate entity, or false == match the entire raw string
 //This lets us pop the stack to undo an action. The editStack is the first place to look for polylines
 //If the stack is empty, gallery.files.[file].parsedRSML.polylines will be used, which is what the RSML on disk represents
 //Each viewer process maintains its own editStack, and it is reset on file move
@@ -108,7 +132,9 @@ state: {
                     [{}, {}, {}],
                     [{}, {}, {}]
                 ],
-                checked: ["C:\plants\wheat"]
+                checked: ["C:\plants\wheat"],
+                filterText: "paragon",
+                filterMode: true
             },
             1853: {
                 architecture: false

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, mkdirSync } from 'fs';
 import { shell } from 'electron';
 import React, { Component } from 'react';
 import { Button, Row, Modal, InputGroup, Collapse, Toast, Spinner } from 'react-bootstrap'
-import { PLUGINDIR, _require } from '../../constants/globals'
+import { PLUGINDIR, _require, getFilterRegex } from '../../constants/globals'
 import Plugin from './Plugin';
 import { StyledCard, StyledCardHeader, StyledCenterListGroupItem, StyledChevron, StyledCardContents, StyledMeasureButton } from './StyledComponents'
 import { StyledIcon } from '../CommonStyledComponents'
@@ -109,7 +109,7 @@ export default class PluginBar extends Component {
                         </InputGroup.Prepend>
                         <input key={0} type="text" className="form-control" readOnly ref={this.exportDest}/>
                         <InputGroup.Append>
-                            <SelectDestinationButton setExportDest={this.setExportDest}/>
+                            <SelectDestinationButton setExportDest={this.setExportDest} ipcMessage={'getExportDest'} tooltip={"Select export location"}/>
                         </InputGroup.Append>
                     </InputGroup>
                     <Collapse in={this.state.measuring}>
@@ -156,32 +156,49 @@ export default class PluginBar extends Component {
     };
 
     measureToast = () => {
+        let toastBody = "You have no folders selected for measuring";
+        if (this.props.folders.length && !this.filteredFileCount()) 
+            toastBody = "No files match the filter query";
+
         return (
-            <Toast onClose={() => this.setState({ ...this.state, toast: false})} delay={4000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
-                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: '15vw' }} >
+            <Toast onClose={() => this.setState({ toast: false })} delay={5000} show={this.state.toast}  autohide style={{ position: 'absolute' }}
+                style={{ position: 'absolute', bottom: '10vh', marginLeft: '50%', marginRight: '50%', transform: 'translateX(-50%)', minWidth: 'max-content' }} >
                 <Toast.Header>
                     <StyledIcon className={"fas fa-arrow-left fa-lg"} />
                     <strong className="mr-auto">Measure Error</strong>
                 </Toast.Header>
-                <Toast.Body>You have no folders selected for measuring</Toast.Body>
+                <Toast.Body>{toastBody}</Toast.Body>
             </Toast>
         );
     };
 
     setExportDest = value => {
         this.exportDest.current.value = value;
-        this.setState({ ...this.state, exportable: true });
+        this.setState({ exportable: true });
+    };
+
+    //Returns how many files are included by the filter string
+    filteredFileCount = () => {
+        const { filterMode, filterText, folders, files } = this.props;
+        return folders.reduce((acc, folder) => acc + Object.keys(files[folder]).reduce((subAcc, fileName) => subAcc += !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)), 0), 0);
+    }
+
+    inFilterGroup = fileName => {
+        const { filterText, filterMode } = this.props;
+        if (!filterText) return true;
+        return !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode));
     };
 
     //Modal's measure button clicked
     export = () => {
-        if (!this.exportDest.current.value) return this.setState({ ...this.state, exportable: false });
-        this.setState({ ...this.state, measuring: true, measuresComplete: false });
+        if (!this.exportDest.current.value) return this.setState({ exportable: false });
+        this.setState({ measuring: true, measuresComplete: false });
         let funcs = []; //Stores an array of processing promises
 
         this.props.folders.forEach(folder => { //For each folder we get passed by the sidebar - this will be in Redux
-            Object.values(this.props.files[folder]).forEach(file => { //For each file inside state for that folder
-                if (file.parsedRSML) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
+            Object.keys(this.props.files[folder]).forEach(fileName => { //For each file inside state for that folder
+                let file = this.props.files[folder][fileName];
+                if (file.parsedRSML && !file.failed && this.inFilterGroup(fileName)) Object.values(this.state.plugins).forEach(group =>  //if we have rsml, for each plugin group
                     Object.values(group).forEach(plugin => plugin.active ? //for each active plugin
                         funcs.push(plugin.function(file.parsedRSML.rsmlJson, file.parsedRSML.polylines, utils)) : null)); //pass the data to each plugin
             });
@@ -229,7 +246,7 @@ export default class PluginBar extends Component {
                     csvWriter.writeRecords(data[type]).then(() => { this.csvPath = path; console.log(`written to ${path}`) });
                 }
             });
-            setTimeout(() => this.setState({ ...this.state, measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
+            setTimeout(() => this.setState({ measuresComplete: true }), 225); //Tiny delay for the animation change so it doesn't collide with the collapse and get missed.
         });
     };
 
@@ -251,9 +268,12 @@ export default class PluginBar extends Component {
 
     //Plugin measure clicked, opens modal
     measure = () => {
-        if (this.props.folders.length) return this.setState({ ...this.state, modal: true });
-        this.props.toggleFolderBorder();
-        this.setState({ ...this.state, toast: true });
+        const { folders, toggleFolderBorder, toggleFilterBorder, filterText } = this.props;
+        let fileCount = this.filteredFileCount();
+        if (folders.length && fileCount) return this.setState({ modal: true });
+        if (!folders.length) toggleFolderBorder();
+        if (filterText && !fileCount) toggleFilterBorder();
+        this.setState({ toast: true });
     };
     
     loadPlugins = () => {
@@ -281,7 +301,7 @@ export default class PluginBar extends Component {
             });
         }
         return plugins;
-    }
+    };
 
     // Requires a valid plugin object (correct object keys) be passed in, and returns if the types of all these keys are correct.
     pluginTypeCheck = plugin => typeof plugin.name === "string" && typeof plugin.group === "string" 
@@ -291,7 +311,6 @@ export default class PluginBar extends Component {
         const { plugins } = this.state;
         if (!plugins.hasOwnProperty(groupName) || !plugins[groupName].hasOwnProperty(pluginName)) return;
         this.setState({
-            ...this.state,
             plugins: {
                 ...plugins,
                 [groupName]: {
@@ -303,17 +322,16 @@ export default class PluginBar extends Component {
                 } 
             }
         });
-    }
+    };
 
     togglePluginGroup = groupName => {
         if (!this.state.hasOwnProperty(groupName)) return;
         this.setState({
-            ...this.state,
             [groupName]: !this.state[groupName]
         });
     };
 
     openContainingDirectory = () => {
         shell.showItemInFolder(this.csvPath);
-    }
+    };
 }

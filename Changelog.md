@@ -1,14 +1,36 @@
+# 0.7.0:
+- Added a filter bar to the viewer page that filters the measure group to files that include the filter string
+- Added "Reimport Files" to folder settings. Any images and RSML in the chosen folder will be reimported back to the folder from which reimport was selected
+- Added 'Export Failed' to folder settings. Any images marked as failed can be exported to a selected directory and removed from RootNav Portal
+- Added right clicking a thumbnail to be able to "mark as failed", and thus exclude the image from exporting traits
+- Added button and styling to Viewer to toggle failed, and colouring the name red if it is failed
+- Added a shrinkable top bar with a hamburger
+- Added a number that shows how many files are left after filtering on the viewer page
+- RSML without an image can now be correctly displayed on the viewer
+- Added new 'absolute average' measurements for angles
+- RSML now correctly renders in thumbnails if there is no accompanying source image
+- Folders will now be matched by the filter bar, and display all images if the folder path includes the query string
+- Viewer will skip any files not matched by the filter query
+- "Open Image: X of Y" respects the filter query, and will display red if no files are matched
+- Fixed a bug causing filenames with `.`s in them to not be read properly in the backend
+- Any failed API responses mark that image as failed
+- Images marked as failed either by user or by API error will not be re-queued for the API
+- Checking a node in the add button folder picker now checks and expands all children
+- Selecting a model in the add button folder picker now propagates that model to all checked children
+- Thumbnail sizing is now based on the size of the Bootstrap grid
+- Increased folder depth to 8 in case it caused a problem
+
 # 0.6.0:
-- Added auto-updates for Windows. App will download, notify, and update on close
+- Added auto-updating. App will download, notify, and update on close
 - Moved thumbnail generation to upon opening a folder to reduce potentially unnecessary loading/storing of folders that may not be opened.
 - Added an 'About' page to document maintainer contacts, suggestion/bug link, version and internals
-- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open.
-- Added type checking for plugins.
-- Modified message dialog when closing the gallery while images are still processing.
-- Added separator to icon menu.
-- Re-added missing util function `splitLinesAsPlants`.
+- Added 'Open Viewer' button to gallery, and added state to viewer if nothing is open
+- Added type checking for plugins
+- Modified message dialog when closing the gallery while images are still processing
+- Added separator to icon menu
+- Re-added missing util function `splitLinesAsPlants`
 - Added tooltip to explain why images are being skipped in viewer page
-- Fixed potential crash when importing non .js plugins.
+- Fixed potential crash when importing non .js plugins
 - Fixed a bug which caused newly imported folders to not update in the viewer page until another action was made
 - Fixed a bug causing thumbnails to not refresh after background app
 - Fixed a bug causing the export "Open" button being unable to find a written file when exporting multiple

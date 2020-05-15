@@ -8,7 +8,9 @@ const mapStateToProps = (state, ownProps) => {
         path: ownProps.path,
         exts: ownProps.exts,
         files: state.gallery.files,
-        editStack: viewer ? viewer.editStack : false
+        editStack: viewer ? viewer.editStack : false,
+        filterText: viewer ? viewer.filterText : "",
+        filterMode: viewer ? viewer.filterMode : false
     }
 };
 

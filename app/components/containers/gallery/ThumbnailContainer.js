@@ -1,4 +1,5 @@
 import { connect } from 'react-redux';
+import { setFailedState } from '../../../actions/galleryActions';
 import Thumbnail from '../../gallery/Thumbnail';
 
 const mapStateToProps = (state, ownProps) => { 
@@ -15,12 +16,13 @@ const mapStateToProps = (state, ownProps) => {
         active: folder.active,
         model: folder.model,
         apiStatus: state.gallery.apiStatus,
-        filterText: state.gallery.filterText
+        filterText: state.gallery.filterText,
+        labels: state.gallery.labels
     };
 };
 
 const mapDispatchToProps = dispatch => (
-    { }
+    { setFailedState: (folder, fileName, failedState) => dispatch(setFailedState(folder, fileName, failedState)) }
 );
 
 export default connect(mapStateToProps, mapDispatchToProps)(Thumbnail);

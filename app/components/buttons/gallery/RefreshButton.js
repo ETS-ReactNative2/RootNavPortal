@@ -7,6 +7,7 @@ import { sep } from 'path';
 import { ipcRenderer } from 'electron';
 import { ALL_EXTS_REGEX, API_PARSE, sendThumbs, _require, IMAGE_EXTS, IMAGES_REMOVED_FROM_GALLERY  } from '../../../constants/globals'
 import TooltipOverlay from '../../common/TooltipOverlay';
+import { Dropdown } from 'react-bootstrap';
 
 export default class RefreshButton extends Component {
 
@@ -30,8 +31,8 @@ export default class RefreshButton extends Component {
                     structuredFiles[folder.path][name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
                 });
                 // Remove old thumbnails that are no longer needed
-                Object.keys(structuredFiles[folder.path]).forEach(name => {
-                    if (Object.keys(files[folder.path][name]).some(key => IMAGE_EXTS.includes(key) && !Object.keys(structuredFiles[folder.path][name]).includes(key))) {
+                Object.keys(structuredFiles[folder.path] ?? {}).forEach(name => {
+                    if (files[folder.path] && Object.keys(files[folder.path][name]).some(key => IMAGE_EXTS.includes(key) && !Object.keys(structuredFiles[folder.path][name]).includes(key))) {
                         removeThumbnails.push({folder: folder.path, filename: name});
                     }
                 })
@@ -72,7 +73,9 @@ export default class RefreshButton extends Component {
     }
 
     render() {
-        return <TooltipOverlay  component={ props => <StyledButton
+        return this.props.isDropdown 
+        ? <Dropdown.Item style={{opacity: 1, paddingLeft: "36px"}} onClick={() => this.onClick()}>Reload Folders</Dropdown.Item>
+        : <TooltipOverlay  component={ props => <StyledButton
                 variant="primary" 
                 className={`btn btn-default fas fa-sync button`} 
                 onClick={() => this.onClick()} 

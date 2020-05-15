@@ -13,7 +13,7 @@ export const REMOVE_THUMB   = 'REMOVE_THUMB';
 export const UPDATE_FILTER_TEXT = 'UPDATE_FILTER_TEXT';
 export const UPDATE_FILTER_ANALYSED = 'UPDATE_FILTER_ANALYSED';
 export const UPDATE_PARSED_RSML = "UPDATE_PARSED_RSML";
-export const UPDATE_CHECKLIST_DROPDOWN = 'UPDATE_CHECKLIST_DROPDOWN';
+export const UPDATE_FOLDER_MODELS_DROPDOWN = 'UPDATE_FOLDER_MODELS_DROPDOWN';
 export const UPDATE_FOLDER_MODEL = 'UPDATE_FOLDER_MODEL';
 export const UPDATE_FILE = 'UPDATE_FILE';
 export const RESET_FOLDER = 'RESET_FOLDER';
@@ -23,6 +23,8 @@ export const SAVE_API_SETTINGS = 'SAVE_API_SETTINGS';
 export const UPDATE_API_STATUS = 'UPDATE_API_STATUS';
 export const UPDATE_API_MODAL = 'UPDATE_API_MODAL';
 export const UPDATE_API_AUTH = 'UPDATE_API_AUTH';
+export const SET_FAILED_STATE = 'SET_FAILED_STATE';
+export const REMOVE_FILES = 'REMOVE_FILES';
 
 export const addFolders    = folderInfo => ({ type: OPEN_DIR, folderInfo });
 export const toggleOpenFile = path => ({ type: TOGGLE_DIR, path });
@@ -39,7 +41,7 @@ export const removeThumb      = toRemove => ({ type: REMOVE_THUMB, toRemove }) /
 export const updateFilterText = text => ({ type: UPDATE_FILTER_TEXT, text });
 export const updateFilterAnalysed = checked => ({ type: UPDATE_FILTER_ANALYSED, checked });
 export const updateParsedRSML = newFiles => ({ type: UPDATE_PARSED_RSML, newFiles });
-export const updateChecklistDropdown = (path, model) => ({ type: UPDATE_CHECKLIST_DROPDOWN, path, model });
+export const updateFolderModelsDropdown = (paths, model) => ({ type: UPDATE_FOLDER_MODELS_DROPDOWN, paths, model });
 export const updateFolderModel = (path, model) => ({ type: UPDATE_FOLDER_MODEL, path, model });
 export const updateFile = (folder, fileName, newExts) => ({ type: UPDATE_FILE, folder, fileName, newExts });
 export const resetFolder = (folder, newState) => ({ type: RESET_FOLDER, folder, newState }); //newState should be the original structure, sans any API extensions
@@ -49,3 +51,5 @@ export const saveAPISettings = (address, key) => ({ type: SAVE_API_SETTINGS, add
 export const updateAPIStatus = status => ({ type: UPDATE_API_STATUS, status });  
 export const updateAPIModal = bool => ({ type: UPDATE_API_MODAL, bool }); //This is in Redux so the indicator button and menus can open the modal
 export const updateAPIAuth = auth => ({ type: UPDATE_API_AUTH, auth });
+export const setFailedState = (folder, fileName, failedState) => ({ type: SET_FAILED_STATE, folder, fileName, failedState});
+export const removeFiles = (folder, fileNames) => ({ type: REMOVE_FILES, folder, fileNames }); //removes an array of filenames from a folder's file structure in state

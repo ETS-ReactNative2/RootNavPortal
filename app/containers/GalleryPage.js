@@ -7,7 +7,8 @@ const mapStateToProps = state => (
         folders: state.gallery.folders,
         hasReadConfig: state.gallery.hasReadConfig,
         apiAddress: state.gallery.apiAddress,
-        apiKey: state.gallery.apiKey
+        apiKey: state.gallery.apiKey,
+        files: state.gallery.files
     }
 );
 

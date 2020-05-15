@@ -1,7 +1,7 @@
 const group = "Plant Measurements";
-const name = "Average Lateral Tip Angle";
-const id = 'avgAbsTipLateralAngle';
-const description = "The mean angle in degrees of lateral root tips relative to vertical, per plant";
+const name = "Average Absolute Lateral Emergence Angle";
+const id = 'avgAbsEmergenceLateralAngle';
+const description = "Mean absolute emergence angle in degrees for all lateral roots. Measured relative to the primary root they emerge from, per plant";
 
 const plugin = (rsmlJson, polylines, utils) => {
 	return new Promise((resolve, reject) => {
@@ -10,13 +10,22 @@ const plugin = (rsmlJson, polylines, utils) => {
         let results = [];
         if (!multiplePlants) results.push({ tag, [id]: 0 });
         let plantCounts = {};
-        
-        polylines.filter(line => line.type == "lateral").forEach((line, index) => {
-            let points = line.points.slice(Math.max(0, line.points.length - 20), line.points.length); // Take last 20 points of array
-            points = utils.pointsSublistFromDistanceReverse(points, 5); // Cut off points that make length > 5px.
-            const gradient = utils.linearRegressionGradient(points);
-            let angle = utils.boundAngle(utils.gradientToAngle(points, gradient));  
 
+        polylines.filter(line => line.type == "lateral").forEach((line, index) => {
+            const primary = utils.getParentOfLateral(line, polylines);
+            let lateralPoints = line.points.slice(0, 20); // Take first 20 points of array
+            lateralPoints = utils.pointsSublistFromDistance(lateralPoints, 5); // Cut off points that make length > 5px.
+            let primaryPoints = utils.getNearestPointsOrdered(primary.points, line.points[0], 20);
+            primaryPoints = utils.pointsSublistFromDistance(primaryPoints, 5); // Cut off points that make length > 5px.
+
+            const lateralGradient = utils.linearRegressionGradient(lateralPoints);
+            const primaryGradient = utils.linearRegressionGradient(primaryPoints);
+
+            const lateralAngle = utils.boundAngle(utils.gradientToAngle(lateralPoints, lateralGradient));
+            const primaryAngle = utils.boundAngle(utils.gradientToAngle(primaryPoints, primaryGradient));
+
+            const angle = Math.abs(utils.boundAngle(lateralAngle - primaryAngle));
+            
             if (!multiplePlants) results[0][id] = utils.addToAverage(results[0][id], angle, index + 1);
             else
             {

@@ -1,6 +1,5 @@
 // @flow
 import React, { Component } from 'react';
-import { writeConfig, CLOSE_VIEWER } from '../../../constants/globals';
 import { StyledButton } from '../StyledComponents'; 
 import TooltipOverlay from '../../common/TooltipOverlay';
 import { ipcRenderer } from 'electron';

@@ -13,7 +13,7 @@
 import { app, BrowserWindow, ipcMain, dialog, Tray, Menu } from 'electron';
 import Store from './store/configureStore';
 const { configureStore } = Store('main'); //Import is a func that sets the type of history based on the process scope calling it and returns the store configurer
-import { WINDOW_HEIGHT, WINDOW_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED, IMAGES_REMOVED_FROM_GALLERY } from './constants/globals';
+import { WINDOW_HEIGHT, WINDOW_WIDTH, MIN_HEIGHT, MIN_WIDTH, API_DELETE, API_PARSE, CLOSE_VIEWER, NOTIFICATION_CLICKED, IMAGES_REMOVED_FROM_GALLERY } from './constants/globals';
 import { join } from 'path';
 const { autoUpdater } = require('electron-updater');
 
@@ -41,8 +41,8 @@ const openGallery = () => {
         show: false,
         width: WINDOW_WIDTH,
         height: WINDOW_HEIGHT,
-        minHeight: WINDOW_HEIGHT,
-        minWidth: WINDOW_WIDTH,
+        minHeight: MIN_HEIGHT,
+        minWidth: MIN_WIDTH,
         webPreferences: {
             nodeIntegration: true,
             additionalArguments: [`--packaged=${app.isPackaged}`] //Zero latency way of ensuring renderers know they're packaged.
@@ -212,7 +212,13 @@ ipcMain.on('openFolder', (event, path) => {
 
 ipcMain.on('getExportDest', event => {
     dialog.showSaveDialog(event.sender.getOwnerBrowserWindow(), { properties: ['showOverwriteConfirmation'], filters: [{ name: 'CSV (Comma delimited)', extensions: ['csv'] }] }).then(result => {
-        if (result.filePath && !result.canceled) event.sender.send('exportDest', result.filePath);
+        if (result.filePath && !result.canceled) event.sender.send('getExportDest', result.filePath);
+    });
+});
+
+ipcMain.on('getExportFailedDest', event => {
+    dialog.showOpenDialog(event.sender.getOwnerBrowserWindow(), { properties: ['openDirectory'] }).then(result => {
+        if (result.filePaths && !result.canceled) event.sender.send('getExportFailedDest', result.filePaths);
     });
 });
 
@@ -231,8 +237,8 @@ ipcMain.on('openViewer', (event, path) => {
     let subWindow = new BrowserWindow({
         width: WINDOW_WIDTH,
         height: WINDOW_HEIGHT,
-        minHeight: WINDOW_HEIGHT,
-        minWidth: WINDOW_WIDTH,
+        minHeight: MIN_HEIGHT,
+        minWidth: MIN_WIDTH,
         webPreferences: {
             nodeIntegration: true,
             additionalArguments: [`--packaged=${app.isPackaged}`]

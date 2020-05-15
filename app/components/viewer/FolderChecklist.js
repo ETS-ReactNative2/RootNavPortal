@@ -1,12 +1,24 @@
-import React, { Component } from 'react';
-import { Card, Row } from 'react-bootstrap';
-import { matchPathName } from '../../constants/globals';
+import React, { Component, createRef } from 'react';
+import { Card, Row, InputGroup } from 'react-bootstrap';
+import { matchPathName, getFilterRegex } from '../../constants/globals';
 import CheckboxTree from 'react-checkbox-tree'
 import { StyledCard, StyledRedI } from './StyledComponents'
 import TooltipOverlay from '../common/TooltipOverlay';
 import { StyledIcon } from '../CommonStyledComponents';
+import styled from 'styled-components';
 
 export default class FolderChecklist extends Component {
+    typingTimeout = 0;
+    text = "";
+
+    StyledInput = styled.input`
+        border-radius: 0;
+    `;
+
+    StyledInputGroupText = styled(InputGroup.Text)`
+        border-radius: 0;
+    `;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -14,12 +26,9 @@ export default class FolderChecklist extends Component {
             expanded: [],
             nodes: []
         };
+        this.textref = createRef();
+        this.checkboxref = createRef();
     }
-
-    componentDidMount() {
-        this.reset();
-        this.props.updateChecked(this.state.checked);
-    }   
 
     reset = () => {
         const { folders, files } = this.props;
@@ -51,8 +60,10 @@ export default class FolderChecklist extends Component {
         if (nodeIndex != -1) children[nodeIndex].children = this.addToChildren(path, children[nodeIndex].children);
         else {
             const name = matchPathName(path).fileName;
+            const filterTextNumIcon = this.props.filterText ? this.getNumberedIcon(this.filteredFileCount(path)) : <></>;
+
             const style = path == this.props.path ? { padding: "2px 7px", background: "rgba(51, 51, 204, 0.3)", borderRadius: "5px", "&:hover": {background: "white"}} : {};
-            children.push({ value: path, children: [], label: <span style={style} title={path}>{name}</span> });
+            children.push({ value: path, children: [], label: <span style={style} title={path}>{name}{filterTextNumIcon}</span> });
         }
         return children;
     };
@@ -65,10 +76,27 @@ export default class FolderChecklist extends Component {
         return children.map(child => this.flattenChildren(child.children).concat(child.value)).flat();
     };
 
+    componentDidMount() {
+        this.reset();
+        this.props.updateChecked(this.state.checked);
+        if (this.props.filterText) 
+        Array.from(document.getElementsByClassName("rct-node-clickable"))
+            .forEach(element => element.style.width = "-webkit-fill-available");
+    }   
+
     componentDidUpdate(prevProps) {
         const folderPaths = this.props.folders.map(it => it.path);
         const oldFolderPaths = prevProps.folders.map(it => it.path);
-        if (folderPaths.length != oldFolderPaths.length || prevProps.path != this.props.path || this.checkNewRSML(prevProps.files)) this.reset();
+        if (folderPaths.length != oldFolderPaths.length 
+            || prevProps.path != this.props.path 
+            || this.checkNewRSML(prevProps.files) 
+            || prevProps.filterText != this.props.filterText
+            || prevProps.filterMode != this.props.filterMode
+        ) this.reset();
+        
+        if (this.props.filterText) 
+            Array.from(document.getElementsByClassName("rct-node-clickable"))
+                .forEach(element => element.style.width = "-webkit-fill-available");
     }
 
     checkNewRSML = oldFiles => {
@@ -90,12 +118,41 @@ export default class FolderChecklist extends Component {
         return false;
     };
 
+    filteredFileCount = path => {
+        const { files, filterText, filterMode } = this.props;
+        return Object.keys(files[path]).reduce((acc, fileName) => acc += !!fileName.toLowerCase().match(getFilterRegex(filterText, filterMode)) && !files[path][fileName].failed, 0); 
+    };
+
+    updateFilterText = e =>
+    {
+        if (this.typingTimeout) clearTimeout(this.typingTimeout);
+        this.text = e.target.value,
+        this.typingTimeout = setTimeout(() => {
+            this.props.updateViewerFilter(this.text.toLowerCase());
+        }, 200);
+    };
+
+    getNumberedIcon = num => (<TooltipOverlay component={ props => <div style={{fontSize: "0.65em", float: "right"}}className="fa-stack fa-sm" {...props}>
+            <span className={`far fa-circle fa-stack-2x`} />
+            <span style={{fontSize: "1.3em"}} className="fa-stack-1x">{num}</span>
+        </div>} 
+        text={`There are ${num} files in this folder that will be measured`}
+        placement={"top"}
+    />)
+
+    clear = () => { 
+        this.props.updateViewerFilter(""); 
+        if (this.props.filterMode) this.props.toggleFilterMode();
+        this.textref.current.value = ""; 
+        this.checkboxref.current.checked = false;
+    }; 
+
     render() {
         const { nodes, checked, expanded } = this.state;
-        const { updateChecked, updatePath, redFolderBorder } = this.props;
+        const { updateChecked, updatePath, redFolderBorder, redFilterBorder, toggleFilterMode } = this.props;
         return (
-            <StyledCard redborder={redFolderBorder ? 1 : 0} style={{borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
-                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em' }}>
+            <StyledCard redborder={redFolderBorder ? 1 : 0} style={{ borderRadius: '0 .25rem 0 0', marginRight: "0.5em" }}>
+                <Card.Header style={{ paddingTop: '0.5em', paddingBottom: '0.5em',  borderBottom: "0" }}>
                     <Row>
                         <div className="col-11">
                             <b>Select folders to measure</b>
@@ -110,6 +167,26 @@ export default class FolderChecklist extends Component {
                             />
                         </div>
                     </Row> 
+                </Card.Header>
+                <Card.Header style={{ padding: 0, borderBottom: "0"  }}>
+                    <InputGroup style={redFilterBorder ? { boxShadow: '0 0 10px red' } : {}}>
+                        <this.StyledInput key={0} type="text" className="form-control" placeholder="Filter images..." onChange={this.updateFilterText} ref={this.textref}/>
+                        <button key={1} className="btn bg-transparent" style={{'marginLeft': '-40px', 'zIndex': '100'}} onClick={this.clear}>
+                            <i className="fa fa-times"></i>
+                        </button>
+                        <InputGroup.Append>
+                            <this.StyledInputGroupText>
+                            <TooltipOverlay component={ props => (<div className="custom-control custom-checkbox" {...props}>
+                                    <input type="checkbox" className="custom-control-input" id="any" onClick={() => toggleFilterMode()} ref={this.checkboxref}/>
+                                    <label className="custom-control-label" htmlFor="any">Any</label>
+                                </div>)} 
+                                text={`If checked, matches any individual word in the search query`}
+                                placement={"top"}
+                            />
+                                
+                            </this.StyledInputGroupText>
+                        </InputGroup.Append>
+                    </InputGroup>
                 </Card.Header>
                 <div style={{ padding: '0.5em' }}><CheckboxTree
                     noCascade={true}
@@ -129,7 +206,6 @@ export default class FolderChecklist extends Component {
                         parentOpen: <i className="far fa-folder-open"/>,
                         leaf: <i className="far fa-folder"/>,
                     }}
-                    showExpandAll={true}
                     onCheck={(rawChecked, clicked) => { 
                         const checked = this.cascadeChecked(rawChecked, clicked);
                         this.setState({ checked })

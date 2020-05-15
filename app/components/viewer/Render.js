@@ -107,7 +107,7 @@ export default class Render extends Component {
                 this.lastPosX = opt.clientX;
                 this.lastPosY = opt.clientY;
             }
-            if (e.target && this.fabricCache.selectedID)
+            if (this.fabricCache.selectedID)
             {
                 let line = this.getObjectByName(this.fabricCache.selectedID)
                 if (line) line.set('stroke', line.get('name').toString().includes(".") ? COLOURS.LATERAL : COLOURS.PRIMARY);
@@ -186,10 +186,10 @@ export default class Render extends Component {
     handleDelete = e =>
     {
         if (!(this.deleteKeys.includes(e.key))) return;
-        const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
         const { selectedID } = this.fabricCache;
         if (selectedID)
         {
+            const { editStack, pushEditStack, file: { parsedRSML }} = this.props;
             this.fabricCanvas.remove(this.getObjectByName(selectedID));
 
             if (!selectedID.includes('.'))
@@ -209,8 +209,15 @@ export default class Render extends Component {
         }
     };
 
+    imageCallback = (image, polylines) => {
+        this.fabricCanvas.add(new fabric.Image(image, {
+            left: 0, top: 0, selectable: false
+        }));
+        if (this.props.architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+    };
+
     draw = () => {
-        const { file, path, architecture, segMasks, updateFile, editStack } = this.props;
+        const { file, architecture, segMasks, editStack } = this.props;
         if (file && file.parsedRSML) //Ready to draw!
         {
             //If there's something on the edit stack, grab the last one, else we use the file state RSML
@@ -218,49 +225,73 @@ export default class Render extends Component {
             if (!polylines) return;
 
             let image = new Image();
-            const { path, fileName }  = matchPathName(this.props.path);
-
+            const { path, fileName } = matchPathName(this.props.path);
             const ext = Object.keys(file).find(ext => ext.match(IMAGE_EXTS_REGEX));
+            this.fabricCanvas.backgroundColor = "white"; 
 
-            // Save image size, for scaling usage!;
-            this.imageSize = sizeOf(path + sep + fileName + "." + ext);
+            if (ext) {
+                // Save image size, for scaling usage!;
+                this.imageSize = sizeOf(path + sep + fileName + "." + ext);
+                if (segMasks && file._C1 && file._C2) //Composite the segmasks together
+                    this.renderSegMask(image);
+                
+                else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
+                {
+                    let canvas = new OffscreenCanvas(this.imageSize.width, this.imageSize.height); //Create offscreen canvas with its resolution
+                    let image  = new Tiff({ buffer: readFileSync(path + sep + fileName + "." + ext) }); //convert tiff
+                    canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
+                    this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
+                        left: 0, top: 0, selectable: false
+                    }));
+                    if (architecture) this.drawRSML(polylines); 
+                }
+                else image.src = path + sep + fileName + "." + ext; //Otherwise we can just ref the file path normally
 
-            if (segMasks && file._C1 && file._C2) //Composite the segmasks together
-                if (!file.seg_mask) 
-                    imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
-                        .then(output => {
-                            updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
-                            image.src = 'data:image/png;base64,' + output.toString('base64');
-                        });
-                else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
-            
-            else if (ext.includes('tif')) //Decode and render tiff to a canvas, which we draw to our main canvas
-            {
-                let canvas = new OffscreenCanvas(this.imageSize.width, this.imageSize.height); //Create offscreen canvas with its resolution
-                let image  = new Tiff({ buffer: readFileSync(path + sep + fileName + "." + ext) }); //convert tiff
-                canvas.getContext("2d").drawImage(image.toCanvas(), 0, 0); //Draw to offscreen canvas which is then copied to fabric
-                this.fabricCanvas.add(new fabric.Image(canvas, { //The 1024x1024 tiff renders really small, as does the RSML. Hmm.
-                    left: 0, top: 0, selectable: false
-                }));
-                if (architecture) this.drawRSML(polylines); 
+                image.onload = () => this.imageCallback(image, polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
             }
-            else image.src = path + sep + fileName + "." + ext; //Otherwise we can just ref the file path normally
+            else 
+            {
+                if (segMasks && file._C1 && file._C2) 
+                { 
+                    this.renderSegMask(image);
 
-            image.onload = () => {
-                this.fabricCanvas.add(new fabric.Image(image, {
-                    left: 0, top: 0, selectable: false
-                }));
-                if (architecture) this.drawRSML(polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
-            };
-            
-            this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.    
+                    this.imageSize = sizeOf(path + sep + fileName + "_C1.png");
+
+                    image.onload = () => this.imageCallback(image, polylines); //This needs to be called after each image draws, otherwise the loading may just draw it over the rsml due to async 
+                    
+                    this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.       
+                    this.drawRSML(polylines);
+                }
+                else 
+                {
+                    this.fabricCanvas.backgroundColor = "#111133"; // Make the background a blueish-grey for contrast.  
+                    const RSMLSize = this.getRSMLSize(polylines);
+                    this.imageSize = { width: Math.max(500, RSMLSize.x), height: RSMLSize.y };
+                    this.drawRSML(polylines, this.imageSize.width / 2 - RSMLSize.minX - RSMLSize.centerX); // Centering RSML in the view.
+                    this.fabricCanvas.setDimensions({ ...this.imageSize, width: this.imageSize.width * this.zoom }, { backstoreOnly: true }); //These really need evening. They both change the canvas.       
+                }  
+            }
         }
-        //setDimensions changes the drawing space WITHIN the element's space, sort of like scaling within the given box. Wheat images are really tall.
     };
 
-    drawRSML = polylines => {
+    renderSegMask = image => {
+        const { file, updateFile } = this.props;
+        const { path, fileName } = matchPathName(this.props.path)
+
+        if (!file.seg_mask) 
+        imageThumb.sharpBlend(path + sep + fileName + "_C1.png", path + sep + fileName + "_C2.png", 'add') //https://libvips.github.io/libvips/API/current/libvips-conversion.html#VipsBlendMode
+            .then(output => {
+                updateFile(path, fileName, { seg_mask: output} ); //Cache the segmask in Redux so we don't composite every time
+                image.src = 'data:image/png;base64,' + output.toString('base64');
+            });
+        else image.src = 'data:image/png;base64,' + file.seg_mask.toString('base64');
+    };
+
+    drawRSML = (polylines, repositionToCenter) => {
+        repositionToCenter = repositionToCenter || 0;
         polylines.forEach(line => {   //Each sub-array is a line of point objects - [ line: [{}, {} ] ]
-            let polyline = new fabric.Polyline(line.points, {
+            let polyline = new fabric.Polyline(line.points.map(point => ({...point, x: point.x + repositionToCenter})), {
                 stroke: line.type == 'primary' ? COLOURS.PRIMARY : COLOURS.LATERAL,
                 fill: null,
                 strokeWidth: 6,
@@ -274,6 +305,26 @@ export default class Render extends Component {
             this.fabricCanvas.add(polyline);
         });
     };
+
+    // Get the size that RSML should take up in the thumbnail, if no image.
+    getRSMLSize = polylines => {
+        let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+        polylines.forEach(polyline => {
+            polyline.points.forEach(point => {
+                if (point.x < minX) minX = point.x;
+                if (point.x > maxX) maxX = point.x;
+                if (point.y < minY) minY = point.y;
+                if (point.y > maxY) maxY = point.y;
+            });
+        });
+        return { 
+            x: (maxX - minX) * 1.5, //Apparently this 1.5 is "just to make them bigger" 
+            y: (maxY + minY) * 1.5, //To put a buffer frame around the RSML
+            centerX: (maxX - minX) / 2, 
+            minX
+        };
+    }
+    
 
     //Formats a plant into arrays of lines - all the polylines in the RSML, labelled by primary/lateral
     formatPoints = (rsml, plantID) => {
@@ -297,7 +348,7 @@ export default class Render extends Component {
 
     FabricCanvas = () => {
         //this.fabricCanvas = new fabric.Canvas(this.canvasID, { fireRightClick: true, targetFindTolerance: 15 }); //Extra pixels around an object the canvas includes in hitbox
-        return <canvas id={this.canvasID}>test</canvas>;
+        return <canvas id={this.canvasID} >test</canvas>;
     };
 
     render() 

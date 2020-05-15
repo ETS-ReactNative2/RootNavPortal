@@ -1,6 +1,6 @@
 import { connect } from 'react-redux';
 import Backend from '../Backend';
-import { updateFile, resetFolder, updateParsedRSML, addThumb, updateAPIStatus, updateAPIAuth } from '../actions/galleryActions';
+import { updateFile, resetFolder, updateParsedRSML, addThumb, updateAPIStatus, updateAPIAuth, setFailedState } from '../actions/galleryActions';
 import { addQueue, removeQueue, addInflight, removeInflight, updateModels, resetQueues } from '../actions/backendActions';
 
 const mapStateToProps = (state, ownProps) => ({ 
@@ -26,7 +26,8 @@ const mapDispatchToProps = dispatch => ({
     updateAPIStatus: status => dispatch(updateAPIStatus(status)),
     updateAPIModels: apiModels => dispatch(updateModels(apiModels)),
     updateAPIAuth: auth => dispatch(updateAPIAuth(auth)),
-    resetQueues: () => dispatch(resetQueues())
+    resetQueues: () => dispatch(resetQueues()),
+    setFailedState: (folder, fileName, failedState) => dispatch(setFailedState(folder, fileName, failedState))
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Backend)

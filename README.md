@@ -6,7 +6,7 @@ _put some pictures and banners in here for better styling later_
 
 ## Install
 ### For users
-Releases are on the GitHub [releases page](https://github.com/Chagrilled/RootNavPortal/releases). Preference should be given to the installed application for Windows, over portable, for performance.
+Releases are on the GitHub [releases page](https://github.com/Chagrilled/RootNavPortal/releases). Your application should auto-update when new releases are published.
 
 ### For developers:
 First, clone the repo via git:
@@ -59,7 +59,7 @@ Note that RootNavPortal cannot be cross-compiled due to its native modules.
 DEBUG_PROD=true yarn package
 ```
 ## Plugins
-Plugins can be installed by placing a compatible JavaScript file into the application's `/resources/plugins` folder for installed versions, or in a `plugins` folder adjacent to the portable executable.  Refer to the [wiki documentation](https://github.com/Chagrilled/RootNavPortal/wiki) when writing plugins.
+Plugins can be installed by placing a compatible JavaScript file into the application's `/resources/plugins` folder. Refer to the [wiki documentation](https://github.com/Chagrilled/RootNavPortal/wiki) when writing plugins.
 
 In development, plugins will be copied from the `plugins` folder into the installer's binary when packaging.
 

@@ -11,7 +11,7 @@ const plugin = (rsmlJson, polylines, utils) => {
         
         polylines.forEach(line => {
             let { lateralID } = utils.getAllIDs(line);
-            if (!lateralID) return; //if it's a primary root, it has no emergence angle
+            if (!lateralID) return; //if it's a primary root, it has no emergence distance
 
             let parent = utils.getParentOfLateral(line, polylines);
             let emergenceDistance = utils.getDistanceUntilPoint(parent.points, utils.getNearestPoint(parent.points, line.points[0]));

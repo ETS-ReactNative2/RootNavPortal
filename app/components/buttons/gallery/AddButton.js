@@ -7,6 +7,7 @@ import { writeConfig, _require, HTTP_PORT } from '../../../constants/globals';
 import { StyledButton, StyledModal } from '../StyledComponents'; 
 import TooltipOverlay from '../../common/TooltipOverlay';
 import { post } from 'axios';
+import { StyledModalDialog } from '../../buttons/StyledComponents'; 
 
 export default class AddButton extends Component {
     constructor(props)
@@ -32,8 +33,13 @@ export default class AddButton extends Component {
 
     importFolders = () => {
         const { imports, addFolders, closeModal, folders, apiAddress, apiKey } = this.props;
-        const config = imports.map(folder => ({'path': folder.path, 'model': folder.model, 'active': false}))
-            .filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
+        const config = imports.map(folder => ({ 
+            path: folder.path, 
+            model: folder.model, 
+            active: false, 
+            failed: [] 
+        })).filter(newfolder => !folders.some(folder => newfolder.path == folder.path));
+        
         addFolders(config);
         closeModal();
         writeConfig(JSON.stringify({ apiAddress, apiKey, folders: folders.concat(config) }, null, 4));
@@ -56,7 +62,7 @@ export default class AddButton extends Component {
                     text={this.state.pending ? "Scanning folders for import, please wait" : "Import Folders"}
                     placement={"bottom"}
                 /> 
-                <StyledModal show={this.props.modal} onHide={this.props.closeModal}>
+                <StyledModal show={this.props.modal} onHide={this.props.closeModal} dialogAs={StyledModalDialog}>
                     <Modal.Header closeButton>
                         <Modal.Title>Select plant image folders</Modal.Title>
                     </Modal.Header>

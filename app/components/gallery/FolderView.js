@@ -1,5 +1,5 @@
 // @flow
-import React, { Component, useState, useRef } from 'react';
+import React, { Component, useState, useRef, createRef } from 'react';
 import RemoveButton from '../containers/gallery/RemoveButtonContainer';
 import SettingsButton from '../containers/gallery/SettingsButtonContainer';
 import Thumbnail from '../containers/gallery/ThumbnailContainer';
@@ -23,6 +23,19 @@ export default class FolderView extends Component {
 	StyledSpinner = styled(Spinner)` && {
 		margin-left: auto;
 		margin-right: 0.7em;
+	}`;
+
+	StyledGridXXL = styled.div` && { 
+		@media (min-width: 1400px) {
+			-ms-flex: 0 0 16.666667%;
+			flex: 0 0 16.666667%;
+			max-width: 16.666667%;
+	}}`;
+
+	StyledCollapse = styled(Collapse)` && {
+		${Collapse}:not(.show):not(.collapsing) {
+			display: block;
+		}
 	}`;
 	
 	shouldComponentUpdate(nextProps, nextState) 
@@ -50,7 +63,7 @@ export default class FolderView extends Component {
 
 	spinner = () => {
         const [show, setShow] = useState(false);
-        const target = useRef(null);
+		const target = useRef(null);
 
         let spinner, tooltipText;
         if (this.state.thumbsGenerating)
@@ -90,10 +103,12 @@ export default class FolderView extends Component {
 
 	componentDidMount()
 	{
-		const { folder, files, addFiles, thumbs } = this.props; 
+		const { folder, files, addFiles, folders } = this.props; 
 		if (!files && !this.state.read) 
 		{
+			let folderObject = folders.find(stateFolder => folder == stateFolder.path);
 			let structuredFiles = {};
+
 			readdir(folder, (err, folderFiles) => {
 
 				let matched = folderFiles.map(file => file.match(ALL_EXTS_REGEX))
@@ -105,7 +120,7 @@ export default class FolderView extends Component {
 					{
 						let name = regex.fileName; //Each file has an object with the key as the file name
 						let ext  = regex.segMask ? regex.segMask.toUpperCase() : regex.ext.toLowerCase(); //if it's a seg mask like file_C1.png we'll get _C1, else we use the actual ext
-						if (!structuredFiles[name]) structuredFiles[name] = {} // if there is rsml and the png you'll get filename: {rsml: true, png: true}
+						if (!structuredFiles[name]) structuredFiles[name] = {}; // if there is rsml and the png you'll get filename: {rsml: true, png: true}
 						structuredFiles[name][ext] = true; //This assumes filename stays consistent for variants of the file. They have to, else there'll be no link I guess. 2x check API behaviour on this.
 					}
 				});
@@ -118,6 +133,7 @@ export default class FolderView extends Component {
 					//"Parse on demand upon exporting" - we need the polylines available on gallery for the thumbnails to render RSML when that gets written
 					let filesToParse = [];
 					fileKeys.forEach(fileName => {
+						if ((folderObject.failed || []).includes(fileName)) structuredFiles[fileName].failed = true;
 						if (structuredFiles[fileName].rsml) filesToParse.push(folder + sep + fileName);
 					});
 					addFiles(folder, structuredFiles); //Add our struct with the folder as the key to state
@@ -134,9 +150,10 @@ export default class FolderView extends Component {
 		//folder - the full path to this folder - in state.gallery.folders
 		//files - object of objects keyed by file name, that are in this folder only - state.gallery.files[folder]
 		const { isActive, folder, filterText, filterAnalysed, files } = this.props; 
-
 		const filesList = files ? Object.keys(files) : []; // If there are no files (files is undefined), don't try to get the keys!
-		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText.toLowerCase()))) //Only display folder if there's no filterText, or any of the files includes the filter text
+		const gridCell = createRef(null);
+
+		if ((!filterText || filesList.some(file => file.toLowerCase().includes(filterText) || folder.includes(filterText))) //Only display folder if there's no filterText, if any of the files includes the filter text, or if the folder is matched
 			&& (!filterAnalysed || (files && filesList.some(file => !!files[file].rsml)))) // AND only display folder if the analysed checkbox is off, or any of the files are analysed
 		{
 			const shortFolder = folder.match(/([^\\\/]+(?:\/|\\){1}[^\\\/]+)$/)[1];
@@ -154,20 +171,20 @@ export default class FolderView extends Component {
 							</div> 
 						</StyledFolderViewDiv>
 					</StyledCardHeader>
-						<Collapse in={!!(isActive && files && folder)}>
+						<this.StyledCollapse unmountOnExit={true} in={!!(isActive && files && folder)}>
 							<div>
 								<StyledFolderViewDiv>
-									<StyledRow> {filesList
-										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase())) && (!filterAnalysed || !!files[file].rsml))) // Remove any files that do not meet the criteria set above.
-										.map((file, index) => (
-											<div key={index} className="col-lg-3 col-xl-2" style={{paddingBottom: '1em', textAlign: '-webkit-center'}}>
-												<Thumbnail folder={folder} fileName={file}/>
-											</div>
+									<StyledRow> {filesList //If the folder is matched by the filter query, display all files
+										.filter(file => ((!filterText || file.toLowerCase().includes(filterText.toLowerCase()) || folder.includes(filterText)) && (!filterAnalysed || !!files[file].rsml))) 
+										.map((file, index) => ( // Remove any files that do not meet the criteria set above.
+											<this.StyledGridXXL key={index} className={`col-md-3 col-xl-3`} style={{paddingBottom: '1em', textAlign: '-webkit-center'}} ref={gridCell}>
+												<Thumbnail folder={folder} fileName={file} parentRef={gridCell}/>
+											</this.StyledGridXXL>
 										))} 
 									</StyledRow>
 								</StyledFolderViewDiv> 
 							</div>
-						</Collapse>
+						</this.StyledCollapse>
 				</StyledFolderCard>
 			);
 		}

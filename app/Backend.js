@@ -1,7 +1,7 @@
 // @flow
 import { Component } from 'react';
 import { post, get, defaults } from 'axios';
-import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT, NOTIFICATION_CLICKED } from './constants/globals';
+import { IMAGE_EXTS_REGEX, API_DELETE, API_PARSE, INFLIGHT_REQS, API_POLLTIME, matchPathName, _require, xmlOptions, THUMB_PERCENTAGE, HTTP_PORT, NOTIFICATION_CLICKED, IMAGE_EXTS } from './constants/globals';
 import { readFileSync, writeFileSync, createWriteStream, unlink, access, constants, existsSync } from 'fs';
 import mFormData from 'form-data';
 import { ipcRenderer } from 'electron';
@@ -108,7 +108,7 @@ export default class Backend extends Component {
 
         this.fastify.post('/import', async (request, reply) => {
             reply.type('application/json').code(200);
-            return request.body.map((item, i) => dree.scan(item, { depth: 5, exclude: /node_modules|system32|Windows|boot|etc|dev|bin/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
+            return request.body.map((item, i) => dree.scan(item, { depth: 8, exclude: /node_modules|system32|Windows|boot|etc|dev|bin/, extensions: [] } )); //extensions: [] excludes all files, because the modal is a folder picker. Don't change this.
         });
 
         //Polled before sending thumbs, to check if the backend process has started the server yet
@@ -137,11 +137,10 @@ export default class Backend extends Component {
         const { files, addQueue } = this.props;
 
         Object.keys(files).forEach(folder => Object.keys(files[folder]).forEach(file => {
-            if (!files[folder][file].rsml)
+            if (!files[folder][file].rsml && !files[folder][file].failed)
             {
                 let imageExt = Object.keys(files[folder][file]).find(ext => ext.match(IMAGE_EXTS_REGEX));
                 let filePath = folder + sep + file + "." + imageExt;
-
                 const { path, fileName } = this.matchFileParts(filePath); //Get the exact same path used for inflightFiles just in case anything differs
                 if (imageExt && this.queue.indexOf(filePath) == -1 && !this.inflightFiles[path + fileName]) apiFiles.push(filePath); //Only if it's not already queued/inflight -> maybe API got updated when it was already up
             }
@@ -226,6 +225,7 @@ export default class Backend extends Component {
             Object.keys(files[path][fileName]).forEach(extension => { //For each extension in the state object
                 
                 if (extension == 'parsedRSML') return; //Get rid of the existing parsed polylines and JSON RSML
+                if (extension == 'failed') return; //Get rid of fail state if reanalysing
                 if (extension.match(/_C1|_C2|rsml/)) //If it's an API file
                 {
                     access(path + sep + fileName + (extension != 'rsml' ? extension + ".png" : '.' + extension), constants.F_OK, err => { //Does it exist?
@@ -275,15 +275,16 @@ export default class Backend extends Component {
         let file = this.queue.shift();
         const { path, fileName, ext } = this.matchFileParts(file);
 
-        let model = folders.find(folder => (folder.path + sep) == path).model;
-        if (!model || !apiModels.some(apiModel => apiModel.value == model)) return;
+        let model = (folders.find(folder => (folder.path + sep) == path) || {}).model; //If there's no model, if means the folder has been removed from gallery while inflight
+        const filePath = path + fileName + ext;
+        removeQueue(path + fileName + ext);
+
+        if (!existsSync(filePath)) return;
+        if (!model || !apiModels.some(apiModel => apiModel.value == model)) return; 
         
         this.inflightReqs--; //Kind of like a semaphore, limits how many jobs we can start at once
-        removeQueue(path + fileName + ext);
-        
         const formData = new mFormData();
-        const filePath = path + fileName + ext;
-        if (!existsSync(filePath)) return;
+        
         
         formData.append('io_rgb', readFileSync(filePath), filePath);
         formData.append('model_id', this.rootNavModel); //3 is rootnav, hardcoded. Unlikely to change.
@@ -311,25 +312,46 @@ export default class Backend extends Component {
     pollJob = (jobID, filePath) => {
         get(this.props.apiAddress + "/job/" + jobID).then(res => {
             if (res.data == 'COMPLETED') this.getOutput(jobID, filePath); 
-            else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME); 
+            else if (res.data == 'PROCESSING' || res.data == 'PENDING') setTimeout(() => this.pollJob(jobID, filePath), API_POLLTIME);
+            else if (res.data == "FAILED") {
+                const { path, fileName } = matchPathName(filePath);
+                this.props.setFailedState(path, fileName, true);
+                this.removeInflight(filePath);
+            }
         })
-        .catch(err => console.error(err))
+        .catch(err => { 
+            console.error(err); 
+            this.removeInflight(filePath);
+             this.inflightReqs++;
+        });
     };
 
     getOutput = (jobID, filePath) => {
-
+        let failed = false;
         let requests = [
-            get(this.props.apiAddress + "/job/" + jobID + "/output/rsml"),
-            get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}),
-            get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'})
+            get(this.props.apiAddress + "/job/" + jobID + "/output/rsml").catch(err => null),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/first_order",  {responseType: 'stream'}).catch(err => null),
+            get(this.props.apiAddress + "/job/" + jobID + "/output/second_order", {responseType: 'stream'}).catch(err => null)
         ]
         const { updateFile, folders, addQueue } = this.props;
 
         Promise.all(requests).then(responses => { //returns an array of the completed responses once they've all finished
+            if (responses.some(resp => resp == null)) { // If any responses failed, end.
+                const { path, fileName } = matchPathName(filePath);
+                this.props.setFailedState(path, fileName, true);
+                this.removeInflight(filePath);
+                return;
+            }
             let exts = {};
             const { path, fileName } = matchPathName(filePath); //folder path and filename, no trailing / on the folder
+            let model = (folders.find(folder => folder.path == path) || {}).model;
+           
+            if (!model) //If there's no model, if means the folder has been removed from gallery while inflight
+            {
+                return this.removeInflight(filePath);
+            }
 
-            if (this.inflightFiles[filePath].model != folders.find(folder => folder.path == path).model)
+            if (this.inflightFiles[filePath].model != model)
             {
                 //Has the model changed in state since we posted the request? Then ignore and requeue
                 addQueue([path + sep + fileName + this.inflightFiles[filePath].ext]);
@@ -373,5 +395,5 @@ export default class Backend extends Component {
         return ""
     }
 
-    matchFileParts = file => file.match(/(?<path>.+(?:\\|\/))(?<fileName>.+?)(?<ext>\..+)/).groups; //Matches the file path into the absolute directory path/, file name and .ext
+    matchFileParts = file => file.match(new RegExp(`(?<path>.+(?:\\\\|\\/))(?<fileName>.+?)(?<ext>\\.(?:${IMAGE_EXTS.join("|")}))$`, 'i')).groups; //Matches the file path into the absolute directory path/, file name and .ext
 }
